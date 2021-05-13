@@ -7,15 +7,15 @@ import (
 
 var db *sql.DB
 
-type TableSchema struct {
+type tableSchema struct {
 	table   string
 	columns []string
 }
 
-var schemata []TableSchema
+var schemata []tableSchema
 
 func registerSchema(table string, columns ...string) {
-	schemata = append(schemata, TableSchema{table, columns})
+	schemata = append(schemata, tableSchema{table, columns})
 }
 
 func InitializeSchemata(dbInput *sql.DB) error {
