@@ -51,6 +51,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	u := models.User{
+		Nickname:  "kayuyuko",
+		Email:     "kayuyuko@example.com",
+		Password:  "P4$$w0rd",
+		Avatar:    "avatar.png",
+		Signature: "Hello, world",
+	}
+	if err := u.Create(); err != nil {
+		log.Fatalln(err)
+	}
+
 	// Listen on TCP port
 	port := Config.ServerPort
 	log.Printf("Listening on http://localhost:%d\n", port)

@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"strings"
+
+	"github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -29,19 +31,11 @@ func InitializeSchemata(dbInput *sql.DB) error {
 			columnName := strings.SplitN(columnDesc, " ", 2)[0]
 			if columnName != "ADD" {
 				// Column
-				row := db.QueryRow("SELECT COUNT(*) FROM information_schema.columns "+
-					"WHERE table_name = $1 AND column_name = $2",
-					schema.table,
-					columnName,
-				)
-				var count int
-				if err := row.Scan(&count); err != nil {
-					return err
-				}
-				if count == 0 {
-					schema := "ALTER TABLE " + schema.table + " ADD COLUMN " + columnDesc
-					if _, err := db.Exec(schema); err != nil {
-						return err
+				schema := "ALTER TABLE " + schema.table + " ADD COLUMN " + columnDesc
+				if _, err := db.Exec(schema); err != nil {
+					// https://www.postgresql.org/docs/13/errcodes-appendix.html
+					if pqErr, cast := err.(*pq.Error); cast && pqErr.Code == "42701" {
+						continue
 					}
 				}
 			}
@@ -54,6 +48,9 @@ func InitializeSchemata(dbInput *sql.DB) error {
 				// Constraint
 				schema := "ALTER TABLE " + schema.table + " " + columnDesc
 				if _, err := db.Exec(schema); err != nil {
+					if pqErr, cast := err.(*pq.Error); cast && pqErr.Code == "42P07" {
+						continue
+					}
 					return err
 				}
 			}
