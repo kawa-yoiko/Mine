@@ -61,6 +61,12 @@ func main() {
 	if err := u.Create(); err != nil {
 		log.Fatalln(err)
 	}
+	u.Avatar = "avatar.jpg"
+	if err := u.Update(); err != nil {
+		log.Fatalln(err)
+	}
+	println(u.VerifyPassword("P4$$w0rd"))
+	println(u.VerifyPassword("password"))
 
 	// Listen on TCP port
 	port := Config.ServerPort
