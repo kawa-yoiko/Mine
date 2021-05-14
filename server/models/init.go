@@ -34,7 +34,7 @@ func InitializeSchemata(dbInput *sql.DB) error {
 				schema := "ALTER TABLE " + schema.table + " ADD COLUMN " + columnDesc
 				if _, err := db.Exec(schema); err != nil {
 					// https://www.postgresql.org/docs/13/errcodes-appendix.html
-					if pqErr, cast := err.(*pq.Error); cast && pqErr.Code == "42701" {
+					if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42701" {
 						continue
 					}
 				}
@@ -48,7 +48,7 @@ func InitializeSchemata(dbInput *sql.DB) error {
 				// Constraint
 				schema := "ALTER TABLE " + schema.table + " " + columnDesc
 				if _, err := db.Exec(schema); err != nil {
-					if pqErr, cast := err.(*pq.Error); cast && pqErr.Code == "42P07" {
+					if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42P07" {
 						continue
 					}
 					return err

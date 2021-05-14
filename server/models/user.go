@@ -2,6 +2,9 @@ package models
 
 import (
 	"golang.org/x/crypto/bcrypt"
+
+	"fmt"
+	"regexp"
 )
 
 type User struct {
@@ -38,7 +41,27 @@ func (u *User) hashPassword() {
 	u.Password = string(hashed)
 }
 
+type UserCreateError struct{ Code uint }
+
+const (
+	UserCreateErrorNone = iota
+	UserCreateErrorFormat
+)
+
+func (e UserCreateError) Error() string {
+	return fmt.Sprintf("UserCreateError: %d", e.Code)
+}
+
+//  RFC 5322
+var rxEmail = regexp.MustCompile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
+
 func (u *User) Create() error {
+	if !(len([]rune(u.Nickname)) >= 3 && len([]rune(u.Nickname)) <= 16 &&
+		rxEmail.MatchString(u.Email) &&
+		len(u.Password) >= 6 && len(u.Password) <= 32) {
+		return UserCreateError{UserCreateErrorFormat}
+	}
+
 	u.hashPassword()
 	err := db.QueryRow("INSERT INTO "+
 		"mine_user ("+fieldsNoId+") "+

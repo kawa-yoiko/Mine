@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/kawa-yoiko/Mine/server/models"
+	"github.com/kawa-yoiko/Mine/server/routes"
 
 	"encoding/json"
 	"fmt"
@@ -51,25 +52,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	u := models.User{
-		Nickname:  "kayuyuko",
-		Email:     "kayuyuko@example.com",
-		Password:  "P4$$w0rd",
-		Avatar:    "avatar.png",
-		Signature: "Hello, world",
-	}
-	if err := u.Create(); err != nil {
-		log.Fatalln(err)
-	}
-	u.Avatar = "avatar.jpg"
-	if err := u.Update(); err != nil {
-		log.Fatalln(err)
-	}
-	println(u.VerifyPassword("P4$$w0rd"))
-	println(u.VerifyPassword("password"))
-
-	// Listen on TCP port
-	port := Config.ServerPort
-	log.Printf("Listening on http://localhost:%d\n", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	// Start HTTP server
+	http.HandleFunc("/", routes.GetRootRouterFunc())
+	log.Printf("Listening on http://localhost:%d\n", Config.ServerPort)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Config.ServerPort), nil))
 }
