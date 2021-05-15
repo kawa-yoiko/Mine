@@ -88,18 +88,24 @@ const check = async (method, url, params, expect, expect_status) => {
     if (expect !== undefined) {
       result = `Incorrect JSON format ${response.trimEnd()}`;
       correct = false;
-    } else {
-      result = `Correct empty response`;
+    } else if (correct) {
+      result = `Correct ${status} empty response`;
     }
   }
-  if (correct && expect !== undefined) {
-    if (objEqual(expect, actual)) {
+  if (correct) {
+    if (expect !== undefined) {
+      if (objEqual(expect, actual)) {
+        const s = JSON.stringify(actual);
+        result = `Correct ${status} ${s.substring(0, 50)}${s.length > 50 ? '...' : ''}`;
+      } else {
+        result = `Incorrect response content`;
+        correct = false;
+        compare = true;
+      }
+    } else if (actual !== undefined) {
       const s = JSON.stringify(actual);
-      result = `Correct ${status} ${s.substring(0, 50)}${s.length > 50 ? '...' : ''}`;
-    } else {
-      result = `Incorrect response content`;
+      result = `Incorrect non-empty response ${s.substring(0, 50)}${s.length > 50 ? '...' : ''}`;
       correct = false;
-      compare = true;
     }
   }
 
@@ -120,8 +126,10 @@ const check = async (method, url, params, expect, expect_status) => {
 };
 
 (async () => {
-  console.log('======== Sign up ========');
   await check('POST', '/reset')
+
+/*
+  console.log('======== Sign up ========');
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa..moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '哈哈哈哈哈哈'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '888'}, {error: 1}, 400)
@@ -131,6 +139,17 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: 'kayuyuko2', email: 'kyyk2@kawa.moe', password: '888888'}, {error: 0}, 200)
   await check('POST', '/signup', {nickname: '小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
+*/
+
+  await check('POST', '/signup', {nickname: 'kayuyuko', email: 'kyyk@kawa.moe', password: 'P4$$w0rd'}, {error: 0}, 200)
+  await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
+  await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
+  let token1 = (await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
+    token: null,
+    user: {nickname: 'kayuyuko', avatar: '', signature: ''}
+  }, 200)).token
+  await check('GET', '/whoami', {token: '123123'}, {}, 400)
+  await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
 
   console.log(`\n${pass}/${total} passed`);
 })();

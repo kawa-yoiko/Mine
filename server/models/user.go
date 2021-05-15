@@ -30,9 +30,16 @@ func init() {
 	)
 }
 
+func (u *User) Repr() map[string]interface{} {
+	return map[string]interface{}{
+		"nickname":  u.Nickname,
+		"avatar":    u.Avatar,
+		"signature": u.Signature,
+	}
+}
+
 const fieldsAll = "id, nickname, email, password, avatar, signature"
 const fieldsNoId = "nickname, email, password, avatar, signature"
-const fieldsNoPassword = "nickname, email, avatar, signature"
 
 func (u *User) hashPassword() {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
@@ -89,9 +96,9 @@ func (u *User) Create() error {
 }
 
 func (u *User) read(field string, value interface{}) error {
-	row := db.QueryRow("SELECT "+fieldsNoPassword+
+	row := db.QueryRow("SELECT "+fieldsAll+
 		" FROM mine_user WHERE "+field+" = $1", value)
-	err := row.Scan(&u.Id, &u.Nickname, &u.Email, &u.Password)
+	err := row.Scan(&u.Id, &u.Nickname, &u.Email, &u.Password, &u.Avatar, &u.Signature)
 	return err
 }
 

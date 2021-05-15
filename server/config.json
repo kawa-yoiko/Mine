@@ -3,5 +3,6 @@
   "db_name": "minedb",
   "db_user": "mineserver",
   "db_password": "",
+  "jwt_secret": "vertraulich",
   "debug": true
 }

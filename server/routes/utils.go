@@ -21,3 +21,5 @@ func EnableResetEndpoint() {
 		}
 	}, "POST")
 }
+
+var JwtSecret []byte
