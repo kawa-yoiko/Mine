@@ -3,7 +3,6 @@ package routes
 import (
 	"github.com/kawa-yoiko/Mine/server/models"
 
-	"fmt"
 	"net/http"
 )
 
@@ -20,12 +19,13 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 
 	if err := u.Create(); err != nil {
 		if err, ok := err.(models.UserCreateError); ok {
-			w.WriteHeader(400)
-			fmt.Fprintf(w, `{"error": %d}`, err.Code)
+			write(w, 400, jsonPayload{"error": err.Code})
 			return
 		}
 		panic(err)
 	}
+
+	write(w, 200, jsonPayload{"error": 0})
 }
 
 func init() {
