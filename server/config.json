@@ -3,5 +3,5 @@
   "db_name": "minedb",
   "db_user": "mineserver",
   "db_password": "",
-  "debug": false
+  "debug": true
 }

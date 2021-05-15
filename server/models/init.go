@@ -58,3 +58,13 @@ func InitializeSchemata(dbInput *sql.DB) error {
 	}
 	return nil
 }
+
+func ResetDatabase() error {
+	for _, schema := range schemata {
+		_, err := db.Exec("DROP TABLE IF EXISTS " + schema.table + " CASCADE")
+		if err != nil {
+			return err
+		}
+	}
+	return InitializeSchemata(db)
+}

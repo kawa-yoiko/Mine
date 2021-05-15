@@ -53,6 +53,9 @@ func main() {
 	}
 
 	// Start HTTP server
+	if Config.Debug {
+		routes.EnableResetEndpoint()
+	}
 	http.HandleFunc("/", routes.GetRootRouterFunc())
 	log.Printf("Listening on http://localhost:%d\n", Config.ServerPort)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Config.ServerPort), nil))
