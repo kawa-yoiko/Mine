@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/lib/pq"
+
 	"fmt"
 	"strings"
 	"time"
@@ -15,6 +17,15 @@ type Post struct {
 	Caption     string
 	Contents    string
 	Tags        []string
+}
+
+type Comment struct {
+	Id        int32
+	Post      Post
+	Author    User
+	Timestamp int64
+	ReplyTo   int32
+	Contents  string
 }
 
 func init() {
@@ -35,10 +46,12 @@ func init() {
 	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
+		"post_id INTEGER NOT NULL",
 		"author_id INTEGER NOT NULL",
 		"timestamp BIGINT NOT NULL",
-		"reply_to INTEGER NOT NULL",
+		"reply_to INTEGER", // nullable
 		"contents TEXT NOT NULL",
+		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT reply_to_ref FOREIGN KEY (reply_to) REFERENCES comment (id)",
 	)
@@ -52,6 +65,16 @@ func (p *Post) Repr() map[string]interface{} {
 		"caption":   p.Caption,
 		"contents":  p.Contents,
 		"tags":      p.Tags,
+	}
+}
+
+func (c *Comment) Repr() map[string]interface{} {
+	return map[string]interface{}{
+		"id":        c.Id,
+		"author":    c.Author.ReprShort(),
+		"timestamp": c.Timestamp,
+		"reply_to":  c.ReplyTo,
+		"contents":  c.Contents,
 	}
 }
 
@@ -86,13 +109,15 @@ func (p *Post) Create() error {
 }
 
 func (p *Post) Read() error {
-	row := db.QueryRow("SELECT "+
+	err := db.QueryRow("SELECT "+
 		"post.*, mine_user.nickname, mine_user.avatar "+
 		"FROM post INNER JOIN mine_user ON post.author_id = mine_user.id "+
-		"WHERE post.id = $1", p.Id)
-	err := row.Scan(&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
+		"WHERE post.id = $1", p.Id,
+	).Scan(
+		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
 		&p.IsPublished, &p.Caption, &p.Contents,
-		&p.Author.Nickname, &p.Author.Avatar)
+		&p.Author.Nickname, &p.Author.Avatar,
+	)
 	if err != nil {
 		return err
 	}
@@ -112,4 +137,38 @@ func (p *Post) Read() error {
 	}
 	p.Tags = tags
 	return rows.Err()
+}
+
+type PostCreateError struct{}
+
+func (e PostCreateError) Error() string {
+	return "PostCreateError"
+}
+
+func (c *Comment) Create() error {
+	c.Timestamp = time.Now().Unix()
+	err := db.QueryRow("INSERT INTO "+
+		"comment (post_id, author_id, timestamp, reply_to, contents) "+
+		"VALUES ($1, $2, $3, NULLIF($4, -1), $5) RETURNING id",
+		c.Post.Id, c.Author.Id, c.Timestamp, c.ReplyTo, c.Contents,
+	).Scan(&c.Id)
+	if err, ok := err.(*pq.Error); ok && err.Code.Class() == "23" {
+		// Integrity Constraint Violation
+		return PostCreateError{}
+	}
+	return err
+}
+
+func (c *Comment) Read() error {
+	err := db.QueryRow("SELECT "+
+		"comment.id, comment.post_id, comment.author_id, comment.timestamp, "+
+		"COALESCE(comment.reply_to, -1), comment.contents, "+
+		"mine_user.nickname, mine_user.avatar "+
+		"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "+
+		"WHERE comment.id = $1", c.Id,
+	).Scan(
+		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.Contents,
+		&c.Author.Nickname, &c.Author.Avatar,
+	)
+	return err
 }

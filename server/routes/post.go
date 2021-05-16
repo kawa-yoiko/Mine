@@ -58,7 +58,37 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, p.Repr())
 }
 
+func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		w.WriteHeader(401)
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	replyTo, _ := strconv.Atoi(r.PostFormValue("reply_to"))
+	c := models.Comment{
+		Post:     models.Post{Id: int32(id)},
+		Author:   u,
+		ReplyTo:  int32(replyTo),
+		Contents: r.PostFormValue("contents"),
+	}
+	if err := c.Create(); err != nil {
+		if _, ok := err.(models.PostCreateError); ok {
+			w.WriteHeader(400)
+			return
+		}
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"id": c.Id})
+}
+
+func getPostComments(w http.ResponseWriter, r *http.Request) {
+}
+
 func init() {
 	registerHandler("/post/new", postPostNew, "POST")
 	registerHandler("/post/{id}", getPost, "GET")
+	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
+	registerHandler("/post/{id}/comments", getPostComments, "GET")
 }

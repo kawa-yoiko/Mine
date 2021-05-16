@@ -151,7 +151,8 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
   await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
 
-  let id1 = (await check('POST', '/post/new', {
+  // Posts
+  let pid1 = (await check('POST', '/post/new', {
     token: token1,
     type: 0,
     caption: 'Caption',
@@ -159,7 +160,8 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: 'tag1,tag2',
     publish: 1,
   }, {id: null})).id
-  await check('GET', `/post/${id1}`, undefined, {
+  let no_pid = pid1 + 10;
+  await check('GET', `/post/${pid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: ''},
     timestamp: null,
     type: 0,
@@ -167,7 +169,30 @@ const check = async (method, url, params, expect, expect_status) => {
     contents: 'Lorem ipsum',
     tags: ['tag1', 'tag2'],
   })
-  await check('GET', `/post/${id1 + 1}`, undefined, undefined, 404)
+  await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
+
+  // Comments
+  let cid1 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: -1,
+    contents: 'No comment',
+  }, {id: null})).id
+  let no_cid = cid1 + 10
+  await check('POST', `/post/${no_pid}/comment/new`, {
+    token: token1,
+    reply_to: -1,
+    contents: 'No comment',
+  }, undefined, 400)
+  await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: no_cid,
+    contents: 'No comment',
+  }, undefined, 400)
+  let cid2 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: cid1,
+    contents: 'Yes comment',
+  }, {id: null})).id
 
   console.log(`\n${pass}/${total} passed`);
 })();
