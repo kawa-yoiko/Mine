@@ -1,5 +1,9 @@
 package models
 
+import (
+	"time"
+)
+
 type Post struct {
 	Id          int32
 	Author      User
@@ -25,7 +29,7 @@ func init() {
 
 func (p *Post) Repr() map[string]interface{} {
 	return map[string]interface{}{
-		"author":    p.Author.Repr(),
+		"author":    p.Author.ReprShort(),
 		"timestamp": p.Timestamp,
 		"type":      p.Type,
 		"caption":   p.Caption,
@@ -35,10 +39,11 @@ func (p *Post) Repr() map[string]interface{} {
 }
 
 func (p *Post) Create() error {
+	p.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
 		"post (author, timestamp, type, is_published, caption, contents) "+
 		"VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		p.Author, p.Timestamp, p.Type, p.IsPublished, p.Caption, p.Contents,
+		p.Author.Id, p.Timestamp, p.Type, p.IsPublished, p.Caption, p.Contents,
 	).Scan(&p.Id)
 	return err
 }

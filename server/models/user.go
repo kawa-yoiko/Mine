@@ -38,6 +38,13 @@ func (u *User) Repr() map[string]interface{} {
 	}
 }
 
+func (u *User) ReprShort() map[string]interface{} {
+	return map[string]interface{}{
+		"nickname": u.Nickname,
+		"avatar":   u.Avatar,
+	}
+}
+
 func (u *User) hashPassword() {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {

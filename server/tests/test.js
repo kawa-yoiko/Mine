@@ -151,5 +151,23 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
   await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
 
+  let id1 = (await check('POST', '/post/new', {
+    token: token1,
+    type: 0,
+    caption: 'Caption',
+    contents: 'Lorem ipsum',
+    tags: '',
+    publish: 1,
+  }, {id: null})).id
+  await check('GET', `/post/${id1}`, undefined, {
+    author: {nickname: 'kayuyuko', avatar: ''},
+    timestamp: null,
+    type: 0,
+    caption: 'Caption',
+    contents: 'Lorem ipsum',
+    tags: [],
+  })
+  await check('GET', `/post/${id1 + 1}`, undefined, undefined, 404)
+
   console.log(`\n${pass}/${total} passed`);
 })();
