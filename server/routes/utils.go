@@ -7,9 +7,18 @@ import (
 	"net/http"
 )
 
+func query(r *http.Request, key string) string {
+	values := r.URL.Query()[key]
+	if values != nil {
+		return values[0]
+	} else {
+		return ""
+	}
+}
+
 type jsonPayload map[string]interface{}
 
-func write(w http.ResponseWriter, status int, p jsonPayload) {
+func write(w http.ResponseWriter, status int, p interface{}) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(p)
 }

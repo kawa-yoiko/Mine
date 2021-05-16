@@ -73,12 +73,11 @@ func (p *Post) Repr() map[string]interface{} {
 
 func (c *Comment) Repr() map[string]interface{} {
 	return map[string]interface{}{
-		"id":         c.Id,
-		"author":     c.Author.ReprShort(),
-		"timestamp":  c.Timestamp,
-		"reply_to":   c.ReplyTo,
-		"reply_root": c.ReplyRoot,
-		"contents":   c.Contents,
+		"id":        c.Id,
+		"author":    c.Author.ReprShort(),
+		"timestamp": c.Timestamp,
+		"reply_to":  c.ReplyTo,
+		"contents":  c.Contents,
 	}
 }
 
@@ -180,4 +179,44 @@ func (c *Comment) Read() error {
 		&c.Author.Nickname, &c.Author.Avatar,
 	)
 	return err
+}
+
+func ReadComments(postId int, start int, count int, replyRoot int) ([]map[string]interface{}, error) {
+	replyRootCond := "comment.reply_root IS NULL"
+	queryArgs := []interface{}{postId, start, count}
+	if replyRoot != -1 {
+		replyRootCond = "comment.reply_root = $4"
+		queryArgs = append(queryArgs, replyRoot)
+	}
+	// TODO: reduce duplication
+	rows, err := db.Query("SELECT "+
+		"comment.id, comment.post_id, comment.author_id, comment.timestamp, "+
+		"COALESCE(comment.reply_to, -1), "+
+		"COALESCE(comment.reply_root, -1), "+
+		"comment.contents, "+
+		"mine_user.nickname, mine_user.avatar "+
+		"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "+
+		"WHERE comment.post_id = $1 AND "+replyRootCond+" "+
+		"ORDER BY comment.timestamp DESC, comment.id DESC "+
+		"LIMIT $3 OFFSET $2",
+		queryArgs...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	comments := []map[string]interface{}{}
+	for rows.Next() {
+		c := Comment{}
+		err := rows.Scan(
+			&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
+			&c.Contents,
+			&c.Author.Nickname, &c.Author.Avatar,
+		)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c.Repr())
+	}
+	return comments, rows.Err()
 }

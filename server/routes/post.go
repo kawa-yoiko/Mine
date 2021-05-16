@@ -84,6 +84,19 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPostComments(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	start, _ := strconv.Atoi(query(r, "start"))
+	count, _ := strconv.Atoi(query(r, "count"))
+	replyRoot := -1
+	if replyRootParsed, err := strconv.Atoi(query(r, "reply_root")); err == nil {
+		replyRoot = replyRootParsed
+	}
+
+	comments, err := models.ReadComments(id, start, count, replyRoot)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, comments)
 }
 
 func init() {

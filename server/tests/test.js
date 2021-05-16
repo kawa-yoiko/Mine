@@ -198,6 +198,37 @@ const check = async (method, url, params, expect, expect_status) => {
     reply_to: cid2,
     contents: 'Unknown comment',
   }, {id: null})).id
+  let cid4 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: -1,
+    contents: 'Another yes comment',
+  }, {id: null})).id
+
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 0,
+    count: 10,
+  }, [
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: -1, contents: 'Another yes comment'},
+    {id: cid1, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: -1, contents: 'No comment'},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 0,
+    count: 10,
+    reply_root: cid1,
+  }, [
+    {id: cid3, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: cid2, contents: 'Unknown comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: cid1, contents: 'Yes comment'},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 1,
+    count: 1,
+    reply_root: cid1,
+  }, [
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: cid1, contents: 'Yes comment'},
+  ])
 
   console.log(`\n${pass}/${total} passed`);
 })();
