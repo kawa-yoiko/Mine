@@ -92,7 +92,7 @@ func auth(r *http.Request) (models.User, bool) {
 func getWhoAmI(w http.ResponseWriter, r *http.Request) {
 	u, ok := auth(r)
 	if !ok {
-		write(w, 401, jsonPayload{})
+		write(w, 400, jsonPayload{})
 		return
 	}
 

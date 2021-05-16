@@ -48,7 +48,8 @@ func InitializeSchemata(dbInput *sql.DB) error {
 				// Constraint
 				schema := "ALTER TABLE " + schema.table + " " + columnDesc
 				if _, err := db.Exec(schema); err != nil {
-					if err, ok := err.(*pq.Error); ok && err.Code == "42P07" {
+					if err, ok := err.(*pq.Error); ok &&
+						(err.Code == "42P07" || err.Code == "42710") {
 						continue
 					}
 					return err

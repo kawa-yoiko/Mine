@@ -38,9 +38,6 @@ func (u *User) Repr() map[string]interface{} {
 	}
 }
 
-const fieldsAll = "id, nickname, email, password, avatar, signature"
-const fieldsNoId = "nickname, email, password, avatar, signature"
-
 func (u *User) hashPassword() {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -62,7 +59,7 @@ func (e UserCreateError) Error() string {
 	return fmt.Sprintf("UserCreateError: %d", e.Code)
 }
 
-//  RFC 5322
+// RFC 5322
 var rxEmail = regexp.MustCompile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
 var rxPassword = regexp.MustCompile("[\x00-\x7F]{6,32}")
 
@@ -75,13 +72,9 @@ func (u *User) Create() error {
 
 	u.hashPassword()
 	err := db.QueryRow("INSERT INTO "+
-		"mine_user ("+fieldsNoId+") "+
+		"mine_user (nickname, email, password, avatar, signature) "+
 		"VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		u.Nickname,
-		u.Email,
-		u.Password,
-		u.Avatar,
-		u.Signature,
+		u.Nickname, u.Email, u.Password, u.Avatar, u.Signature,
 	).Scan(&u.Id)
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23505" { // unique_violation
@@ -96,8 +89,8 @@ func (u *User) Create() error {
 }
 
 func (u *User) read(field string, value interface{}) error {
-	row := db.QueryRow("SELECT "+fieldsAll+
-		" FROM mine_user WHERE "+field+" = $1", value)
+	row := db.QueryRow("SELECT id, nickname, email, password, avatar, signature "+
+		"FROM mine_user WHERE "+field+" = $1", value)
 	err := row.Scan(&u.Id, &u.Nickname, &u.Email, &u.Password, &u.Avatar, &u.Signature)
 	return err
 }
@@ -118,10 +111,7 @@ func (u *User) Update() error {
 	_, err := db.Exec("UPDATE mine_user SET "+
 		"nickname = $1, email = $2, avatar = $3, signature = $4 "+
 		"WHERE id = $5",
-		u.Nickname,
-		u.Email,
-		u.Avatar,
-		u.Signature,
+		u.Nickname, u.Email, u.Avatar, u.Signature,
 		u.Id,
 	)
 	return err
