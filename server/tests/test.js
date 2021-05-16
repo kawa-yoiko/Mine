@@ -86,7 +86,7 @@ const check = async (method, url, params, expect, expect_status) => {
     actual = JSON.parse(response);
   } catch (e) {
     if (expect !== undefined) {
-      result = `Incorrect JSON format ${response.trimEnd()}`;
+      result = `Incorrect JSON format ${status} ${response.trimEnd()}`;
       correct = false;
     } else if (correct) {
       result = `Correct ${status} empty response`;
@@ -122,7 +122,7 @@ const check = async (method, url, params, expect, expect_status) => {
   total += 1;
   pass += (correct ? 1 : 0);
 
-  return actual;
+  return actual || {};
 };
 
 (async () => {
@@ -192,6 +192,11 @@ const check = async (method, url, params, expect, expect_status) => {
     token: token1,
     reply_to: cid1,
     contents: 'Yes comment',
+  }, {id: null})).id
+  let cid3 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: cid2,
+    contents: 'Unknown comment',
   }, {id: null})).id
 
   console.log(`\n${pass}/${total} passed`);

@@ -25,6 +25,7 @@ type Comment struct {
 	Author    User
 	Timestamp int64
 	ReplyTo   int32
+	ReplyRoot int32
 	Contents  string
 }
 
@@ -49,11 +50,13 @@ func init() {
 		"post_id INTEGER NOT NULL",
 		"author_id INTEGER NOT NULL",
 		"timestamp BIGINT NOT NULL",
-		"reply_to INTEGER", // nullable
+		"reply_to INTEGER",   // nullable
+		"reply_root INTEGER", // nullable
 		"contents TEXT NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT reply_to_ref FOREIGN KEY (reply_to) REFERENCES comment (id)",
+		"ADD CONSTRAINT reply_root_ref FOREIGN KEY (reply_root) REFERENCES comment (id)",
 	)
 }
 
@@ -70,11 +73,12 @@ func (p *Post) Repr() map[string]interface{} {
 
 func (c *Comment) Repr() map[string]interface{} {
 	return map[string]interface{}{
-		"id":        c.Id,
-		"author":    c.Author.ReprShort(),
-		"timestamp": c.Timestamp,
-		"reply_to":  c.ReplyTo,
-		"contents":  c.Contents,
+		"id":         c.Id,
+		"author":     c.Author.ReprShort(),
+		"timestamp":  c.Timestamp,
+		"reply_to":   c.ReplyTo,
+		"reply_root": c.ReplyRoot,
+		"contents":   c.Contents,
 	}
 }
 
@@ -148,8 +152,10 @@ func (e PostCreateError) Error() string {
 func (c *Comment) Create() error {
 	c.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
-		"comment (post_id, author_id, timestamp, reply_to, contents) "+
-		"VALUES ($1, $2, $3, NULLIF($4, -1), $5) RETURNING id",
+		"comment (post_id, author_id, timestamp, reply_to, reply_root, contents) "+
+		"VALUES ($1, $2, $3, NULLIF($4, -1), "+
+		"  COALESCE((SELECT reply_root FROM comment WHERE id = $4), NULLIF($4, -1)), $5"+
+		") RETURNING id",
 		c.Post.Id, c.Author.Id, c.Timestamp, c.ReplyTo, c.Contents,
 	).Scan(&c.Id)
 	if err, ok := err.(*pq.Error); ok && err.Code.Class() == "23" {
@@ -162,12 +168,15 @@ func (c *Comment) Create() error {
 func (c *Comment) Read() error {
 	err := db.QueryRow("SELECT "+
 		"comment.id, comment.post_id, comment.author_id, comment.timestamp, "+
-		"COALESCE(comment.reply_to, -1), comment.contents, "+
+		"COALESCE(comment.reply_to, -1), "+
+		"COALESCE(comment.reply_root, -1), "+
+		"comment.contents, "+
 		"mine_user.nickname, mine_user.avatar "+
 		"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "+
 		"WHERE comment.id = $1", c.Id,
 	).Scan(
-		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.Contents,
+		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
+		&c.Contents,
 		&c.Author.Nickname, &c.Author.Avatar,
 	)
 	return err
