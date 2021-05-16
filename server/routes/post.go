@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func postPostNew(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +35,7 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 		Caption:     r.PostFormValue("caption"),
 		Contents:    r.PostFormValue("contents"),
 		IsPublished: (publish != 0),
+		Tags:        strings.Split(r.PostFormValue("tags"), ","),
 	}
 	if err := p.Create(); err != nil {
 		panic(err)

@@ -156,7 +156,7 @@ const check = async (method, url, params, expect, expect_status) => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    tags: '',
+    tags: 'tag1,tag2',
     publish: 1,
   }, {id: null})).id
   await check('GET', `/post/${id1}`, undefined, {
@@ -165,7 +165,7 @@ const check = async (method, url, params, expect, expect_status) => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    tags: [],
+    tags: ['tag1', 'tag2'],
   })
   await check('GET', `/post/${id1 + 1}`, undefined, undefined, 404)
 
