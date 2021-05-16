@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView
+        android:id="@+id/triangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/triangle_left"
+        tools:ignore="MissingConstraints"></ImageView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text"
+        app:layout_constraintLeft_toRightOf="@+id/triangle"
+        app:layout_constraintBaseline_toBaselineOf="@+id/triangle"
+        android:background="@drawable/rectangle_corner"
+        android:text="你好，你好吗？"
+        android:padding="4dp"
+        tools:ignore="MissingConstraints"></TextView>
+</androidx.constraintlayout.widget.ConstraintLayout>
