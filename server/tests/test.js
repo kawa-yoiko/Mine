@@ -168,6 +168,9 @@ const check = async (method, url, params, expect, expect_status) => {
     caption: 'Caption',
     contents: 'Lorem ipsum',
     tags: ['tag1', 'tag2'],
+    upvote_count: 0,
+    comment_count: 0,
+    mark_count: 0,
   })
   await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
 
@@ -229,6 +232,20 @@ const check = async (method, url, params, expect, expect_status) => {
   }, [
     {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: cid1, contents: 'Yes comment'},
   ])
+
+  // Upvote and comment counts
+  await check('GET', `/post/${pid1}`, undefined, {
+    author: {nickname: 'kayuyuko', avatar: ''},
+    timestamp: null,
+    type: 0,
+    caption: 'Caption',
+    contents: 'Lorem ipsum',
+    tags: ['tag1', 'tag2'],
+    upvote_count: 0,
+    comment_count: 4,
+    mark_count: 0,
+  })
+
 
   console.log(`\n${pass}/${total} passed`);
 })();

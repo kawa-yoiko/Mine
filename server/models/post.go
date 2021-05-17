@@ -9,14 +9,17 @@ import (
 )
 
 type Post struct {
-	Id          int32
-	Author      User
-	Timestamp   int64
-	Type        int32
-	IsPublished bool
-	Caption     string
-	Contents    string
-	Tags        []string
+	Id           int32
+	Author       User
+	Timestamp    int64
+	Type         int32
+	IsPublished  bool
+	Caption      string
+	Contents     string
+	Tags         []string
+	UpvoteCount  int32
+	CommentCount int32
+	MarkCount    int32
 }
 
 type Comment struct {
@@ -45,6 +48,12 @@ func init() {
 		"tag TEXT NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 	)
+	registerSchema("post_upvote",
+		"post_id INTEGER NOT NULL",
+		"user_id INTEGER NOT NULL",
+		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
+		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
+	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
 		"post_id INTEGER NOT NULL",
@@ -62,12 +71,15 @@ func init() {
 
 func (p *Post) Repr() map[string]interface{} {
 	return map[string]interface{}{
-		"author":    p.Author.ReprShort(),
-		"timestamp": p.Timestamp,
-		"type":      p.Type,
-		"caption":   p.Caption,
-		"contents":  p.Contents,
-		"tags":      p.Tags,
+		"author":        p.Author.ReprShort(),
+		"timestamp":     p.Timestamp,
+		"type":          p.Type,
+		"caption":       p.Caption,
+		"contents":      p.Contents,
+		"tags":          p.Tags,
+		"upvote_count":  p.UpvoteCount,
+		"comment_count": p.CommentCount,
+		"mark_count":    p.MarkCount,
 	}
 }
 
@@ -139,13 +151,28 @@ func (p *Post) Read() error {
 		tags = append(tags, tag)
 	}
 	p.Tags = tags
-	return rows.Err()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	err = db.QueryRow(
+		"SELECT COUNT(*) FROM post_upvote WHERE post_id = $1", p.Id,
+	).Scan(&p.UpvoteCount)
+	if err != nil {
+		return err
+	}
+
+	// TODO: optimize
+	err = db.QueryRow(
+		"SELECT COUNT(*) FROM comment WHERE post_id = $1", p.Id,
+	).Scan(&p.CommentCount)
+	return err
 }
 
-type PostCreateError struct{}
+type CommentCreateError struct{}
 
-func (e PostCreateError) Error() string {
-	return "PostCreateError"
+func (e CommentCreateError) Error() string {
+	return "CommentCreateError"
 }
 
 func (c *Comment) Create() error {
@@ -159,19 +186,21 @@ func (c *Comment) Create() error {
 	).Scan(&c.Id)
 	if err, ok := err.(*pq.Error); ok && err.Code.Class() == "23" {
 		// Integrity Constraint Violation
-		return PostCreateError{}
+		return CommentCreateError{}
 	}
 	return err
 }
 
+const commentSelectClause = "SELECT " +
+	"comment.id, comment.post_id, comment.author_id, comment.timestamp, " +
+	"COALESCE(comment.reply_to, -1), " +
+	"COALESCE(comment.reply_root, -1), " +
+	"comment.contents, " +
+	"mine_user.nickname, mine_user.avatar " +
+	"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "
+
 func (c *Comment) Read() error {
-	err := db.QueryRow("SELECT "+
-		"comment.id, comment.post_id, comment.author_id, comment.timestamp, "+
-		"COALESCE(comment.reply_to, -1), "+
-		"COALESCE(comment.reply_root, -1), "+
-		"comment.contents, "+
-		"mine_user.nickname, mine_user.avatar "+
-		"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "+
+	err := db.QueryRow(commentSelectClause+
 		"WHERE comment.id = $1", c.Id,
 	).Scan(
 		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
@@ -188,14 +217,7 @@ func ReadComments(postId int, start int, count int, replyRoot int) ([]map[string
 		replyRootCond = "comment.reply_root = $4"
 		queryArgs = append(queryArgs, replyRoot)
 	}
-	// TODO: reduce duplication
-	rows, err := db.Query("SELECT "+
-		"comment.id, comment.post_id, comment.author_id, comment.timestamp, "+
-		"COALESCE(comment.reply_to, -1), "+
-		"COALESCE(comment.reply_root, -1), "+
-		"comment.contents, "+
-		"mine_user.nickname, mine_user.avatar "+
-		"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "+
+	rows, err := db.Query(commentSelectClause+
 		"WHERE comment.post_id = $1 AND "+replyRootCond+" "+
 		"ORDER BY comment.timestamp DESC, comment.id DESC "+
 		"LIMIT $3 OFFSET $2",

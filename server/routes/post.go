@@ -74,7 +74,7 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 		Contents: r.PostFormValue("contents"),
 	}
 	if err := c.Create(); err != nil {
-		if _, ok := err.(models.PostCreateError); ok {
+		if _, ok := err.(models.CommentCreateError); ok {
 			w.WriteHeader(400)
 			return
 		}
