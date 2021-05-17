@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="标题"
+        android:paddingLeft="8dp"
+        android:layout_marginBottom="30dp"
+        tools:ignore="MissingConstraints"
+        android:id="@+id/title"
+        ></EditText>
+    <view
+        class="com.example.mine.WidthEqualsHeightImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        tools:ignore="MissingConstraints"
+        android:src="@drawable/luoxiaohei"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        ></view>
+</androidx.constraintlayout.widget.ConstraintLayout>
