@@ -3,8 +3,6 @@ package routes
 import (
 	"github.com/kawa-yoiko/Mine/server/models"
 
-	"database/sql"
-	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -48,10 +46,6 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	p := models.Post{Id: int32(id)}
 	if err := p.Read(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			w.WriteHeader(404)
-			return
-		}
 		panic(err)
 	}
 
@@ -74,16 +68,65 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 		Contents: r.PostFormValue("contents"),
 	}
 	if err := c.Create(); err != nil {
-		if _, ok := err.(models.PostCreateError); ok {
-			w.WriteHeader(400)
-			return
-		}
 		panic(err)
 	}
 	write(w, 200, jsonPayload{"id": c.Id})
 }
 
 func getPostComments(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	start, _ := strconv.Atoi(query(r, "start"))
+	count, _ := strconv.Atoi(query(r, "count"))
+	replyRoot := -1
+	if replyRootParsed, err := strconv.Atoi(query(r, "reply_root")); err == nil {
+		replyRoot = replyRootParsed
+	}
+
+	comments, err := models.ReadComments(id, start, count, replyRoot)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, comments)
+}
+
+func postPostUpvote(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		w.WriteHeader(401)
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
+	if err != nil {
+		panic(err)
+	}
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Upvote(u, isUpvote != 0); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
+}
+
+func postPostMark(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		w.WriteHeader(401)
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	isMark, err := strconv.Atoi(r.PostFormValue("is_mark"))
+	if err != nil {
+		panic(err)
+	}
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Mark(u, isMark != 0); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"mark_count": p.MarkCount})
 }
 
 func init() {
@@ -91,4 +134,6 @@ func init() {
 	registerHandler("/post/{id}", getPost, "GET")
 	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
+	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
+	registerHandler("/post/{id}/mark", postPostMark, "POST")
 }

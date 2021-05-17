@@ -43,10 +43,12 @@ const asyncPost = (url, params) => new Promise((resolve, reject) => {
   req.end();
 });
 
+const any = {};
 const objEqual = (a, b) => {
-  if (a === null || b === null) return true;
+  if (a === any || b === any) return true;
   if (typeof a !== typeof b) return false;
   if (typeof a !== 'object') return a === b;
+  if ((a === null) ^ (b === null)) return false;
 
   for (let key in a) if (!objEqual(a[key], b[key])) return false;
   for (let key in b) if (!objEqual(a[key], b[key])) return false;
@@ -86,7 +88,7 @@ const check = async (method, url, params, expect, expect_status) => {
     actual = JSON.parse(response);
   } catch (e) {
     if (expect !== undefined) {
-      result = `Incorrect JSON format ${response.trimEnd()}`;
+      result = `Incorrect JSON format ${status} ${response.trimEnd()}`;
       correct = false;
     } else if (correct) {
       result = `Correct ${status} empty response`;
@@ -122,7 +124,7 @@ const check = async (method, url, params, expect, expect_status) => {
   total += 1;
   pass += (correct ? 1 : 0);
 
-  return actual;
+  return actual || {};
 };
 
 (async () => {
@@ -142,14 +144,19 @@ const check = async (method, url, params, expect, expect_status) => {
 */
 
   await check('POST', '/signup', {nickname: 'kayuyuko', email: 'kyyk@kawa.moe', password: 'P4$$w0rd'}, {error: 0}, 200)
+  await check('POST', '/signup', {nickname: 'kurikoneko', email: 'kuriko@example.com', password: 'letme1n'}, {error: 0}, 200)
   await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
   await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
   let token1 = (await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
-    token: null,
+    token: any,
     user: {nickname: 'kayuyuko', avatar: '', signature: ''}
   }, 200)).token
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
   await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
+  let token2 = (await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
+    token: any,
+    user: {nickname: 'kurikoneko', avatar: '', signature: ''}
+  }, 200)).token
 
   // Posts
   let pid1 = (await check('POST', '/post/new', {
@@ -159,24 +166,27 @@ const check = async (method, url, params, expect, expect_status) => {
     contents: 'Lorem ipsum',
     tags: 'tag1,tag2',
     publish: 1,
-  }, {id: null})).id
+  }, {id: any})).id
   let no_pid = pid1 + 10;
   await check('GET', `/post/${pid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: ''},
-    timestamp: null,
+    timestamp: any,
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
     tags: ['tag1', 'tag2'],
+    upvote_count: 0,
+    comment_count: 0,
+    mark_count: 0,
   })
   await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
 
   // Comments
   let cid1 = (await check('POST', `/post/${pid1}/comment/new`, {
-    token: token1,
+    token: token2,
     reply_to: -1,
     contents: 'No comment',
-  }, {id: null})).id
+  }, {id: any})).id
   let no_cid = cid1 + 10
   await check('POST', `/post/${no_pid}/comment/new`, {
     token: token1,
@@ -192,7 +202,76 @@ const check = async (method, url, params, expect, expect_status) => {
     token: token1,
     reply_to: cid1,
     contents: 'Yes comment',
-  }, {id: null})).id
+  }, {id: any})).id
+  let cid3 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token2,
+    reply_to: cid2,
+    contents: 'Unknown comment',
+  }, {id: any})).id
+  let cid4 = (await check('POST', `/post/${pid1}/comment/new`, {
+    token: token1,
+    reply_to: -1,
+    contents: 'Another yes comment',
+  }, {id: any})).id
+
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 0,
+    count: 10,
+  }, [
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: null, contents: 'No comment'},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 0,
+    count: 10,
+    reply_root: cid1,
+  }, [
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: ''}, contents: 'Unknown comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 1,
+    count: 1,
+    reply_root: cid1,
+  }, [
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+  ])
+
+  // Upvote
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
+  await check('POST', `/post/${no_pid}/upvote`, {token: token2, is_upvote: 1}, undefined, 400)
+
+  // Mark
+  await check('POST', `/post/${pid1}/mark`, {token: token1, is_mark: 0}, {mark_count: 0})
+  await check('POST', `/post/${pid1}/mark`, {token: token1, is_mark: 1}, {mark_count: 1})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 0}, {mark_count: 1})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+
+  // Upvote and comment counts
+  await check('GET', `/post/${pid1}`, undefined, {
+    author: {nickname: 'kayuyuko', avatar: ''},
+    timestamp: any,
+    type: 0,
+    caption: 'Caption',
+    contents: 'Lorem ipsum',
+    tags: ['tag1', 'tag2'],
+    upvote_count: 1,
+    comment_count: 4,
+    mark_count: 2,
+  })
+
 
   console.log(`\n${pass}/${total} passed`);
 })();

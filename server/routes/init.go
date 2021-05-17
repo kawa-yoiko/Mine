@@ -1,9 +1,8 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 var router *mux.Router
@@ -23,7 +22,7 @@ func GetRootRouterFunc() func(w http.ResponseWriter, req *http.Request) {
 		defer func() {
 			if e := recover(); e != nil {
 				if e, ok := e.(error); ok {
-					http.Error(w, e.Error(), 500)
+					handleError(w, e)
 				}
 			}
 		}()

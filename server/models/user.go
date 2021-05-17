@@ -25,8 +25,8 @@ func init() {
 		"password TEXT NOT NULL",
 		"avatar TEXT NOT NULL",
 		"signature TEXT NOT NULL",
-		"ADD CONSTRAINT nickname_unique UNIQUE (nickname)",
-		"ADD CONSTRAINT email_unique UNIQUE (email)",
+		"ADD CONSTRAINT user_nickname_uniq UNIQUE (nickname)",
+		"ADD CONSTRAINT user_email_uniq UNIQUE (email)",
 	)
 }
 

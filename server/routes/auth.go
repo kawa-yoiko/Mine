@@ -59,10 +59,7 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 func auth(r *http.Request) (models.User, bool) {
 	tokenString := r.PostFormValue("token")
 	if tokenString == "" {
-		a := r.URL.Query()["token"]
-		if a != nil {
-			tokenString = a[0]
-		}
+		tokenString = query(r, "token")
 	}
 	token, err := jwt.Parse(tokenString,
 		func(*jwt.Token) (interface{}, error) { return JwtSecret, nil })
