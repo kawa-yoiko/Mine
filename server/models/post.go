@@ -30,6 +30,8 @@ type Comment struct {
 	ReplyTo   int32
 	ReplyRoot int32
 	Contents  string
+
+	ReplyUser User
 }
 
 func init() {
@@ -92,12 +94,18 @@ func (p *Post) Repr() map[string]interface{} {
 }
 
 func (c *Comment) Repr() map[string]interface{} {
+	var replyUser interface{}
+	if c.ReplyUser.Nickname == "" {
+		replyUser = nil
+	} else {
+		replyUser = c.ReplyUser.ReprShort()
+	}
 	return map[string]interface{}{
-		"id":        c.Id,
-		"author":    c.Author.ReprShort(),
-		"timestamp": c.Timestamp,
-		"reply_to":  c.ReplyTo,
-		"contents":  c.Contents,
+		"id":         c.Id,
+		"author":     c.Author.ReprShort(),
+		"timestamp":  c.Timestamp,
+		"reply_user": replyUser,
+		"contents":   c.Contents,
 	}
 }
 
@@ -235,8 +243,12 @@ const commentSelectClause = "SELECT " +
 	"COALESCE(comment.reply_to, -1), " +
 	"COALESCE(comment.reply_root, -1), " +
 	"comment.contents, " +
-	"mine_user.nickname, mine_user.avatar " +
-	"FROM comment INNER JOIN mine_user ON comment.author_id = mine_user.id "
+	"author.nickname, author.avatar, " +
+	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, '') " +
+	"FROM comment " +
+	"  INNER JOIN mine_user AS author ON comment.author_id = author.id " +
+	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
+	"  LEFT JOIN mine_user AS reply_user ON reply_comment.author_id = reply_user.id "
 
 func (c *Comment) Read() error {
 	err := db.QueryRow(commentSelectClause+
@@ -245,6 +257,7 @@ func (c *Comment) Read() error {
 		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
 		&c.Contents,
 		&c.Author.Nickname, &c.Author.Avatar,
+		&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
 	)
 	return err
 }
@@ -273,6 +286,7 @@ func ReadComments(postId int, start int, count int, replyRoot int) ([]map[string
 			&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
 			&c.Contents,
 			&c.Author.Nickname, &c.Author.Avatar,
+			&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
 		)
 		if err != nil {
 			return nil, err
