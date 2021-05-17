@@ -81,7 +81,7 @@ func init() {
 
 func (p *Post) Repr() map[string]interface{} {
 	return map[string]interface{}{
-		"author":        p.Author.ReprShort(),
+		"author":        p.Author.ReprBrief(),
 		"timestamp":     p.Timestamp,
 		"type":          p.Type,
 		"caption":       p.Caption,
@@ -98,11 +98,11 @@ func (c *Comment) Repr() map[string]interface{} {
 	if c.ReplyUser.Nickname == "" {
 		replyUser = nil
 	} else {
-		replyUser = c.ReplyUser.ReprShort()
+		replyUser = c.ReplyUser.ReprBrief()
 	}
 	return map[string]interface{}{
 		"id":         c.Id,
-		"author":     c.Author.ReprShort(),
+		"author":     c.Author.ReprBrief(),
 		"timestamp":  c.Timestamp,
 		"reply_user": replyUser,
 		"contents":   c.Contents,

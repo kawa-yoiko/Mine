@@ -38,7 +38,7 @@ func (u *User) Repr() map[string]interface{} {
 	}
 }
 
-func (u *User) ReprShort() map[string]interface{} {
+func (u *User) ReprBrief() map[string]interface{} {
 	return map[string]interface{}{
 		"nickname": u.Nickname,
 		"avatar":   u.Avatar,
