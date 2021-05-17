@@ -272,6 +272,21 @@ const check = async (method, url, params, expect, expect_status) => {
     mark_count: 2,
   })
 
+  // Collections
+  let lid1 = (await check('POST', '/collection/new', {
+    token: token2,
+    title: 'Collection',
+    description: 'A collection',
+    tags: 'tag2,tag3,tag4',
+  }, {id: any})).id
+  await check('GET', `/collection/${lid1}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: ''},
+    title: 'Collection',
+    description: 'A collection',
+    posts: [],
+    tags: ['tag2', 'tag3', 'tag4'],
+  })
+
 
   console.log(`\n${pass}/${total} passed`);
 })();

@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -93,6 +91,13 @@ func (p *Post) Repr() map[string]interface{} {
 	}
 }
 
+func (p *Post) ReprOutline() map[string]interface{} {
+	return map[string]interface{}{
+		"caption":  p.Caption,
+		"contents": p.Contents,
+	}
+}
+
 func (c *Comment) Repr() map[string]interface{} {
 	var replyUser interface{}
 	if c.ReplyUser.Nickname == "" {
@@ -120,22 +125,7 @@ func (p *Post) Create() error {
 		return err
 	}
 
-	// Create tags
-	if len(p.Tags) == 0 {
-		return nil
-	}
-	placeholders := strings.Builder{}
-	values := []interface{}{}
-	for i, tag := range p.Tags {
-		if i != 0 {
-			fmt.Fprintf(&placeholders, ", ")
-		}
-		fmt.Fprintf(&placeholders, "($%d, $%d)", i*2+1, i*2+2)
-		values = append(values, p.Id, tag)
-	}
-	_, err = db.Exec(
-		"INSERT INTO post_tag (post_id, tag) VALUES "+placeholders.String(),
-		values...)
+	err = insertTags("post_tag", "post_id", p.Id, p.Tags)
 	return err
 }
 
@@ -153,21 +143,8 @@ func (p *Post) Read() error {
 		return err
 	}
 
-	rows, err := db.Query("SELECT tag FROM post_tag WHERE post_id = $1", p.Id)
+	p.Tags, err = readTags("post_tag", "post_id", p.Id)
 	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	tags := []string{}
-	for rows.Next() {
-		var tag string
-		if err := rows.Scan(&tag); err != nil {
-			return err
-		}
-		tags = append(tags, tag)
-	}
-	p.Tags = tags
-	if err := rows.Err(); err != nil {
 		return err
 	}
 
