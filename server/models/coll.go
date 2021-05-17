@@ -20,12 +20,13 @@ func init() {
 	registerSchema("collection_tag",
 		"collection_id INTEGER NOT NULL",
 		"tag TEXT NOT NULL",
-		"ADD CONSTRAINT post_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
+		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 	)
 	registerSchema("collection_post",
 		"collection_id INTEGER NOT NULL",
 		"post_id INTEGER NOT NULL",
-		"ADD CONSTRAINT post_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
+		"seq BIGSERIAL",
+		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 	)
 }
@@ -72,5 +73,61 @@ func (c *Collection) Read() error {
 	}
 
 	c.Tags, err = readTags("collection_tag", "collection_id", c.Id)
+	if err != nil {
+		return err
+	}
+
+	// Read posts
+	rows, err := db.Query(`SELECT
+		post.id, post.caption, post.contents
+		FROM collection_post
+		  INNER JOIN post ON collection_post.post_id = post.id
+		WHERE collection_post.collection_id = $1 ORDER BY collection_post.seq`, c.Id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	posts := []Post{}
+	for rows.Next() {
+		p := Post{}
+		err := rows.Scan(&p.Id, &p.Caption, &p.Contents)
+		if err != nil {
+			return err
+		}
+		posts = append(posts, p)
+	}
+	if err = rows.Err(); err != nil {
+		return err
+	}
+	c.Posts = posts
+	return nil
+}
+
+func (c *Collection) EditPosts(add bool, postId int32) error {
+	var err error
+	index := -1
+	for i, p := range c.Posts {
+		if p.Id == postId {
+			index = i
+			break
+		}
+	}
+	if add && index == -1 {
+		_, err = db.Exec(`INSERT INTO
+			collection_post (collection_id, post_id)
+			VALUES ($1, $2)`, c.Id, postId)
+		if err != nil {
+			return err
+		}
+		p := Post{Id: postId}
+		if err = p.Read(); err != nil {
+			return err
+		}
+		c.Posts = append(c.Posts, p)
+	} else if !add && index != -1 {
+		_, err = db.Exec(`DELETE FROM collection_post
+			WHERE collection_id = $1 AND post_id = $2`, c.Id, postId)
+		c.Posts = append(c.Posts[:index], c.Posts[index+1:]...)
+	}
 	return err
 }
