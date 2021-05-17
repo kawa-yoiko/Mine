@@ -53,7 +53,14 @@ func init() {
 		"user_id INTEGER NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
-		"ADD CONSTRAINT uniq UNIQUE (post_id, user_id)",
+		"ADD CONSTRAINT post_upvote_uniq UNIQUE (post_id, user_id)",
+	)
+	registerSchema("post_mark",
+		"post_id INTEGER NOT NULL",
+		"user_id INTEGER NOT NULL",
+		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
+		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT post_mark_uniq UNIQUE (post_id, user_id)",
 	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
@@ -163,6 +170,13 @@ func (p *Post) Read() error {
 		return err
 	}
 
+	err = db.QueryRow(
+		"SELECT COUNT(*) FROM post_mark WHERE post_id = $1", p.Id,
+	).Scan(&p.MarkCount)
+	if err != nil {
+		return err
+	}
+
 	// TODO: optimize
 	err = db.QueryRow(
 		"SELECT COUNT(*) FROM comment WHERE post_id = $1", p.Id,
@@ -170,15 +184,15 @@ func (p *Post) Read() error {
 	return err
 }
 
-func (p *Post) Upvote(u User, upvote bool) error {
+func (p *Post) processUserRel(table string, u User, add bool, count *int32) error {
 	var err error
-	if upvote {
+	if add {
 		_, err = db.Exec(
-			"INSERT INTO post_upvote (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+			"INSERT INTO "+table+" (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
 			p.Id, u.Id)
 	} else {
 		_, err = db.Exec(
-			"DELETE FROM post_upvote WHERE post_id = $1 AND user_id = $2",
+			"DELETE FROM "+table+" WHERE post_id = $1 AND user_id = $2",
 			p.Id, u.Id)
 	}
 	if err != nil {
@@ -191,9 +205,17 @@ func (p *Post) Upvote(u User, upvote bool) error {
 	}
 
 	err = db.QueryRow(
-		"SELECT COUNT(*) FROM post_upvote WHERE post_id = $1", p.Id,
-	).Scan(&p.UpvoteCount)
+		"SELECT COUNT(*) FROM "+table+" WHERE post_id = $1", p.Id,
+	).Scan(count)
 	return err
+}
+
+func (p *Post) Upvote(u User, add bool) error {
+	return p.processUserRel("post_upvote", u, add, &p.UpvoteCount)
+}
+
+func (p *Post) Mark(u User, add bool) error {
+	return p.processUserRel("post_mark", u, add, &p.MarkCount)
 }
 
 func (c *Comment) Create() error {

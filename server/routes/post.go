@@ -109,10 +109,31 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
 }
 
+func postPostMark(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		w.WriteHeader(401)
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	isMark, err := strconv.Atoi(r.PostFormValue("is_mark"))
+	if err != nil {
+		panic(err)
+	}
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Mark(u, isMark != 0); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"mark_count": p.MarkCount})
+}
+
 func init() {
 	registerHandler("/post/new", postPostNew, "POST")
 	registerHandler("/post/{id}", getPost, "GET")
 	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
 	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
+	registerHandler("/post/{id}/mark", postPostMark, "POST")
 }

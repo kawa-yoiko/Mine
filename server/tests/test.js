@@ -249,6 +249,14 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
   await check('POST', `/post/${no_pid}/upvote`, {token: token2, is_upvote: 1}, undefined, 400)
 
+  // Mark
+  await check('POST', `/post/${pid1}/mark`, {token: token1, is_mark: 0}, {mark_count: 0})
+  await check('POST', `/post/${pid1}/mark`, {token: token1, is_mark: 1}, {mark_count: 1})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 0}, {mark_count: 1})
+  await check('POST', `/post/${pid1}/mark`, {token: token2, is_mark: 1}, {mark_count: 2})
+
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: ''},
@@ -259,7 +267,7 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
     comment_count: 4,
-    mark_count: 0,
+    mark_count: 2,
   })
 
 
