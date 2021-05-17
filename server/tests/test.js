@@ -142,6 +142,7 @@ const check = async (method, url, params, expect, expect_status) => {
 */
 
   await check('POST', '/signup', {nickname: 'kayuyuko', email: 'kyyk@kawa.moe', password: 'P4$$w0rd'}, {error: 0}, 200)
+  await check('POST', '/signup', {nickname: 'kurikoneko', email: 'kuriko@example.com', password: 'letme1n'}, {error: 0}, 200)
   await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
   await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
   let token1 = (await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
@@ -150,6 +151,10 @@ const check = async (method, url, params, expect, expect_status) => {
   }, 200)).token
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
   await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
+  let token2 = (await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
+    token: null,
+    user: {nickname: 'kurikoneko', avatar: '', signature: ''}
+  }, 200)).token
 
   // Posts
   let pid1 = (await check('POST', '/post/new', {
@@ -233,6 +238,16 @@ const check = async (method, url, params, expect, expect_status) => {
     {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: null, reply_to: cid1, contents: 'Yes comment'},
   ])
 
+  // Upvote
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 0})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
+  await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
+  await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
+
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: ''},
@@ -241,7 +256,7 @@ const check = async (method, url, params, expect, expect_status) => {
     caption: 'Caption',
     contents: 'Lorem ipsum',
     tags: ['tag1', 'tag2'],
-    upvote_count: 0,
+    upvote_count: 1,
     comment_count: 4,
     mark_count: 0,
   })

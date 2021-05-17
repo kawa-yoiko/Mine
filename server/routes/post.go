@@ -99,9 +99,31 @@ func getPostComments(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, comments)
 }
 
+func postPostUpvote(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		w.WriteHeader(401)
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Upvote(u, isUpvote != 0); err != nil {
+		panic(err) // TODO: Handle known errors
+	}
+	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
+}
+
 func init() {
 	registerHandler("/post/new", postPostNew, "POST")
 	registerHandler("/post/{id}", getPost, "GET")
 	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
+	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
 }

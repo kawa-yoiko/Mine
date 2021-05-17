@@ -53,6 +53,7 @@ func init() {
 		"user_id INTEGER NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT uniq UNIQUE (post_id, user_id)",
 	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
@@ -166,6 +167,27 @@ func (p *Post) Read() error {
 	err = db.QueryRow(
 		"SELECT COUNT(*) FROM comment WHERE post_id = $1", p.Id,
 	).Scan(&p.CommentCount)
+	return err
+}
+
+func (p *Post) Upvote(u User, upvote bool) error {
+	var err error
+	if upvote {
+		_, err = db.Exec(
+			"INSERT INTO post_upvote (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+			p.Id, u.Id)
+	} else {
+		_, err = db.Exec(
+			"DELETE FROM post_upvote WHERE post_id = $1 AND user_id = $2",
+			p.Id, u.Id)
+	}
+	if err != nil {
+		return err
+	}
+
+	err = db.QueryRow(
+		"SELECT COUNT(*) FROM post_upvote WHERE post_id = $1", p.Id,
+	).Scan(&p.UpvoteCount)
 	return err
 }
 
