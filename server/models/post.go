@@ -1,11 +1,11 @@
 package models
 
 import (
-	"github.com/lib/pq"
-
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type Post struct {
@@ -182,6 +182,11 @@ func (p *Post) Upvote(u User, upvote bool) error {
 			p.Id, u.Id)
 	}
 	if err != nil {
+		if err, ok := err.(*pq.Error); ok && false {
+			if err.Code.Class() == "23" && err.Constraint == "post_ref" {
+				return CheckedError{404}
+			}
+		}
 		return err
 	}
 
@@ -189,12 +194,6 @@ func (p *Post) Upvote(u User, upvote bool) error {
 		"SELECT COUNT(*) FROM post_upvote WHERE post_id = $1", p.Id,
 	).Scan(&p.UpvoteCount)
 	return err
-}
-
-type CommentCreateError struct{}
-
-func (e CommentCreateError) Error() string {
-	return "CommentCreateError"
 }
 
 func (c *Comment) Create() error {
@@ -206,10 +205,6 @@ func (c *Comment) Create() error {
 		") RETURNING id",
 		c.Post.Id, c.Author.Id, c.Timestamp, c.ReplyTo, c.Contents,
 	).Scan(&c.Id)
-	if err, ok := err.(*pq.Error); ok && err.Code.Class() == "23" {
-		// Integrity Constraint Violation
-		return CommentCreateError{}
-	}
 	return err
 }
 

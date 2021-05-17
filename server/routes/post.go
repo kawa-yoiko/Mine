@@ -3,8 +3,6 @@ package routes
 import (
 	"github.com/kawa-yoiko/Mine/server/models"
 
-	"database/sql"
-	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -48,10 +46,6 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	p := models.Post{Id: int32(id)}
 	if err := p.Read(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			w.WriteHeader(404)
-			return
-		}
 		panic(err)
 	}
 
@@ -74,10 +68,6 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 		Contents: r.PostFormValue("contents"),
 	}
 	if err := c.Create(); err != nil {
-		if _, ok := err.(models.CommentCreateError); ok {
-			w.WriteHeader(400)
-			return
-		}
 		panic(err)
 	}
 	write(w, 200, jsonPayload{"id": c.Id})
@@ -109,13 +99,12 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
 	if err != nil {
-		w.WriteHeader(400)
-		return
+		panic(err)
 	}
 
 	p := models.Post{Id: int32(id)}
 	if err := p.Upvote(u, isUpvote != 0); err != nil {
-		panic(err) // TODO: Handle known errors
+		panic(err)
 	}
 	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
 }

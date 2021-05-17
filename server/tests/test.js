@@ -247,6 +247,7 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2})
   await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
+  await check('POST', `/post/${no_pid}/upvote`, {token: token2, is_upvote: 1}, undefined, 400)
 
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, undefined, {

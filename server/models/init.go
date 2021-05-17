@@ -69,3 +69,9 @@ func ResetDatabase() error {
 	}
 	return InitializeSchemata(db)
 }
+
+type CheckedError struct{ Status int }
+
+func (e CheckedError) Error() string {
+	return "CheckedError"
+}
