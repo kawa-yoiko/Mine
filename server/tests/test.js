@@ -9,9 +9,21 @@ const getCookies = () => {
   return s.join('; ');
 };
 
+const getToken = (params) => {
+  if (params) {
+    const token = params.token;
+    delete params.token;
+    return token;
+  } else {
+    return null;
+  }
+};
+
 const asyncGet = (url, params) => new Promise((resolve, reject) => {
+  const token = getToken(params);
   if (params) url += '?' + (new URLSearchParams(params)).toString();
   const headers = {
+    'Authorization': token ? `Bearer ${token}` : '',
     'Cookie': getCookies(),
   };
   const req = http.request(url, { headers }, (res) => {
@@ -24,12 +36,14 @@ const asyncGet = (url, params) => new Promise((resolve, reject) => {
 });
 
 const asyncPost = (url, params) => new Promise((resolve, reject) => {
+  const token = getToken(params);
   const body = (new URLSearchParams(params)).toString();
   const opt = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Content-Length': Buffer.byteLength(body),
+      'Authorization': token ? `Bearer ${token}` : '',
       'Cookie': getCookies(),
     },
   };

@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"strings"
 )
 
 func postSignup(w http.ResponseWriter, r *http.Request) {
@@ -57,10 +58,11 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func auth(r *http.Request) (models.User, bool) {
-	tokenString := r.PostFormValue("token")
-	if tokenString == "" {
-		tokenString = query(r, "token")
+	authorization := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+	if len(authorization) != 2 || authorization[0] != "Bearer" {
+		return models.User{}, false
 	}
+	tokenString := authorization[1]
 	token, err := jwt.Parse(tokenString,
 		func(*jwt.Token) (interface{}, error) { return JwtSecret, nil })
 	if err != nil {

@@ -13,10 +13,10 @@ import (
 var uploadDir string
 
 func postUpload(w http.ResponseWriter, r *http.Request) {
-	/*_, ok := auth(r)
+	_, ok := auth(r)
 	if !ok {
 		panic(models.CheckedError{401})
-	}*/
+	}
 
 	reader, err := r.MultipartReader()
 	if err != nil {
