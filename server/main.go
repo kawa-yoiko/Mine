@@ -20,6 +20,7 @@ var Config struct {
 	DbUser     string `json:"db_user"`
 	DbPassword string `json:"db_password"`
 	JwtSecret  string `json:"jwt_secret"`
+	UploadDir  string `json:"upload_dir"`
 	Debug      bool   `json:"debug"`
 }
 
@@ -58,6 +59,9 @@ func main() {
 		routes.EnableResetEndpoint()
 	}
 	routes.JwtSecret = []byte(Config.JwtSecret)
+	if err := routes.InitUpload(Config.UploadDir); err != nil {
+		log.Fatalln(err)
+	}
 	http.HandleFunc("/", routes.GetRootRouterFunc())
 	log.Printf("Listening on http://localhost:%d\n", Config.ServerPort)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Config.ServerPort), nil))

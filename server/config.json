@@ -4,5 +4,6 @@
   "db_user": "mineserver",
   "db_password": "",
   "jwt_secret": "vertraulich",
+  "upload_dir": "upload",
   "debug": true
 }
