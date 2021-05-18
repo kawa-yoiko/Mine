@@ -14,14 +14,7 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
         }
     }
 
-    /*
-    private final int viewId;
-    public SingleViewAdapter(int viewId) {
-        this.viewId = viewId;
-    }
-     */
-
-    private View view;
+    private final View view;
     public SingleViewAdapter(View view) {
         ((ViewGroup)view.getParent()).removeView(view);
         this.view = view;
@@ -38,7 +31,6 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
     @NonNull
     @Override
     public SingleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // View view = LayoutInflater.from(parent.getContext()).inflate(this.viewId, parent, false);
         return new SingleViewHolder(view);
     }
 

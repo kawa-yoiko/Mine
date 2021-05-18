@@ -25,7 +25,7 @@ public class PostActivity extends AppCompatActivity {
         View postView = getPostView(post);
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
-        Fragment commentFragment = new CommentFragment();
+        Fragment commentFragment = new CommentFragment(findViewById(R.id.post_content_heading));
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
         TextView flower_num_text = findViewById(R.id.flower_num);
         flower_num_text.setText(post.getFlower_num());
