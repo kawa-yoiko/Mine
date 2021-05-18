@@ -16,6 +16,7 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int DATE = 0;
     private static final int PICTURE = 1;
     private LinkedList<Object> data;
+    private int itemsBefore = 0;
 
     public static class DateHolder extends RecyclerView.ViewHolder {
         TextView textView;
@@ -36,6 +37,11 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public SquareAdapter(LinkedList<Object> data)
     {
         this.data = data;
+    }
+
+    public SquareAdapter(LinkedList<Object> data, int itemsBefore) {
+        this.data = data;
+        this.itemsBefore = itemsBefore;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    return getItemViewType(position) == DATE
+                    return (position < itemsBefore || getItemViewType(position - itemsBefore) == DATE)
                             ? gridManager.getSpanCount() : 1;
                 }
             });

@@ -15,9 +15,10 @@ public class CollectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);
 
-        squareFragment = new SquareFragment();
+        squareFragment = new SquareFragment(this.findViewById(R.id.heading));
         FrameLayout layout = (FrameLayout)this.findViewById(R.id.squares_container);
-        android.util.Log.d("x", layout != null ? "yes" : "no");
-        //layout.addView(squareFragment.getView());
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.squares_container, squareFragment)
+                .commit();
     }
 }
