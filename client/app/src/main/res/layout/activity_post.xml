@@ -6,51 +6,55 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
+
                 <FrameLayout
+                    android:id="@+id/post_content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/post_content"></FrameLayout>
+                    android:layout_height="wrap_content"></FrameLayout>
+
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="20dp"
                     android:layout_marginLeft="10dp"
-                    >
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp">
+
                     <TextView
+                        android:id="@+id/comment_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="评论"
                         android:textSize="18dp"
-                        android:id="@+id/comment_text"
                         android:textStyle="bold"></TextView>
+
                     <TextView
+                        android:id="@+id/comment_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="(23)"
-                        android:textSize="14dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="3dp"
                         android:layout_toRightOf="@+id/comment_text"
-                        android:layout_centerVertical="true"
-                        android:id="@+id/comment_num"
-                       ></TextView>
+                        android:text="(23)"
+                        android:textSize="14dp"></TextView>
                 </RelativeLayout>
+
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:id="@+id/post_comment"
-                    ></FrameLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></FrameLayout>
             </LinearLayout>
         </ScrollView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
