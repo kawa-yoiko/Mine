@@ -60,7 +60,7 @@ let total = 0, pass = 0;
 const check = async (method, url, params, expect, expect_status) => {
   const baseUrl = 'http://localhost:2317';
   const info = `${method + ' '.repeat(4 - method.length)} ` +
-    `${url + ' '.repeat(20 - url.length)} | `;
+    `${url + ' '.repeat(25 - url.length)} | `;
   const [status, response, headers] =
     await (method === 'GET' ? asyncGet : asyncPost)(baseUrl + url, params);
 
@@ -270,6 +270,87 @@ const check = async (method, url, params, expect, expect_status) => {
     upvote_count: 1,
     comment_count: 4,
     mark_count: 2,
+  })
+
+  // More posts for collections
+  let pids = Array(5);
+  for (let i = 0; i < pids.length; i++)
+    pids[i] = (await check('POST', '/post/new', {
+      token: token2,
+      type: 0,
+      caption: `Caption ${i}`,
+      contents: `Lorem ipsum ${i}`,
+      tags: `tag${i},tag${i*2+2}`,
+      publish: 1,
+    }, {id: any})).id
+
+  // Collections
+  let lid1 = (await check('POST', '/collection/new', {
+    token: token2,
+    title: 'Collection',
+    description: 'A collection',
+    tags: 'tag2,tag3,tag4',
+  }, {id: any})).id
+  await check('GET', `/collection/${lid1}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: ''},
+    title: 'Collection',
+    description: 'A collection',
+    posts: [],
+    tags: ['tag2', 'tag3', 'tag4'],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `+${pids[0]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+    ],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `+${pids[2]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+    ],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `+${pids[1]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+    ],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `-${pids[0]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+    ],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `+${pids[2]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+    ],
+  })
+  await check('POST', `/collection/${lid1}/edit_posts`, {
+    token: token2, op: `-${pids[3]}`
+  }, {
+    author: any, title: any, description: any, tags: any,
+    posts: [
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+    ],
   })
 
 

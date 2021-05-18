@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 
 	"github.com/lib/pq"
@@ -74,4 +75,43 @@ type CheckedError struct{ Status int }
 
 func (e CheckedError) Error() string {
 	return "CheckedError"
+}
+
+func insertTags(table, field string, id int32, tags []string) error {
+	if len(tags) == 0 {
+		return nil
+	}
+	placeholders := strings.Builder{}
+	values := []interface{}{}
+	for i, tag := range tags {
+		if i != 0 {
+			fmt.Fprintf(&placeholders, ", ")
+		}
+		fmt.Fprintf(&placeholders, "($%d, $%d)", i*2+1, i*2+2)
+		values = append(values, id, tag)
+	}
+	_, err := db.Exec(
+		"INSERT INTO "+table+" ("+field+", tag) VALUES "+placeholders.String(),
+		values...)
+	return err
+}
+
+func readTags(table, field string, id int32) ([]string, error) {
+	rows, err := db.Query("SELECT tag FROM "+table+" WHERE "+field+" = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	tags := []string{}
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return tags, nil
 }
