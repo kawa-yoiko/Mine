@@ -1,6 +1,7 @@
 package com.example.mine;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
@@ -51,6 +52,15 @@ public class PostActivity extends AppCompatActivity {
         caption_text.setText(post.getCaption());
         ImageView content_image = postView.findViewById(R.id.content);
         content_image.setImageResource((int)post.getContent());
+
+        collection_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), CollectionActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        });
 
         return postView;
     }
