@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 //        View cv = getWindow().getDecorView();
 //        ViewGroup test = cv.findViewById(R.id.test);
 //        test.addView(view);
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, PostActivity.class);
+        MainActivity.this.startActivity(intent);
     }
 
     private void setCurrentFragment(Fragment fragment) {
