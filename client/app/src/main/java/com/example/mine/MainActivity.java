@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
@@ -28,9 +30,30 @@ public class MainActivity extends AppCompatActivity {
 //        View cv = getWindow().getDecorView();
 //        ViewGroup test = cv.findViewById(R.id.test);
 //        test.addView(view);
-        Intent intent = new Intent();
-        intent.setClass(MainActivity.this, PostActivity.class);
-        MainActivity.this.startActivity(intent);
+//        Intent intent = new Intent();
+//        intent.setClass(MainActivity.this, PostActivity.class);
+//        MainActivity.this.startActivity(intent);
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.main:
+                            setCurrentFragment(postsListFragment);
+                            return true;
+                        case R.id.discover:
+                            setCurrentFragment(discoverFragment);
+                            return true;
+                        case R.id.message:
+                            setCurrentFragment(squareFragment);
+                            return true;
+                        case R.id.my:
+                            setCurrentFragment(myFragment);
+                            return true;
+                    }
+                    return false;
+                }
+        );
+
     }
 
     private void setCurrentFragment(Fragment fragment) {

@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +89,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             TextView content_text = item.findViewById(R.id.content);
             content_text.setText((String)post.getContent());
         }
+
+        item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), PostActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
