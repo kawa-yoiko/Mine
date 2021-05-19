@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -49,6 +51,21 @@ public class ServerReq {
         return call;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static Call getJson(String url, Consumer<JSONObject> callbackFn) {
+        return get(url, (String s) -> {
+            JSONObject obj = null;
+            if (s != null) {
+                try {
+                    obj = new JSONObject(s);
+                } catch (JSONException e) {
+                    Log.d("network", "JSONException " + e.toString());
+                    obj = null;
+                }
+            }
+            callbackFn.accept(obj);
+        });
+    }
 
     public static Call post(String url, Consumer<String> callbackFn) {
         RequestBody requestBody = new FormBody.Builder()

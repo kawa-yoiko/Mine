@@ -1,6 +1,12 @@
 package com.example.mine;
 
-public class Post {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+public class Post implements Serializable {
     private String collection;
     private String tag;
     private int avatar;
@@ -9,12 +15,12 @@ public class Post {
     private String caption;
     private Object content;
     private int contentType;  //0 means image and 1 means text
-    private String flower_num;
-    private String comment_num;
-    private String star_num;
+    private int flower_num;
+    private int comment_num;
+    private int star_num;
 
     public Post(String collection, String tag, int avatar, String nickname, String timestamp, String caption, Object content,
-                String flower_num, String comment_num, String star_num) {
+                int flower_num, int comment_num, int star_num) {
         this.collection = collection;
         this.tag = tag;
         this.avatar = avatar;
@@ -30,6 +36,31 @@ public class Post {
         }
         else {
             this.contentType = 0;
+        }
+    }
+
+    public Post(JSONObject obj) {
+        try {
+            this.collection = "粥粥的烹饪";
+            StringBuilder builder = new StringBuilder();
+            JSONArray tags = obj.getJSONArray("tags");
+            for (int i = 0; i < tags.length(); i++) {
+                builder.append(i == 0 ? "#" : " #");
+                builder.append(tags.getString(i));
+            }
+            this.tag = builder.toString();
+            this.avatar = R.drawable.flower;
+            JSONObject author = obj.getJSONObject("author");
+            this.nickname = author.getString("nickname");
+            this.caption = obj.getString("caption");
+            this.content = R.drawable.luoxiaohei;
+            this.timestamp = "15 分钟前";
+            this.flower_num = obj.getInt("upvote_count");
+            this.comment_num = obj.getInt("comment_count");
+            this.star_num = obj.getInt("mark_count");
+            this.contentType = obj.getInt("type");
+        } catch (JSONException e) {
+            android.util.Log.e("post", "Invalid JSON object " + e.toString());
         }
     }
 
@@ -65,15 +96,15 @@ public class Post {
         return timestamp;
     }
 
-    public String getComment_num() {
+    public int getComment_num() {
         return comment_num;
     }
 
-    public String getFlower_num() {
+    public int getFlower_num() {
         return flower_num;
     }
 
-    public String getStar_num() {
+    public int getStar_num() {
         return star_num;
     }
 }

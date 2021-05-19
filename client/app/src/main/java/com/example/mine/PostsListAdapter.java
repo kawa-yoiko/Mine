@@ -76,11 +76,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView caption_text = item.findViewById(R.id.caption);
         caption_text.setText(post.getCaption());
         TextView flower_num_text = item.findViewById(R.id.flower_num);
-        flower_num_text.setText(post.getFlower_num());
+        flower_num_text.setText(String.valueOf(post.getFlower_num()));
         TextView comment_num_text = item.findViewById(R.id.comment_num);
-        comment_num_text.setText(post.getComment_num());
+        comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = item.findViewById(R.id.star_num);
-        star_num_text.setText(post.getStar_num());
+        star_num_text.setText(String.valueOf(post.getStar_num()));
         if (holder instanceof ImageHolder) {
             ImageView content_image = item.findViewById(R.id.content);
             content_image.setImageResource((int)post.getContent());

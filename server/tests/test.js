@@ -173,6 +173,14 @@ const check = async (method, url, params, expect, expect_status) => {
   }, 200)).token
 
   // Posts
+  await check('POST', '/post/new', {
+    token: token2,
+    type: 0,
+    caption: '今天是甜粥粥。',
+    contents: 'Lorem ipsum',
+    tags: '美食,狗粮,每周粥粥',
+    publish: 1,
+  }, {id: any})
   let pid1 = (await check('POST', '/post/new', {
     token: token1,
     type: 0,

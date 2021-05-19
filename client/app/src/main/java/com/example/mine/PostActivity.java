@@ -20,19 +20,18 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-        Post post = new Post("粥粥的烹饪", "#美食 #狗粮 #每周粥粥", R.drawable.flower, "kuriko", "15分钟前", "今天是甜粥粥。",
-                R.drawable.luoxiaohei, "221", "221", "221");
+        Post post = (Post) getIntent().getSerializableExtra("post");
         View postView = getPostView(post);
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
         Fragment commentFragment = new CommentFragment(findViewById(R.id.post_content_heading));
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
         TextView flower_num_text = findViewById(R.id.flower_num);
-        flower_num_text.setText(post.getFlower_num());
+        flower_num_text.setText(String.valueOf(post.getFlower_num()));
         TextView comment_num_text = findViewById(R.id.comment_num);
-        comment_num_text.setText(post.getComment_num());
+        comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = findViewById(R.id.star_num);
-        star_num_text.setText(post.getStar_num());
+        star_num_text.setText(String.valueOf(post.getStar_num()));
     }
 
     private View getPostView(Post post) {
