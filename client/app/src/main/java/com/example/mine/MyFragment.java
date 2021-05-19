@@ -2,6 +2,7 @@ package com.example.mine;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.LinkedList;
+import okhttp3.*;
 
 public class MyFragment  extends Fragment {
     private PopupWindow popupWindow;
@@ -61,6 +66,22 @@ public class MyFragment  extends Fragment {
                 popupWindow.setFocusable(true);
                 popupWindow.showAsDropDown(post_button, 300, -100);
 //                popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+            }
+        });
+
+        Button btn = (Button)view.findViewById(R.id.settings_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServerReq.get("http://8.140.133.34:7678/", (String s) -> {
+                    Log.d("network", "(1) received " + s);
+                });
+                ServerReq.get("http://8.140.133.34:7678/post/1", (String s) -> {
+                    Log.d("network", "(2) received " + s);
+                });
+                ServerReq.post("http://8.140.133.34:7678/signup", (String s) -> {
+                    Log.d("network", "(3) received " + s);
+                });
             }
         });
     }
