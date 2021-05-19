@@ -73,13 +73,13 @@ public class MyFragment  extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ServerReq.get("http://8.140.133.34:7678/", (String s) -> {
+                ServerReq.get("/", (String s) -> {
                     Log.d("network", "(1) received " + s);
                 });
-                ServerReq.get("http://8.140.133.34:7678/post/1", (String s) -> {
+                ServerReq.get("/1", (String s) -> {
                     Log.d("network", "(2) received " + s);
                 });
-                ServerReq.post("http://8.140.133.34:7678/signup", (String s) -> {
+                ServerReq.post("/signup", (String s) -> {
                     Log.d("network", "(3) received " + s);
                 });
             }

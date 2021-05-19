@@ -41,7 +41,7 @@ public class ServerReq {
 
     public static Call get(String url, Consumer<String> callbackFn) {
         Request request = new Request.Builder()
-                .url(url)
+                .url("http://8.140.133.34:7678" + url)
                 .get()
                 .build();
         Call call = client.newCall(request);
@@ -57,7 +57,7 @@ public class ServerReq {
                 .add("password", "9876543210")
                 .build();
         Request request = new Request.Builder()
-                .url(url)
+                .url("http://8.140.133.34:7678" + url)
                 .post(requestBody)
                 .build();
         Call call = client.newCall(request);

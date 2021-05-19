@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- XXX: disable usesCleartextTraffic -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,7 +14,8 @@
         android:theme="@style/Theme.Mine"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
-        <activity android:name=".CollectionActivity"></activity>
+        <activity android:name=".LoadingActivity"></activity>
+        <activity android:name=".CollectionActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,8 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateActivity"></activity>
-        <activity android:name=".PostActivity"></activity>
+        <activity android:name=".CreateActivity" />
+        <activity android:name=".PostActivity" />
     </application>
 
 </manifest>
