@@ -72,7 +72,7 @@ const objEqual = (a, b) => {
 let total = 0, pass = 0;
 
 const check = async (method, url, params, expect, expect_status) => {
-  const baseUrl = 'http://localhost:2317';
+  const baseUrl = process.env['HOST'] || 'http://localhost:2317';
   const info = `${method + ' '.repeat(4 - method.length)} ` +
     `${url + ' '.repeat(25 - url.length)} | `;
   const [status, response, headers] =
