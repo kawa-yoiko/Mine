@@ -15,6 +15,14 @@ public class LoadingActivity extends AppCompatActivity {
         post,
     }
 
+    // XXX: Straightforward but works
+    private boolean animationComplete = false;
+
+    @Override
+    public void onEnterAnimationComplete() {
+        animationComplete = true;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +35,10 @@ public class LoadingActivity extends AppCompatActivity {
         switch (destType) {
             case post:
                 ServerReq.getJson("/post/1", (JSONObject obj) -> {
+                    try {
+                        while (!animationComplete) Thread.sleep(5);
+                    } catch (Exception e) {
+                    }
                     Log.d("loading", obj.toString());
                     Intent intent = new Intent(this, PostActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME |
