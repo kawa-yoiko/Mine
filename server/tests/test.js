@@ -157,6 +157,12 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
 */
 
+  //const avt1 = 'https://kawa.moe/-704de9615c08031d.jpg';
+  //const avt2 = 'https://kawa.moe/-30d9f34c8439e183.jpg';
+  const avt1 = '', avt2 = '';
+  const bio1 = '我爱吃栗子';
+  const bio2 = '我爱吃寿司';
+
   await check('POST', '/signup', {nickname: 'kayuyuko', email: 'kyyk@kawa.moe', password: 'P4$$w0rd'}, {error: 0}, 200)
   await check('POST', '/signup', {nickname: 'kurikoneko', email: 'kuriko@example.com', password: 'letme1n'}, {error: 0}, 200)
   await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
@@ -171,6 +177,15 @@ const check = async (method, url, params, expect, expect_status) => {
     token: any,
     user: {nickname: 'kurikoneko', avatar: '', signature: ''}
   }, 200)).token
+
+  // User modification
+  await check('POST', '/whoami/edit',
+    {token: token2, signature: bio2},
+    {nickname: 'kurikoneko', avatar: '', signature: bio2})
+  await check('GET', '/whoami', {token: token2}, {nickname: 'kurikoneko', avatar: '', signature: bio2})
+  await check('POST', '/whoami/edit',
+    {token: token2, signature: bio1},
+    {nickname: 'kurikoneko', avatar: '', signature: bio1})
 
   // Posts
   await check('POST', '/post/new', {
@@ -191,7 +206,7 @@ const check = async (method, url, params, expect, expect_status) => {
   }, {id: any})).id
   let no_pid = pid1 + 10;
   await check('GET', `/post/${pid1}`, undefined, {
-    author: {nickname: 'kayuyuko', avatar: ''},
+    author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
     caption: 'Caption',
@@ -241,8 +256,8 @@ const check = async (method, url, params, expect, expect_status) => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: null, contents: 'No comment'},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: null, contents: 'No comment'},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -250,8 +265,8 @@ const check = async (method, url, params, expect, expect_status) => {
     count: 10,
     reply_root: cid1,
   }, [
-    {id: cid3, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: ''}, contents: 'Unknown comment'},
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -259,7 +274,7 @@ const check = async (method, url, params, expect, expect_status) => {
     count: 1,
     reply_root: cid1,
   }, [
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
   ])
 
   // Upvote
@@ -283,7 +298,7 @@ const check = async (method, url, params, expect, expect_status) => {
 
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, undefined, {
-    author: {nickname: 'kayuyuko', avatar: ''},
+    author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
     caption: 'Caption',
@@ -314,7 +329,7 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: 'tag2,tag3,tag4',
   }, {id: any})).id
   await check('GET', `/collection/${lid1}`, undefined, {
-    author: {nickname: 'kurikoneko', avatar: ''},
+    author: {nickname: 'kurikoneko', avatar: avt2},
     title: 'Collection',
     description: 'A collection',
     posts: [],

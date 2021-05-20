@@ -15,11 +15,15 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	nickname := r.PostFormValue("nickname")
 	email := r.PostFormValue("email")
 	password := r.PostFormValue("password")
+	avatar := r.PostFormValue("avatar")
+	signature := r.PostFormValue("signature")
 
 	u := models.User{}
 	u.Nickname = nickname
 	u.Email = email
 	u.Password = password
+	u.Avatar = avatar
+	u.Signature = signature
 
 	if err := u.Create(); err != nil {
 		if err, ok := err.(models.UserCreateError); ok {
@@ -98,8 +102,23 @@ func getWhoAmI(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, u.Repr())
 }
 
+func postWhoAmIEdit(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		panic(models.CheckedError{400})
+	}
+
+	u.Signature = r.PostFormValue("signature")
+	if err := u.Update(); err != nil {
+		panic(err)
+	}
+
+	write(w, 200, u.Repr())
+}
+
 func init() {
 	registerHandler("/signup", postSignup, "POST")
 	registerHandler("/login", postLogin, "POST")
 	registerHandler("/whoami", getWhoAmI, "GET")
+	registerHandler("/whoami/edit", postWhoAmIEdit, "POST")
 }
