@@ -36,13 +36,6 @@ public class PostActivity extends AppCompatActivity {
         comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = findViewById(R.id.star_num);
         star_num_text.setText(String.valueOf(post.getStar_num()));
-
-        ServerReq.Utils.loadImage(
-                "https://avatars.githubusercontent.com/u/67597548?v=4",
-                findViewById(R.id.avatar));
-        ServerReq.Utils.loadImage(
-                "https://codimd.starrah.cn/uploads/upload_2a9b755195e5b0d2398731519ea9152b.jpg",
-                findViewById(R.id.content));
     }
 
     private View getPostView(Post post) {
@@ -53,15 +46,22 @@ public class PostActivity extends AppCompatActivity {
         TextView tag_text = postView.findViewById(R.id.tag);
         tag_text.setText(post.getTag());
         ImageView avatar_image = postView.findViewById(R.id.avatar);
-        avatar_image.setImageResource(post.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" + post.getAvatar(), avatar_image);
         TextView nickname_text = postView.findViewById(R.id.nickname);
         nickname_text.setText(post.getNickname());
         TextView timestamp_text = postView.findViewById(R.id.timestamp);
         timestamp_text.setText(post.getTimestamp());
         TextView caption_text = postView.findViewById(R.id.caption);
         caption_text.setText(post.getCaption());
-        ImageView content_image = postView.findViewById(R.id.content);
-        content_image.setImageResource((int)post.getContent());
+        switch (post.getContentType()) {
+            default:
+            case 0:
+                break;
+            case 1:
+                ImageView content_image = postView.findViewById(R.id.content);
+                ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
+                break;
+        }
 
         collection_text.setOnClickListener(new View.OnClickListener() {
             @Override

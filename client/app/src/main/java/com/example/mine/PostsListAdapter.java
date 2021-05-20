@@ -37,10 +37,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (data.get(position).getContentType() == 0) {
-            return IMAGE;
-        } else {
-            return TEXT;
+        switch (data.get(position).getContentType()) {
+            default:
+            case 0: return TEXT;
+            case 1: return IMAGE;
         }
     }
 
@@ -68,7 +68,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView tag_text = item.findViewById(R.id.tag);
         tag_text.setText(post.getTag());
         ImageView avatar_image = item.findViewById(R.id.avatar);
-        avatar_image.setImageResource(post.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" + post.getAvatar(), avatar_image);
         TextView nickname_text = item.findViewById(R.id.nickname);
         nickname_text.setText(post.getNickname());
         TextView timestamp_text = item.findViewById(R.id.timestamp);
@@ -83,11 +83,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         star_num_text.setText(String.valueOf(post.getStar_num()));
         if (holder instanceof ImageHolder) {
             ImageView content_image = item.findViewById(R.id.content);
-            content_image.setImageResource((int)post.getContent());
+            ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
         }
         else if (holder instanceof TextHolder) {
             TextView content_text = item.findViewById(R.id.content);
-            content_text.setText((String)post.getContent());
+            content_text.setText(post.getContent());
         }
 
         item.setOnClickListener(new View.OnClickListener() {

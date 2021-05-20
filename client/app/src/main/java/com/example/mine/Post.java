@@ -11,17 +11,17 @@ import java.io.Serializable;
 public class Post implements Serializable {
     private String collection;
     private String tag;
-    private int avatar;
+    private String avatar;
     private String nickname;
     private String timestamp;
     private String caption;
-    private Object content;
-    private int contentType;  //0 means image and 1 means text
+    private String content;
+    private int contentType; // 0 - text; 1 - image; 2 - audio; 3 - video
     private int flower_num;
     private int comment_num;
     private int star_num;
 
-    public Post(String collection, String tag, int avatar, String nickname, String timestamp, String caption, Object content,
+    public Post(String collection, String tag, String avatar, String nickname, String timestamp, String caption, String content, int contentType,
                 int flower_num, int comment_num, int star_num) {
         this.collection = collection;
         this.tag = tag;
@@ -29,16 +29,11 @@ public class Post implements Serializable {
         this.nickname = nickname;
         this.caption = caption;
         this.content = content;
+        this.contentType = contentType;
         this.timestamp = timestamp;
         this.flower_num = flower_num;
         this.comment_num = comment_num;
         this.star_num = star_num;
-        if (content instanceof String) {
-            this.contentType = 1;
-        }
-        else {
-            this.contentType = 0;
-        }
     }
 
     public Post(JSONObject obj) {
@@ -51,16 +46,16 @@ public class Post implements Serializable {
                 builder.append(tags.getString(i));
             }
             this.tag = builder.toString();
-            this.avatar = R.drawable.flower;
             JSONObject author = obj.getJSONObject("author");
+            this.avatar = author.getString("avatar");
             this.nickname = author.getString("nickname");
             this.caption = obj.getString("caption");
-            this.content = R.drawable.luoxiaohei;
+            this.content = obj.getString("contents");
+            this.contentType = obj.getInt("type");
             this.timestamp = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
             this.flower_num = obj.getInt("upvote_count");
             this.comment_num = obj.getInt("comment_count");
             this.star_num = obj.getInt("mark_count");
-            this.contentType = obj.getInt("type");
         } catch (JSONException e) {
             android.util.Log.e("post", "Invalid JSON object " + e.toString());
         }
@@ -74,7 +69,7 @@ public class Post implements Serializable {
         return tag;
     }
 
-    public int getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 
@@ -86,7 +81,7 @@ public class Post implements Serializable {
         return caption;
     }
 
-    public Object getContent() {
+    public String getContent() {
         return content;
     }
 

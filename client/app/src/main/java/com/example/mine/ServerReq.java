@@ -53,12 +53,12 @@ public class ServerReq {
         }
     }
 
-    private static JSONObject parseJson(String s) {JSONObject obj = null;
+    private static JSONObject parseJson(String s) {
         if (s != null) {
             try {
                 return new JSONObject(s);
             } catch (JSONException e) {
-                Log.e("network", "JSONException " + e.toString());
+                Log.e("network", "JSON parse " + s + " " + e.toString());
                 return null;
             }
         }
