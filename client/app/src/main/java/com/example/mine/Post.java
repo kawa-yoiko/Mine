@@ -1,5 +1,7 @@
 package com.example.mine;
 
+import android.text.format.DateUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +56,7 @@ public class Post implements Serializable {
             this.nickname = author.getString("nickname");
             this.caption = obj.getString("caption");
             this.content = R.drawable.luoxiaohei;
-            this.timestamp = "15 分钟前";
+            this.timestamp = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
             this.flower_num = obj.getInt("upvote_count");
             this.comment_num = obj.getInt("comment_count");
             this.star_num = obj.getInt("mark_count");

@@ -2,6 +2,8 @@ package com.example.mine;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import java.io.InputStream;
 
 public class PostActivity extends AppCompatActivity {
     private ViewGroup fView;
@@ -32,6 +36,13 @@ public class PostActivity extends AppCompatActivity {
         comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = findViewById(R.id.star_num);
         star_num_text.setText(String.valueOf(post.getStar_num()));
+
+        ServerReq.Utils.loadImage(
+                "https://avatars.githubusercontent.com/u/67597548?v=4",
+                findViewById(R.id.avatar));
+        ServerReq.Utils.loadImage(
+                "https://codimd.starrah.cn/uploads/upload_2a9b755195e5b0d2398731519ea9152b.jpg",
+                findViewById(R.id.content));
     }
 
     private View getPostView(Post post) {
