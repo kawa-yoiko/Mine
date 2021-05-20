@@ -72,8 +72,8 @@ func InitUpload(uploadDirInput string) error {
 }
 
 func postUpload(w http.ResponseWriter, r *http.Request) {
-	_, _ = handleUpload(w, r)
-	write(w, 200, jsonPayload{})
+	_, files := handleUpload(w, r)
+	write(w, 200, jsonPayload{"ids": files})
 }
 
 func postUploadAvatar(w http.ResponseWriter, r *http.Request) {

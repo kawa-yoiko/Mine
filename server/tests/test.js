@@ -230,12 +230,19 @@ const check = async (method, url, params, expect, expect_status) => {
     {token: token2, file: 'avt2.png'},
     {nickname: 'kurikoneko', avatar: any, signature: bio2})).avatar
 
+  let u2img1 = (await check('PUT', '/upload',
+    {token: token2, file: 'post1.png'},
+    {ids: [any]})).ids[0]
+  let u2img2 = (await check('PUT', '/upload',
+    {token: token2, file: 'avt2.png'},
+    {ids: [any]})).ids[0]
+
   // Posts
   await check('POST', '/post/new', {
     token: token2,
-    type: 0,
+    type: 1,
     caption: '今天是甜粥粥。',
-    contents: 'Lorem ipsum',
+    contents: `${u2img1} ${u2img2}`,
     tags: '美食,狗粮,每周粥粥',
     publish: 1,
   }, {id: any})
