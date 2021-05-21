@@ -88,6 +88,7 @@ func (p *Post) Repr() map[string]interface{} {
 		"type":          p.Type,
 		"caption":       p.Caption,
 		"contents":      p.Contents,
+		"collection":    p.Collection.ReprBrief(),
 		"tags":          p.Tags,
 		"upvote_count":  p.UpvoteCount,
 		"comment_count": p.CommentCount,
@@ -211,6 +212,14 @@ func (p *Post) Upvote(u User, add bool) error {
 
 func (p *Post) Star(u User, add bool) error {
 	return p.processUserRel("post_star", u, add, &p.StarCount)
+}
+
+func (p *Post) SetCollection(c Collection) error {
+	_, err := db.Exec(`UPDATE post SET
+		collection_id = $1, collection_seq = $2
+		WHERE id = $3`,
+		c.Id, 1234, p.Id)
+	return err
 }
 
 func (c *Comment) Create() error {

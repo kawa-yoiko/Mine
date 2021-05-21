@@ -122,7 +122,7 @@ func postPostStar(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isStar, err := strconv.Atoi(r.PostFormValue("is_star"))
 	if err != nil {
-		panic(err)
+		panic(models.CheckedError{400})
 	}
 
 	p := models.Post{Id: int32(id)}
@@ -132,6 +132,31 @@ func postPostStar(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, jsonPayload{"star_count": p.StarCount})
 }
 
+func postPostSetCollection(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		panic(models.CheckedError{401})
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	c := referredCollection(u, r.PostFormValue("collection_id"))
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Read(); err != nil {
+		panic(err)
+	}
+
+	if p.Author.Id != u.Id {
+		panic(models.CheckedError{403})
+	}
+
+	if err := p.SetCollection(c); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{})
+}
+
 func init() {
 	registerHandler("/post/new", postPostNew, "POST")
 	registerHandler("/post/{id}", getPost, "GET")
@@ -139,4 +164,5 @@ func init() {
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
 	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
 	registerHandler("/post/{id}/star", postPostStar, "POST")
+	registerHandler("/post/{id}/set_collection", postPostSetCollection, "POST")
 }

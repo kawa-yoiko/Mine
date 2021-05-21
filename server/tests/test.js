@@ -267,6 +267,7 @@ const check = async (method, url, params, expect, expect_status) => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
+    collection: {id: lid1, title: any, description: any},
     tags: ['tag1', 'tag2'],
     upvote_count: 0,
     comment_count: 0,
@@ -359,6 +360,7 @@ const check = async (method, url, params, expect, expect_status) => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
+    collection: {id: lid1, title: any, description: any},
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
     comment_count: 4,
@@ -415,6 +417,46 @@ const check = async (method, url, params, expect, expect_status) => {
     posts: [],
     tags: ['tag2', 'tag3', 'tag4'],
   })
+
+  await check('POST', `/post/${pids[1]}/set_collection`, {
+    token: token2,
+    collection_id: lid3,
+  }, {})
+  await check('POST', `/post/${pids[3]}/set_collection`, {
+    token: token2,
+    collection_id: lid3,
+  }, {})
+  await check('GET', `/collection/${lid2}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: avt2},
+    title: any,
+    description: any,
+    posts: [
+      {caption: '今天是甜粥粥。', contents: any},
+      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+    ],
+    tags: [],
+  })
+  await check('GET', `/collection/${lid3}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: avt2},
+    title: 'Collection',
+    description: 'A collection',
+    posts: [
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+    ],
+    tags: ['tag2', 'tag3', 'tag4'],
+  })
+
+  await check('POST', `/post/${pids[0]}/set_collection`, {
+    token: token2,
+    collection_id: lid1,  // Others' collection
+  }, undefined, 403)
+  await check('POST', `/post/${pids[0]}/set_collection`, {
+    token: token1,  // Others' post
+    collection_id: lid1,
+  }, undefined, 403)
 
   console.log(`\n${pass}/${total} passed`);
 })();
