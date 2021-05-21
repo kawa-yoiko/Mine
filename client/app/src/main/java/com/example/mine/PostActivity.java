@@ -66,6 +66,7 @@ public class PostActivity extends AppCompatActivity {
         collection_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                android.util.Log.d("PostActivity", String.valueOf(post.getCollectionID()));
                 Intent intent = new Intent();
                 intent.setClass(v.getContext(), CollectionActivity.class);
                 v.getContext().startActivity(intent);

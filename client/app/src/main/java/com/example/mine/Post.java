@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 public class Post implements Serializable {
     private String collection;
+    private int collectionID;
     private String tag;
     private String avatar;
     private String nickname;
@@ -38,7 +39,6 @@ public class Post implements Serializable {
 
     public Post(JSONObject obj) {
         try {
-            this.collection = "粥粥的烹饪";
             StringBuilder builder = new StringBuilder();
             JSONArray tags = obj.getJSONArray("tags");
             for (int i = 0; i < tags.length(); i++) {
@@ -55,7 +55,14 @@ public class Post implements Serializable {
             this.timestamp = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
             this.flower_num = obj.getInt("upvote_count");
             this.comment_num = obj.getInt("comment_count");
-            this.star_num = obj.getInt("mark_count");
+            this.star_num = obj.getInt("star_count");
+
+            JSONObject collection = obj.getJSONObject("collection");
+            this.collection = collection.getString("title");
+            if (this.collection.equals("")) {
+                this.collection = this.nickname + " 的未分类合集";
+            }
+            this.collectionID = collection.getInt("id");
         } catch (JSONException e) {
             android.util.Log.e("post", "Invalid JSON object " + e.toString());
         }
@@ -64,6 +71,8 @@ public class Post implements Serializable {
     public String getCollection() {
         return collection;
     }
+
+    public int getCollectionID() { return collectionID; }
 
     public String getTag() {
         return tag;
