@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -16,8 +17,9 @@ import java.util.LinkedList;
 
 public class CommentFragment extends Fragment {
     private RecyclerView recyclerView;
+    private View headingView;
 
-    public CommentFragment() {}
+    public CommentFragment(View headingView) { this.headingView = headingView; }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,9 @@ public class CommentFragment extends Fragment {
         comments.add(new Comment(R.drawable.luoxiaohei, "yyg", "口水从奇怪的地方流了出来", "05-10", "", "25"));
         comments.add(new Comment(R.drawable.luoxiaohei2, "栗子", "太太下凡辛苦了", "05-9", "", "2"));
         CommentAdapter commentAdapter = new CommentAdapter(comments);
-        recyclerView.setAdapter(commentAdapter);
+        SingleViewAdapter headingAdapter = new SingleViewAdapter(headingView);
+        ConcatAdapter concatAdapter = new ConcatAdapter(headingAdapter, commentAdapter);
+        recyclerView.setAdapter(concatAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
     }
 

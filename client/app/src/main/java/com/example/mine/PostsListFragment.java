@@ -40,10 +40,10 @@ public class PostsListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         LinkedList<Post> posts = new LinkedList<>();
-        posts.add(new Post("粥粥的烹饪", "#美食 #狗粮 #每周粥粥", R.drawable.flower, "kuriko", "15分钟前", "今天是甜粥粥。",
-                R.drawable.luoxiaohei, "221", "221", "221"));
-        posts.add(new Post("沙雕", "#自然科学 #物理 #什么奇怪的东西混进来了", R.drawable.star, "pisces", "30分钟前", "栗子发射",
-                "什么是栗子发射器呢？很多人都想知道这个问题，快来跟小编一起看看吧。顾名思义，栗子发射器就是发射栗子的发射器，这就是什么是栗子发射器的解释，希望粥粥精心整理的这篇内容能够解决你的困惑。", "1023", "1023", "1023"));
+        posts.add(new Post("粥粥的烹饪", "#美食 #狗粮 #每周粥粥", "", "kuriko", "15分钟前", "今天是甜粥粥。",
+                "", 0, 221, 221, 221));
+        posts.add(new Post("沙雕", "#自然科学 #物理 #什么奇怪的东西混进来了", "", "pisces", "30分钟前", "栗子发射",
+                "什么是栗子发射器呢？很多人都想知道这个问题，快来跟小编一起看看吧。顾名思义，栗子发射器就是发射栗子的发射器，这就是什么是栗子发射器的解释，希望粥粥精心整理的这篇内容能够解决你的困惑。", 1, 1023, 1023, 1023));
         PostsListAdapter postsListAdapter = new PostsListAdapter(posts);
         recyclerView.setAdapter(postsListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));

@@ -1,35 +1,63 @@
 package com.example.mine;
 
-public class Post {
+import android.text.format.DateUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+public class Post implements Serializable {
     private String collection;
     private String tag;
-    private int avatar;
+    private String avatar;
     private String nickname;
     private String timestamp;
     private String caption;
-    private Object content;
-    private int contentType;  //0 means image and 1 means text
-    private String flower_num;
-    private String comment_num;
-    private String star_num;
+    private String content;
+    private int contentType; // 0 - text; 1 - image; 2 - audio; 3 - video
+    private int flower_num;
+    private int comment_num;
+    private int star_num;
 
-    public Post(String collection, String tag, int avatar, String nickname, String timestamp, String caption, Object content,
-                String flower_num, String comment_num, String star_num) {
+    public Post(String collection, String tag, String avatar, String nickname, String timestamp, String caption, String content, int contentType,
+                int flower_num, int comment_num, int star_num) {
         this.collection = collection;
         this.tag = tag;
         this.avatar = avatar;
         this.nickname = nickname;
         this.caption = caption;
         this.content = content;
+        this.contentType = contentType;
         this.timestamp = timestamp;
         this.flower_num = flower_num;
         this.comment_num = comment_num;
         this.star_num = star_num;
-        if (content instanceof String) {
-            this.contentType = 1;
-        }
-        else {
-            this.contentType = 0;
+    }
+
+    public Post(JSONObject obj) {
+        try {
+            this.collection = "粥粥的烹饪";
+            StringBuilder builder = new StringBuilder();
+            JSONArray tags = obj.getJSONArray("tags");
+            for (int i = 0; i < tags.length(); i++) {
+                builder.append(i == 0 ? "#" : " #");
+                builder.append(tags.getString(i));
+            }
+            this.tag = builder.toString();
+            JSONObject author = obj.getJSONObject("author");
+            this.avatar = author.getString("avatar");
+            this.nickname = author.getString("nickname");
+            this.caption = obj.getString("caption");
+            this.content = obj.getString("contents");
+            this.contentType = obj.getInt("type");
+            this.timestamp = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
+            this.flower_num = obj.getInt("upvote_count");
+            this.comment_num = obj.getInt("comment_count");
+            this.star_num = obj.getInt("mark_count");
+        } catch (JSONException e) {
+            android.util.Log.e("post", "Invalid JSON object " + e.toString());
         }
     }
 
@@ -41,7 +69,7 @@ public class Post {
         return tag;
     }
 
-    public int getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 
@@ -53,7 +81,7 @@ public class Post {
         return caption;
     }
 
-    public Object getContent() {
+    public String getContent() {
         return content;
     }
 
@@ -65,15 +93,15 @@ public class Post {
         return timestamp;
     }
 
-    public String getComment_num() {
+    public int getComment_num() {
         return comment_num;
     }
 
-    public String getFlower_num() {
+    public int getFlower_num() {
         return flower_num;
     }
 
-    public String getStar_num() {
+    public int getStar_num() {
         return star_num;
     }
 }

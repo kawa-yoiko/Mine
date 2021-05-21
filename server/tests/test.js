@@ -1,4 +1,5 @@
 const http = require('http');
+const fs = require('fs');
 
 let jarId = 0;
 const cookieJar = [{}, {}, {}, {}, {}];
@@ -57,6 +58,40 @@ const asyncPost = (url, params) => new Promise((resolve, reject) => {
   req.end();
 });
 
+const asyncUpload = (url, params) => new Promise((resolve, reject) => {
+  const token = getToken(params);
+
+  const fileContents = fs.readFileSync(params.file);
+
+  const boundary = '----' +
+    Math.random().toString().substr(2) + '-' +
+    Math.random().toString().substr(2);
+  const payloadHeader = Buffer.from(
+    '--' + boundary + '\r\n' +
+    'Content-Disposition: form-data; name="qwqwqwq"; filename="quququq"\r\n' +
+    'Content-Type: application/octet-stream\r\n\r\n');
+  const payloadFooter = Buffer.from('\r\n--' + boundary + '--\r\n');
+  const payload = Buffer.concat([payloadHeader, fileContents, payloadFooter]);
+
+  const opt = {
+    method: 'POST',
+    headers: {
+      'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      'Content-Length': payload.length,
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Cookie': getCookies(),
+    },
+  };
+  const req = http.request(url, opt, (res) => {
+    res.setEncoding('utf8');
+    const data = [];
+    res.on('data', (chunk) => data.push(chunk));
+    res.on('end', () => resolve([res.statusCode, data.join(''), res.headers]));
+  });
+  req.write(payload);
+  req.end();
+});
+
 const any = {};
 const objEqual = (a, b) => {
   if (a === any || b === any) return true;
@@ -72,11 +107,14 @@ const objEqual = (a, b) => {
 let total = 0, pass = 0;
 
 const check = async (method, url, params, expect, expect_status) => {
-  const baseUrl = 'http://localhost:2317';
+  const baseUrl = process.env['HOST'] || 'http://localhost:2317';
   const info = `${method + ' '.repeat(4 - method.length)} ` +
     `${url + ' '.repeat(25 - url.length)} | `;
   const [status, response, headers] =
-    await (method === 'GET' ? asyncGet : asyncPost)(baseUrl + url, params);
+    await (
+      method === 'POST' ? asyncPost :
+      method === 'PUT' ? asyncUpload : asyncGet
+    )(baseUrl + url, params);
 
   // Handle cookies
   const setCookie = headers['set-cookie'];
@@ -157,6 +195,9 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
 */
 
+  const bio1 = '我爱吃栗子';
+  const bio2 = '我爱吃寿司';
+
   await check('POST', '/signup', {nickname: 'kayuyuko', email: 'kyyk@kawa.moe', password: 'P4$$w0rd'}, {error: 0}, 200)
   await check('POST', '/signup', {nickname: 'kurikoneko', email: 'kuriko@example.com', password: 'letme1n'}, {error: 0}, 200)
   await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
@@ -172,7 +213,39 @@ const check = async (method, url, params, expect, expect_status) => {
     user: {nickname: 'kurikoneko', avatar: '', signature: ''}
   }, 200)).token
 
+  // User modification
+  await check('POST', '/whoami/edit',
+    {token: token2, signature: bio2},
+    {nickname: 'kurikoneko', avatar: '', signature: bio2})
+  await check('GET', '/whoami', {token: token2}, {nickname: 'kurikoneko', avatar: '', signature: bio2})
+  await check('POST', '/whoami/edit',
+    {token: token1, signature: bio1},
+    {nickname: 'kayuyuko', avatar: '', signature: bio1})
+
+  // Avatar
+  let avt1 = (await check('PUT', '/upload/avatar',
+    {token: token1, file: 'avt1.png'},
+    {nickname: 'kayuyuko', avatar: any, signature: bio1})).avatar
+  let avt2 = (await check('PUT', '/upload/avatar',
+    {token: token2, file: 'avt2.png'},
+    {nickname: 'kurikoneko', avatar: any, signature: bio2})).avatar
+
+  let u2img1 = (await check('PUT', '/upload',
+    {token: token2, file: 'post1.png'},
+    {ids: [any]})).ids[0]
+  let u2img2 = (await check('PUT', '/upload',
+    {token: token2, file: 'avt2.png'},
+    {ids: [any]})).ids[0]
+
   // Posts
+  await check('POST', '/post/new', {
+    token: token2,
+    type: 1,
+    caption: '今天是甜粥粥。',
+    contents: `${u2img1} ${u2img2}`,
+    tags: '美食,狗粮,每周粥粥',
+    publish: 1,
+  }, {id: any})
   let pid1 = (await check('POST', '/post/new', {
     token: token1,
     type: 0,
@@ -183,7 +256,7 @@ const check = async (method, url, params, expect, expect_status) => {
   }, {id: any})).id
   let no_pid = pid1 + 10;
   await check('GET', `/post/${pid1}`, undefined, {
-    author: {nickname: 'kayuyuko', avatar: ''},
+    author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
     caption: 'Caption',
@@ -233,8 +306,8 @@ const check = async (method, url, params, expect, expect_status) => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: null, contents: 'No comment'},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: null, contents: 'No comment'},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -242,8 +315,8 @@ const check = async (method, url, params, expect, expect_status) => {
     count: 10,
     reply_root: cid1,
   }, [
-    {id: cid3, author: {nickname: 'kurikoneko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: ''}, contents: 'Unknown comment'},
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -251,7 +324,7 @@ const check = async (method, url, params, expect, expect_status) => {
     count: 1,
     reply_root: cid1,
   }, [
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: ''}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: ''}, contents: 'Yes comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
   ])
 
   // Upvote
@@ -275,7 +348,7 @@ const check = async (method, url, params, expect, expect_status) => {
 
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, undefined, {
-    author: {nickname: 'kayuyuko', avatar: ''},
+    author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
     caption: 'Caption',
@@ -306,7 +379,7 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: 'tag2,tag3,tag4',
   }, {id: any})).id
   await check('GET', `/collection/${lid1}`, undefined, {
-    author: {nickname: 'kurikoneko', avatar: ''},
+    author: {nickname: 'kurikoneko', avatar: avt2},
     title: 'Collection',
     description: 'A collection',
     posts: [],

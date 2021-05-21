@@ -6,85 +6,93 @@
     android:layout_height="wrap_content"
     app:layout_goneMarginBottom="50px"
     >
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginLeft="50px"
+            android:layout_marginTop="30px"
             android:layout_marginRight="50px"
             android:layout_marginBottom="30px"
-            android:layout_marginTop="30px"
-            >
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <view
                 android:id="@+id/avatar"
-                android:src="@drawable/flower"></ImageView>
+                class="com.example.mine.WidthEqualsHeightImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/flower"
+                />
+
             <TextView
+                android:id="@+id/nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:text="kuriko"
-                android:id="@+id/nickname"
                 android:textSize="16dp"
-                android:textStyle="bold"
-                ></TextView>
+                android:textStyle="bold"></TextView>
+
             <TextView
+                android:id="@+id/timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:gravity="right"
-                android:text="15分钟前"
-                android:id="@+id/timestamp"
-                ></TextView>
+                android:text="15分钟前"></TextView>
         </LinearLayout>
+
         <TextView
+            android:id="@+id/caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="50px"
+            android:layout_marginRight="50px"
             android:text="粥粥与草莓"
-            app:layout_constraintLeft_toLeftOf="@id/avatar"
             android:textSize="16dp"
             android:textStyle="bold"
-            android:layout_marginLeft="50px"
-            android:layout_marginRight="50px"
-            android:id="@+id/caption"
-            ></TextView>
+            app:layout_constraintLeft_toLeftOf="@id/avatar"></TextView>
+
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/avatar"
-            android:maxHeight="300dp"
-            android:layout_marginLeft="50px"
-            android:layout_marginRight="50px"
-            android:adjustViewBounds="true"
-            android:layout_marginBottom="30px"
-            android:layout_marginTop="20px"
             android:id="@+id/content"
-            android:src="@drawable/luoxiaohei"></ImageView>
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="50px"
+            android:layout_marginTop="20px"
+            android:layout_marginRight="50px"
+            android:layout_marginBottom="30px"
+            android:adjustViewBounds="true"
+            android:maxHeight="300dp"
+            android:src="@drawable/luoxiaohei"
+            app:layout_constraintLeft_toLeftOf="@id/avatar"></ImageView>
+
+        <TextView
             android:id="@+id/tag"
-            android:text="#猫猫 #狗粮 #摄影 #1234567891234"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="50px"
             android:layout_marginBottom="8dp"
+            android:text="#猫猫 #狗粮 #摄影 #1234567891234"
             android:textSize="16dp"></TextView>
+
         <TextView
+            android:id="@+id/collection"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:layout_marginRight="50px"
-            android:text="粥粥可爱"
-            android:drawableLeft="@drawable/flower"
-            android:id="@+id/collection"
-            android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="6dp"
             android:layout_marginLeft="50px"
-            android:background="@drawable/bt_background_yellow"></TextView>
+            android:layout_marginRight="50px"
+            android:background="@drawable/bt_background_yellow"
+            android:drawableLeft="@drawable/flower"
+            android:padding="6dp"
+            android:text="粥粥可爱"
+            android:textSize="16dp"
+            android:textStyle="bold"></TextView>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

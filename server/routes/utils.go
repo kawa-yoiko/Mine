@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/lib/pq"
 )
@@ -30,6 +31,12 @@ func write(w http.ResponseWriter, status int, p interface{}) {
 func EnableResetEndpoint() {
 	registerHandler("/reset", func(w http.ResponseWriter, r *http.Request) {
 		if err := models.ResetDatabase(); err != nil {
+			panic(err)
+		}
+		if err := os.RemoveAll(uploadDir); err != nil {
+			panic(err)
+		}
+		if err := InitUpload(uploadDir); err != nil {
 			panic(err)
 		}
 	}, "POST")

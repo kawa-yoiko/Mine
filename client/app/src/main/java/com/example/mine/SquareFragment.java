@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,8 +16,10 @@ import java.util.LinkedList;
 
 public class SquareFragment extends Fragment {
     private RecyclerView recyclerView;
+    private View headingView;
 
     public SquareFragment() {}
+    public SquareFragment(View headingView) { this.headingView = headingView; }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,17 +30,26 @@ public class SquareFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         LinkedList<Object> dateAndImages = new LinkedList<>();
-        dateAndImages.add("2021年5月");
-        dateAndImages.add(R.drawable.content1);
-        dateAndImages.add(R.drawable.content2);
-        dateAndImages.add("2021年6月");
-        dateAndImages.add(R.drawable.content1);
-        dateAndImages.add(R.drawable.content2);
-        dateAndImages.add(R.drawable.content3);
+        for (int i = 0; i < 10; i++) {
+            dateAndImages.add("2021年5月");
+            dateAndImages.add(R.drawable.content1);
+            dateAndImages.add(R.drawable.content2);
+            dateAndImages.add("2021年6月");
+            dateAndImages.add(R.drawable.content1);
+            dateAndImages.add(R.drawable.content2);
+            dateAndImages.add(R.drawable.content3);
+        }
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(),3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        SquareAdapter adapter = new SquareAdapter(dateAndImages);
-        recyclerView.setAdapter(adapter);
+        if (headingView != null) {
+            SingleViewAdapter adapterHeading = new SingleViewAdapter(headingView);
+            SquareAdapter adapter = new SquareAdapter(dateAndImages, 1);
+            ConcatAdapter adapterConcat = new ConcatAdapter(adapterHeading, adapter);
+            recyclerView.setAdapter(adapterConcat);
+        } else {
+            SquareAdapter adapter = new SquareAdapter(dateAndImages, 0);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override
