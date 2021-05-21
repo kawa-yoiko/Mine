@@ -11,7 +11,6 @@ type Post struct {
 	Author       User
 	Timestamp    int64
 	Type         int32
-	IsPublished  bool
 	Caption      string
 	Contents     string
 	Collection   Collection
@@ -39,7 +38,6 @@ func init() {
 		"author_id INTEGER NOT NULL",
 		"timestamp BIGINT NOT NULL",
 		"type INTEGER NOT NULL",
-		"is_published BOOLEAN NOT NULL",
 		"caption TEXT NOT NULL",
 		"contents TEXT NOT NULL",
 		"collection_id INTEGER NOT NULL",
@@ -122,10 +120,10 @@ func (c *Comment) Repr() map[string]interface{} {
 func (p *Post) Create() error {
 	p.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
-		"post (author_id, timestamp, type, is_published, caption, contents, "+
+		"post (author_id, timestamp, type, caption, contents, "+
 		"  collection_id, collection_seq) "+
-		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-		p.Author.Id, p.Timestamp, p.Type, p.IsPublished, p.Caption, p.Contents,
+		"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		p.Author.Id, p.Timestamp, p.Type, p.Caption, p.Contents,
 		p.Collection.Id, 1234,
 	).Scan(&p.Id)
 	if err != nil {
@@ -145,7 +143,7 @@ func (p *Post) Read() error {
 		"WHERE post.id = $1", p.Id,
 	).Scan(
 		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
-		&p.IsPublished, &p.Caption, &p.Contents,
+		&p.Caption, &p.Contents,
 		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
 		&p.Collection.Title,

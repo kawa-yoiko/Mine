@@ -208,7 +208,8 @@ const check = async (method, url, params, expect, expect_status) => {
   }, 200)
   let token1 = u1.token
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
-  await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
+  await check('GET', '/whoami', {token: token1},
+    {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
   let u2 = await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
     token: any,
     user: {nickname: 'kurikoneko', avatar: '', signature: '', collections: [any]}
@@ -219,7 +220,8 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/whoami/edit',
     {token: token2, signature: bio2},
     {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
-  await check('GET', '/whoami', {token: token2}, {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+  await check('GET', '/whoami', {token: token2},
+    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
   await check('POST', '/whoami/edit',
     {token: token1, signature: bio1},
     {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]})
@@ -249,7 +251,6 @@ const check = async (method, url, params, expect, expect_status) => {
     contents: `${u2img1} ${u2img2}`,
     collection: lid2,
     tags: '美食,狗粮,每周粥粥',
-    publish: 1,
   }, {id: any})
   let pid1 = (await check('POST', '/post/new', {
     token: token1,
@@ -258,7 +259,6 @@ const check = async (method, url, params, expect, expect_status) => {
     contents: 'Lorem ipsum',
     collection: lid1,
     tags: 'tag1,tag2',
-    publish: 1,
   }, {id: any})).id
   let no_pid = pid1 + 10;
   await check('GET', `/post/${pid1}`, undefined, {
@@ -377,7 +377,6 @@ const check = async (method, url, params, expect, expect_status) => {
       contents: `Lorem ipsum ${i}`,
       collection: lid2,
       tags: `tag${i},tag${i*2+2}`,
-      publish: 1,
     }, {id: any})).id
 
   // Collections
@@ -457,6 +456,10 @@ const check = async (method, url, params, expect, expect_status) => {
     token: token1,  // Others' post
     collection_id: lid1,
   }, undefined, 403)
+  await check('POST', `/post/${no_pid}/set_collection`, {
+    token: token1,
+    collection_id: lid1,
+  }, undefined, 404)
 
   console.log(`\n${pass}/${total} passed`);
 })();

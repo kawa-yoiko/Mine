@@ -3,8 +3,6 @@ package routes
 import (
 	"github.com/kawa-yoiko/Mine/server/models"
 
-	"database/sql"
-	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -48,9 +46,6 @@ func referredCollection(u models.User, idStr string) models.Collection {
 	}
 	c := models.Collection{Id: int32(id)}
 	if err := c.Read(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			panic(models.CheckedError{404})
-		}
 		panic(err)
 	}
 	if c.Author.Id != u.Id {
