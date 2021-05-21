@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mine">
-
+    package="com.example.mine"
+    >
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Mine">
+        android:theme="@style/Theme.Mine"
+        android:requestLegacyExternalStorage="true"
+        >
         <activity android:name=".CollectionActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -19,6 +22,8 @@
         </activity>
         <activity android:name=".CreateActivity"></activity>
         <activity android:name=".PostActivity"></activity>
+        <activity android:name=".HomepageActivity"></activity>
+        <activity android:name=".SelectorActivity"></activity>
     </application>
 
 </manifest>

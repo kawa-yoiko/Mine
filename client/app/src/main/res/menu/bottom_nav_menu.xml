@@ -6,15 +6,15 @@
     <item
         android:id="@+id/main"
         android:title="首页"
-        android:icon="@drawable/flower"/>
+        android:icon="@mipmap/ic_flower"/>
     <item
         android:id="@+id/discover"
         android:title="发现"
-        android:icon="@drawable/flower" />
+        android:icon="@mipmap/ic_flower" />
     <item
         android:id="@+id/message"
         android:title="消息"
-        android:icon="@drawable/flower"/>
+        android:icon="@mipmap/ic_flower"/>
     <item
         android:id="@+id/my"
         android:title="我的"

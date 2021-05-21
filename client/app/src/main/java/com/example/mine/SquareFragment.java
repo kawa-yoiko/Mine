@@ -34,7 +34,7 @@ public class SquareFragment extends Fragment {
         dateAndImages.add(R.drawable.content1);
         dateAndImages.add(R.drawable.content2);
         dateAndImages.add(R.drawable.content3);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(),5);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(),3);
         recyclerView.setLayoutManager(gridLayoutManager);
         SquareAdapter adapter = new SquareAdapter(dateAndImages);
         recyclerView.setAdapter(adapter);
