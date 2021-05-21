@@ -40,9 +40,8 @@ func (c *Collection) Repr() map[string]interface{} {
 
 func (c *Collection) ReprBrief() map[string]interface{} {
 	return map[string]interface{}{
-		"id":          c.Id,
-		"title":       c.Title,
-		"description": c.Description,
+		"id":    c.Id,
+		"title": c.Title,
 	}
 }
 
