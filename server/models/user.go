@@ -31,10 +31,15 @@ func init() {
 }
 
 func (u *User) Repr() map[string]interface{} {
+	collections, err := readCollections(u.Id)
+	if err != nil {
+		panic(err)
+	}
 	return map[string]interface{}{
-		"nickname":  u.Nickname,
-		"avatar":    u.Avatar,
-		"signature": u.Signature,
+		"nickname":    u.Nickname,
+		"avatar":      u.Avatar,
+		"signature":   u.Signature,
+		"collections": collections,
 	}
 }
 

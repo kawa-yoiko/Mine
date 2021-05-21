@@ -202,33 +202,35 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: 'kurikoneko', email: 'kuriko@example.com', password: 'letme1n'}, {error: 0}, 200)
   await check('POST', '/login', {nickname: 'doesnotexist', password: '888888'}, undefined, 400)
   await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
-  let token1 = (await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
+  let u1 = await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
     token: any,
-    user: {nickname: 'kayuyuko', avatar: '', signature: ''}
-  }, 200)).token
+    user: {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]}
+  }, 200)
+  let token1 = u1.token
   await check('GET', '/whoami', {token: '123123'}, {}, 400)
-  await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: ''})
-  let token2 = (await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
+  await check('GET', '/whoami', {token: token1}, {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
+  let u2 = await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
     token: any,
-    user: {nickname: 'kurikoneko', avatar: '', signature: ''}
-  }, 200)).token
+    user: {nickname: 'kurikoneko', avatar: '', signature: '', collections: [any]}
+  }, 200)
+  let token2 = u2.token
 
   // User modification
   await check('POST', '/whoami/edit',
     {token: token2, signature: bio2},
-    {nickname: 'kurikoneko', avatar: '', signature: bio2})
-  await check('GET', '/whoami', {token: token2}, {nickname: 'kurikoneko', avatar: '', signature: bio2})
+    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+  await check('GET', '/whoami', {token: token2}, {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
   await check('POST', '/whoami/edit',
     {token: token1, signature: bio1},
-    {nickname: 'kayuyuko', avatar: '', signature: bio1})
+    {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]})
 
   // Avatar
   let avt1 = (await check('PUT', '/upload/avatar',
     {token: token1, file: 'avt1.png'},
-    {nickname: 'kayuyuko', avatar: any, signature: bio1})).avatar
+    {nickname: 'kayuyuko', avatar: any, signature: bio1, collections: [any]})).avatar
   let avt2 = (await check('PUT', '/upload/avatar',
     {token: token2, file: 'avt2.png'},
-    {nickname: 'kurikoneko', avatar: any, signature: bio2})).avatar
+    {nickname: 'kurikoneko', avatar: any, signature: bio2, collections: [any]})).avatar
 
   let u2img1 = (await check('PUT', '/upload',
     {token: token2, file: 'post1.png'},
@@ -238,11 +240,14 @@ const check = async (method, url, params, expect, expect_status) => {
     {ids: [any]})).ids[0]
 
   // Posts
+  let lid1 = u1.user.collections[0].id
+  let lid2 = u2.user.collections[0].id
   await check('POST', '/post/new', {
     token: token2,
     type: 1,
     caption: '今天是甜粥粥。',
     contents: `${u2img1} ${u2img2}`,
+    collection: lid2,
     tags: '美食,狗粮,每周粥粥',
     publish: 1,
   }, {id: any})
@@ -251,6 +256,7 @@ const check = async (method, url, params, expect, expect_status) => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
+    collection: lid1,
     tags: 'tag1,tag2',
     publish: 1,
   }, {id: any})).id
@@ -367,79 +373,48 @@ const check = async (method, url, params, expect, expect_status) => {
       type: 0,
       caption: `Caption ${i}`,
       contents: `Lorem ipsum ${i}`,
+      collection: lid2,
       tags: `tag${i},tag${i*2+2}`,
       publish: 1,
     }, {id: any})).id
 
   // Collections
-  let lid1 = (await check('POST', '/collection/new', {
+  await check('GET', `/collection/${lid1}`, undefined, {
+    author: {nickname: 'kayuyuko', avatar: avt1},
+    title: any,
+    description: any,
+    posts: [
+      {caption: 'Caption', contents: 'Lorem ipsum'}
+    ],
+    tags: [],
+  })
+  await check('GET', `/collection/${lid2}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: avt2},
+    title: any,
+    description: any,
+    posts: [
+      {caption: '今天是甜粥粥。', contents: any},
+      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+    ],
+    tags: [],
+  })
+  let lid3 = (await check('POST', '/collection/new', {
     token: token2,
     title: 'Collection',
     description: 'A collection',
     tags: 'tag2,tag3,tag4',
   }, {id: any})).id
-  await check('GET', `/collection/${lid1}`, undefined, {
+  await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
     title: 'Collection',
     description: 'A collection',
     posts: [],
     tags: ['tag2', 'tag3', 'tag4'],
   })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `+${pids[0]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-    ],
-  })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `+${pids[2]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-    ],
-  })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `+${pids[1]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-    ],
-  })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `-${pids[0]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-    ],
-  })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `+${pids[2]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-    ],
-  })
-  await check('POST', `/collection/${lid1}/edit_posts`, {
-    token: token2, op: `-${pids[3]}`
-  }, {
-    author: any, title: any, description: any, tags: any,
-    posts: [
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-    ],
-  })
-
 
   console.log(`\n${pass}/${total} passed`);
 })();

@@ -27,12 +27,15 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	c := referredCollection(u, r.PostFormValue("collection"))
+
 	p := models.Post{
 		Author:      u,
 		Type:        int32(ty),
 		Caption:     r.PostFormValue("caption"),
 		Contents:    r.PostFormValue("contents"),
 		IsPublished: (publish != 0),
+		Collection:  models.Collection{Id: c.Id},
 		Tags:        strings.Split(r.PostFormValue("tags"), ","),
 	}
 	if err := p.Create(); err != nil {

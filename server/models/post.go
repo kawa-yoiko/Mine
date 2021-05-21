@@ -14,6 +14,7 @@ type Post struct {
 	IsPublished  bool
 	Caption      string
 	Contents     string
+	Collection   Collection
 	Tags         []string
 	UpvoteCount  int32
 	CommentCount int32
@@ -41,7 +42,10 @@ func init() {
 		"is_published BOOLEAN NOT NULL",
 		"caption TEXT NOT NULL",
 		"contents TEXT NOT NULL",
+		"collection_id INTEGER NOT NULL",
+		"collection_seq INTEGER NOT NULL",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 	)
 	registerSchema("post_tag",
 		"post_id INTEGER NOT NULL",
@@ -117,9 +121,11 @@ func (c *Comment) Repr() map[string]interface{} {
 func (p *Post) Create() error {
 	p.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
-		"post (author_id, timestamp, type, is_published, caption, contents) "+
-		"VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		"post (author_id, timestamp, type, is_published, caption, contents, "+
+		"  collection_id, collection_seq) "+
+		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
 		p.Author.Id, p.Timestamp, p.Type, p.IsPublished, p.Caption, p.Contents,
+		p.Collection.Id, 1234,
 	).Scan(&p.Id)
 	if err != nil {
 		return err
@@ -130,14 +136,18 @@ func (p *Post) Create() error {
 }
 
 func (p *Post) Read() error {
+	var collectionSeq int32
 	err := db.QueryRow("SELECT "+
-		"post.*, mine_user.nickname, mine_user.avatar "+
+		"post.*, mine_user.nickname, mine_user.avatar, collection.title "+
 		"FROM post INNER JOIN mine_user ON post.author_id = mine_user.id "+
+		"  INNER JOIN collection ON post.collection_id = collection.id "+
 		"WHERE post.id = $1", p.Id,
 	).Scan(
 		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
 		&p.IsPublished, &p.Caption, &p.Contents,
+		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
+		&p.Collection.Title,
 	)
 	if err != nil {
 		return err

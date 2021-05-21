@@ -21,8 +21,11 @@ func registerSchema(table string, columns ...string) {
 	schemata = append(schemata, tableSchema{table, columns})
 }
 
-func InitializeSchemata(dbInput *sql.DB) error {
+func SetDB(dbInput *sql.DB) {
 	db = dbInput
+}
+
+func InitializeSchemata() error {
 	for _, schema := range schemata {
 		cmd := "CREATE TABLE IF NOT EXISTS " + schema.table + " ()"
 		if _, err := db.Exec(cmd); err != nil {
@@ -68,7 +71,7 @@ func ResetDatabase() error {
 			return err
 		}
 	}
-	return InitializeSchemata(db)
+	return InitializeSchemata()
 }
 
 type CheckedError struct{ Status int }
