@@ -50,7 +50,13 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := models.InitializeSchemata(db); err != nil {
+	models.SetDB(db)
+	if os.Getenv("RESET") != "" {
+		if err := models.ResetDatabase(); err != nil {
+			log.Fatalln(err)
+		}
+	}
+	if err := models.InitializeSchemata(); err != nil {
 		log.Fatalln(err)
 	}
 

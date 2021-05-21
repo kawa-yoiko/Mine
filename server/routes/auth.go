@@ -33,6 +33,17 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	// Create default collection
+	c := models.Collection{
+		Author:      models.User{Id: u.Id},
+		Title:       "",
+		Description: "default collection",
+		Tags:        []string{},
+	}
+	if err := c.Create(); err != nil {
+		panic(err)
+	}
+
 	write(w, 200, jsonPayload{"error": 0})
 }
 

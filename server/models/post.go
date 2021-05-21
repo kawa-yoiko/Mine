@@ -11,13 +11,13 @@ type Post struct {
 	Author       User
 	Timestamp    int64
 	Type         int32
-	IsPublished  bool
 	Caption      string
 	Contents     string
+	Collection   Collection
 	Tags         []string
 	UpvoteCount  int32
 	CommentCount int32
-	MarkCount    int32
+	StarCount    int32
 }
 
 type Comment struct {
@@ -38,10 +38,12 @@ func init() {
 		"author_id INTEGER NOT NULL",
 		"timestamp BIGINT NOT NULL",
 		"type INTEGER NOT NULL",
-		"is_published BOOLEAN NOT NULL",
 		"caption TEXT NOT NULL",
 		"contents TEXT NOT NULL",
+		"collection_id INTEGER NOT NULL",
+		"collection_seq INTEGER NOT NULL",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 	)
 	registerSchema("post_tag",
 		"post_id INTEGER NOT NULL",
@@ -55,12 +57,12 @@ func init() {
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT post_upvote_uniq UNIQUE (post_id, user_id)",
 	)
-	registerSchema("post_mark",
+	registerSchema("post_star",
 		"post_id INTEGER NOT NULL",
 		"user_id INTEGER NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
-		"ADD CONSTRAINT post_mark_uniq UNIQUE (post_id, user_id)",
+		"ADD CONSTRAINT post_star_uniq UNIQUE (post_id, user_id)",
 	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
@@ -84,18 +86,24 @@ func (p *Post) Repr() map[string]interface{} {
 		"type":          p.Type,
 		"caption":       p.Caption,
 		"contents":      p.Contents,
+		"collection":    p.Collection.ReprBrief(),
 		"tags":          p.Tags,
 		"upvote_count":  p.UpvoteCount,
 		"comment_count": p.CommentCount,
-		"mark_count":    p.MarkCount,
+		"star_count":    p.StarCount,
 	}
 }
 
 func (p *Post) ReprOutline() map[string]interface{} {
-	return map[string]interface{}{
-		"caption":  p.Caption,
+	ret := map[string]interface{}{
+		"id":       p.Id,
+		"type":     p.Type,
 		"contents": p.Contents,
 	}
+	if p.Type == 0 {
+		ret["caption"] = p.Caption
+	}
+	return ret
 }
 
 func (c *Comment) Repr() map[string]interface{} {
@@ -117,9 +125,11 @@ func (c *Comment) Repr() map[string]interface{} {
 func (p *Post) Create() error {
 	p.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
-		"post (author_id, timestamp, type, is_published, caption, contents) "+
-		"VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		p.Author.Id, p.Timestamp, p.Type, p.IsPublished, p.Caption, p.Contents,
+		"post (author_id, timestamp, type, caption, contents, "+
+		"  collection_id, collection_seq) "+
+		"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		p.Author.Id, p.Timestamp, p.Type, p.Caption, p.Contents,
+		p.Collection.Id, 1234,
 	).Scan(&p.Id)
 	if err != nil {
 		return err
@@ -130,14 +140,18 @@ func (p *Post) Create() error {
 }
 
 func (p *Post) Read() error {
+	var collectionSeq int32
 	err := db.QueryRow("SELECT "+
-		"post.*, mine_user.nickname, mine_user.avatar "+
+		"post.*, mine_user.nickname, mine_user.avatar, collection.title "+
 		"FROM post INNER JOIN mine_user ON post.author_id = mine_user.id "+
+		"  INNER JOIN collection ON post.collection_id = collection.id "+
 		"WHERE post.id = $1", p.Id,
 	).Scan(
 		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
-		&p.IsPublished, &p.Caption, &p.Contents,
+		&p.Caption, &p.Contents,
+		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
+		&p.Collection.Title,
 	)
 	if err != nil {
 		return err
@@ -156,8 +170,8 @@ func (p *Post) Read() error {
 	}
 
 	err = db.QueryRow(
-		"SELECT COUNT(*) FROM post_mark WHERE post_id = $1", p.Id,
-	).Scan(&p.MarkCount)
+		"SELECT COUNT(*) FROM post_star WHERE post_id = $1", p.Id,
+	).Scan(&p.StarCount)
 	if err != nil {
 		return err
 	}
@@ -199,8 +213,16 @@ func (p *Post) Upvote(u User, add bool) error {
 	return p.processUserRel("post_upvote", u, add, &p.UpvoteCount)
 }
 
-func (p *Post) Mark(u User, add bool) error {
-	return p.processUserRel("post_mark", u, add, &p.MarkCount)
+func (p *Post) Star(u User, add bool) error {
+	return p.processUserRel("post_star", u, add, &p.StarCount)
+}
+
+func (p *Post) SetCollection(c Collection) error {
+	_, err := db.Exec(`UPDATE post SET
+		collection_id = $1, collection_seq = $2
+		WHERE id = $3`,
+		c.Id, 1234, p.Id)
+	return err
 }
 
 func (c *Comment) Create() error {

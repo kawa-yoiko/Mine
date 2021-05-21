@@ -21,19 +21,16 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
-	publish, err := strconv.Atoi(r.PostFormValue("publish"))
-	if err != nil || publish < 0 || publish > 1 {
-		w.WriteHeader(400)
-		return
-	}
+
+	c := referredCollection(u, r.PostFormValue("collection"))
 
 	p := models.Post{
-		Author:      u,
-		Type:        int32(ty),
-		Caption:     r.PostFormValue("caption"),
-		Contents:    r.PostFormValue("contents"),
-		IsPublished: (publish != 0),
-		Tags:        strings.Split(r.PostFormValue("tags"), ","),
+		Author:     u,
+		Type:       int32(ty),
+		Caption:    r.PostFormValue("caption"),
+		Contents:   r.PostFormValue("contents"),
+		Collection: models.Collection{Id: c.Id},
+		Tags:       strings.Split(r.PostFormValue("tags"), ","),
 	}
 	if err := p.Create(); err != nil {
 		panic(err)
@@ -109,7 +106,7 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
 }
 
-func postPostMark(w http.ResponseWriter, r *http.Request) {
+func postPostStar(w http.ResponseWriter, r *http.Request) {
 	u, ok := auth(r)
 	if !ok {
 		w.WriteHeader(401)
@@ -117,16 +114,41 @@ func postPostMark(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
-	isMark, err := strconv.Atoi(r.PostFormValue("is_mark"))
+	isStar, err := strconv.Atoi(r.PostFormValue("is_star"))
 	if err != nil {
-		panic(err)
+		panic(models.CheckedError{400})
 	}
 
 	p := models.Post{Id: int32(id)}
-	if err := p.Mark(u, isMark != 0); err != nil {
+	if err := p.Star(u, isStar != 0); err != nil {
 		panic(err)
 	}
-	write(w, 200, jsonPayload{"mark_count": p.MarkCount})
+	write(w, 200, jsonPayload{"star_count": p.StarCount})
+}
+
+func postPostSetCollection(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		panic(models.CheckedError{401})
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	c := referredCollection(u, r.PostFormValue("collection_id"))
+
+	p := models.Post{Id: int32(id)}
+	if err := p.Read(); err != nil {
+		panic(err)
+	}
+
+	if p.Author.Id != u.Id {
+		panic(models.CheckedError{403})
+	}
+
+	if err := p.SetCollection(c); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{})
 }
 
 func init() {
@@ -135,5 +157,6 @@ func init() {
 	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
 	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
-	registerHandler("/post/{id}/mark", postPostMark, "POST")
+	registerHandler("/post/{id}/star", postPostStar, "POST")
+	registerHandler("/post/{id}/set_collection", postPostSetCollection, "POST")
 }
