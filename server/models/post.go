@@ -17,7 +17,7 @@ type Post struct {
 	Tags         []string
 	UpvoteCount  int32
 	CommentCount int32
-	MarkCount    int32
+	StarCount    int32
 }
 
 type Comment struct {
@@ -55,12 +55,12 @@ func init() {
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT post_upvote_uniq UNIQUE (post_id, user_id)",
 	)
-	registerSchema("post_mark",
+	registerSchema("post_star",
 		"post_id INTEGER NOT NULL",
 		"user_id INTEGER NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
-		"ADD CONSTRAINT post_mark_uniq UNIQUE (post_id, user_id)",
+		"ADD CONSTRAINT post_star_uniq UNIQUE (post_id, user_id)",
 	)
 	registerSchema("comment",
 		"id SERIAL PRIMARY KEY",
@@ -87,7 +87,7 @@ func (p *Post) Repr() map[string]interface{} {
 		"tags":          p.Tags,
 		"upvote_count":  p.UpvoteCount,
 		"comment_count": p.CommentCount,
-		"mark_count":    p.MarkCount,
+		"star_count":    p.StarCount,
 	}
 }
 
@@ -156,8 +156,8 @@ func (p *Post) Read() error {
 	}
 
 	err = db.QueryRow(
-		"SELECT COUNT(*) FROM post_mark WHERE post_id = $1", p.Id,
-	).Scan(&p.MarkCount)
+		"SELECT COUNT(*) FROM post_star WHERE post_id = $1", p.Id,
+	).Scan(&p.StarCount)
 	if err != nil {
 		return err
 	}
@@ -199,8 +199,8 @@ func (p *Post) Upvote(u User, add bool) error {
 	return p.processUserRel("post_upvote", u, add, &p.UpvoteCount)
 }
 
-func (p *Post) Mark(u User, add bool) error {
-	return p.processUserRel("post_mark", u, add, &p.MarkCount)
+func (p *Post) Star(u User, add bool) error {
+	return p.processUserRel("post_star", u, add, &p.StarCount)
 }
 
 func (c *Comment) Create() error {
