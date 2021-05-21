@@ -28,6 +28,7 @@
         <activity android:name=".PostActivity"></activity>
         <activity android:name=".HomepageActivity"></activity>
         <activity android:name=".SelectorActivity"></activity>
+        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

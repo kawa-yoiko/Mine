@@ -16,7 +16,10 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
 
     private final View view;
     public SingleViewAdapter(View view) {
-        ((ViewGroup)view.getParent()).removeView(view);
+        ViewGroup parent = (ViewGroup)view.getParent();
+        if(parent != null) {
+            parent.removeView(view);
+        }
         this.view = view;
     }
 

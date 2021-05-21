@@ -73,15 +73,17 @@ public class MyFragment  extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ServerReq.get("/", (String s) -> {
-                    Log.d("network", "(1) received " + s);
-                });
-                ServerReq.get("/1", (String s) -> {
-                    Log.d("network", "(2) received " + s);
-                });
-                ServerReq.post("/signup", (String s) -> {
-                    Log.d("network", "(3) received " + s);
-                });
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+
+        View gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
+        gotoHomePageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), HomepageActivity.class);
+                getActivity().startActivity(intent);
             }
         });
     }

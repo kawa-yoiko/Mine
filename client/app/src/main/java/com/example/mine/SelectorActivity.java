@@ -37,7 +37,7 @@ public class SelectorActivity extends AppCompatActivity {
         imagePicker.setImageLoader(new PicassoImageLoader());
         imagePicker.setCrop(true);
         imagePicker.setSaveRectangle(true);
-        imagePicker.setSelectLimit(9);    //选中数量限制
+        imagePicker.setSelectLimit(1);
         imagePicker.setStyle(CropImageView.Style.RECTANGLE);  //裁剪框的形状
         imagePicker.setFocusWidth(800);
         imagePicker.setFocusHeight(800);

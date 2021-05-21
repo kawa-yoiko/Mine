@@ -13,12 +13,11 @@
         tools:ignore="MissingConstraints"
         android:id="@+id/title"
         ></EditText>
-    <view
-        class="com.example.mine.WidthEqualsHeightImageView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/recyclerview"
         tools:ignore="MissingConstraints"
-        android:src="@drawable/luoxiaohei"
         app:layout_constraintTop_toBottomOf="@+id/title"
-        ></view>
+        ></androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>
