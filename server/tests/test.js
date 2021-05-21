@@ -275,6 +275,15 @@ const check = async (method, url, params, expect, expect_status) => {
   })
   await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
 
+  await check('POST', '/post/new', {
+    token: token1,
+    type: 0,
+    caption: 'Caption',
+    contents: 'Lorem ipsum',
+    collection: lid2, // Others' collection
+    tags: 'tag1,tag2',
+  }, undefined, 403)
+
   // Comments
   let cid1 = (await check('POST', `/post/${pid1}/comment/new`, {
     token: token2,
@@ -385,7 +394,7 @@ const check = async (method, url, params, expect, expect_status) => {
     title: any,
     description: any,
     posts: [
-      {caption: 'Caption', contents: 'Lorem ipsum'}
+      {id: pid1, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
     ],
     tags: [],
   })
@@ -394,12 +403,12 @@ const check = async (method, url, params, expect, expect_status) => {
     title: any,
     description: any,
     posts: [
-      {caption: '今天是甜粥粥。', contents: any},
-      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 3', contents: 'Lorem ipsum 3'},
-      {caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
   })
@@ -430,10 +439,10 @@ const check = async (method, url, params, expect, expect_status) => {
     title: any,
     description: any,
     posts: [
-      {caption: '今天是甜粥粥。', contents: any},
-      {caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
   })
@@ -442,8 +451,8 @@ const check = async (method, url, params, expect, expect_status) => {
     title: 'Collection',
     description: 'A collection',
     posts: [
-      {caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
     ],
     tags: ['tag2', 'tag3', 'tag4'],
   })

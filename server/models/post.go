@@ -95,10 +95,15 @@ func (p *Post) Repr() map[string]interface{} {
 }
 
 func (p *Post) ReprOutline() map[string]interface{} {
-	return map[string]interface{}{
-		"caption":  p.Caption,
+	ret := map[string]interface{}{
+		"id":       p.Id,
+		"type":     p.Type,
 		"contents": p.Contents,
 	}
+	if p.Type == 0 {
+		ret["caption"] = p.Caption
+	}
+	return ret
 }
 
 func (c *Comment) Repr() map[string]interface{} {
