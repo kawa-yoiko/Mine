@@ -68,7 +68,9 @@ public class PostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 android.util.Log.d("PostActivity", String.valueOf(post.getCollectionID()));
                 Intent intent = new Intent();
-                intent.setClass(v.getContext(), CollectionActivity.class);
+                intent.setClass(v.getContext(), LoadingActivity.class);
+                intent.putExtra("type", LoadingActivity.DestType.collection);
+                intent.putExtra("id", post.getCollectionID());
                 v.getContext().startActivity(intent);
             }
         });
