@@ -10,11 +10,7 @@ import (
 )
 
 func postCollectionNew(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		w.WriteHeader(401)
-		return
-	}
+	u := mustAuth(r)
 
 	c := models.Collection{
 		Author:      u,

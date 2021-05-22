@@ -103,21 +103,21 @@ func auth(r *http.Request) (models.User, bool) {
 	return u, true
 }
 
-func getWhoAmI(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		write(w, 400, jsonPayload{})
-		return
+func mustAuth(r *http.Request) models.User {
+	if u, ok := auth(r); ok {
+		return u
+	} else {
+		panic(models.CheckedError{401})
 	}
+}
 
+func getWhoAmI(w http.ResponseWriter, r *http.Request) {
+	u := mustAuth(r)
 	write(w, 200, u.Repr())
 }
 
 func postWhoAmIEdit(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		panic(models.CheckedError{400})
-	}
+	u := mustAuth(r)
 
 	u.Signature = r.PostFormValue("signature")
 	if err := u.Update(); err != nil {

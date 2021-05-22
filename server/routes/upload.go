@@ -14,10 +14,7 @@ import (
 var uploadDir string
 
 func handleUpload(w http.ResponseWriter, r *http.Request) (models.User, []string) {
-	u, ok := auth(r)
-	if !ok {
-		panic(models.CheckedError{401})
-	}
+	u := mustAuth(r)
 
 	reader, err := r.MultipartReader()
 	if err != nil {

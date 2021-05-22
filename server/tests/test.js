@@ -207,7 +207,7 @@ const check = async (method, url, params, expect, expect_status) => {
     user: {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]}
   }, 200)
   let token1 = u1.token
-  await check('GET', '/whoami', {token: '123123'}, {}, 400)
+  await check('GET', '/whoami', {token: '123123'}, undefined, 401)
   await check('GET', '/whoami', {token: token1},
     {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
   let u2 = await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {

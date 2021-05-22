@@ -10,11 +10,7 @@ import (
 )
 
 func postPostNew(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		w.WriteHeader(401)
-		return
-	}
+	u := mustAuth(r)
 
 	ty, err := strconv.Atoi(r.PostFormValue("type"))
 	if err != nil || ty < 0 || ty > 3 {
@@ -50,11 +46,7 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		w.WriteHeader(401)
-		return
-	}
+	u := mustAuth(r)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	replyTo, _ := strconv.Atoi(r.PostFormValue("reply_to"))
@@ -87,11 +79,7 @@ func getPostComments(w http.ResponseWriter, r *http.Request) {
 }
 
 func postPostUpvote(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		w.WriteHeader(401)
-		return
-	}
+	u := mustAuth(r)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
@@ -107,11 +95,7 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 }
 
 func postPostStar(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		w.WriteHeader(401)
-		return
-	}
+	u := mustAuth(r)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isStar, err := strconv.Atoi(r.PostFormValue("is_star"))
@@ -127,10 +111,7 @@ func postPostStar(w http.ResponseWriter, r *http.Request) {
 }
 
 func postPostSetCollection(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		panic(models.CheckedError{401})
-	}
+	u := mustAuth(r)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
