@@ -7,6 +7,7 @@ type Collection struct {
 	Description string
 	Tags        []string
 	Posts       []Post
+	SubCount    int32
 }
 
 func init() {
@@ -22,6 +23,13 @@ func init() {
 		"tag TEXT NOT NULL",
 		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 	)
+	registerSchema("collection_subscription",
+		"collection_id INTEGER NOT NULL",
+		"user_id INTEGER NOT NULL",
+		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
+		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT collection_subscription_uniq UNIQUE (collection_id, user_id)",
+	)
 }
 
 func (c *Collection) Repr() map[string]interface{} {
@@ -30,11 +38,12 @@ func (c *Collection) Repr() map[string]interface{} {
 		posts = append(posts, post.ReprOutline())
 	}
 	return map[string]interface{}{
-		"author":      c.Author.ReprBrief(),
-		"title":       c.Title,
-		"description": c.Description,
-		"posts":       posts,
-		"tags":        c.Tags,
+		"author":             c.Author.ReprBrief(),
+		"title":              c.Title,
+		"description":        c.Description,
+		"posts":              posts,
+		"tags":               c.Tags,
+		"subscription_count": c.SubCount,
 	}
 }
 
@@ -99,6 +108,13 @@ func (c *Collection) Read() error {
 		return err
 	}
 	c.Posts = posts
+
+	err = db.QueryRow(
+		"SELECT COUNT (*) FROM collection_subscription WHERE collection_id = $1", c.Id,
+	).Scan(&c.SubCount)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -122,4 +138,8 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 		return nil, err
 	}
 	return collections, nil
+}
+
+func (c *Collection) Subscribe(u User, add bool) error {
+	return processEntityUserRel("collection_subscription", "collection", c.Id, u, add, &c.SubCount)
 }

@@ -50,7 +50,24 @@ func referredCollection(u models.User, idStr string) models.Collection {
 	return c
 }
 
+func postCollectionSubscribe(w http.ResponseWriter, r *http.Request) {
+	u := mustAuth(r)
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	isSubscribe, err := strconv.Atoi(r.PostFormValue("is_subscribe"))
+	if err != nil || (isSubscribe != 0 && isSubscribe != 1) {
+		panic(models.CheckedError{400})
+	}
+
+	c := models.Collection{Id: int32(id)}
+	if err := c.Subscribe(u, isSubscribe != 0); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"subscription_count": c.SubCount})
+}
+
 func init() {
 	registerHandler("/collection/new", postCollectionNew, "POST")
 	registerHandler("/collection/{id}", getCollection, "GET")
+	registerHandler("/collection/{id}/subscribe", postCollectionSubscribe, "POST")
 }

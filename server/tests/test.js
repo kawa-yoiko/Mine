@@ -397,6 +397,7 @@ const check = async (method, url, params, expect, expect_status) => {
       {id: pid1, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
     ],
     tags: [],
+    subscription_count: 0,
   })
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
@@ -411,6 +412,7 @@ const check = async (method, url, params, expect, expect_status) => {
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
+    subscription_count: 0,
   })
   let lid3 = (await check('POST', '/collection/new', {
     token: token2,
@@ -424,6 +426,7 @@ const check = async (method, url, params, expect, expect_status) => {
     description: 'A collection',
     posts: [],
     tags: ['tag2', 'tag3', 'tag4'],
+    subscription_count: 0,
   })
 
   await check('POST', `/post/${pids[1]}/set_collection`, {
@@ -445,6 +448,7 @@ const check = async (method, url, params, expect, expect_status) => {
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
+    subscription_count: 0,
   })
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
@@ -455,6 +459,7 @@ const check = async (method, url, params, expect, expect_status) => {
       {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
     ],
     tags: ['tag2', 'tag3', 'tag4'],
+    subscription_count: 0,
   })
 
   await check('POST', `/post/${pids[0]}/set_collection`, {
@@ -469,6 +474,26 @@ const check = async (method, url, params, expect, expect_status) => {
     token: token1,
     collection_id: lid1,
   }, undefined, 404)
+
+  // Subscription
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 1}, {subscription_count: 1})
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 1}, {subscription_count: 1})
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 0}, {subscription_count: 1})
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 1}, {subscription_count: 2})
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 0}, {subscription_count: 1})
+  await check('GET', `/collection/${lid2}`, undefined, {
+    author: {nickname: 'kurikoneko', avatar: avt2},
+    title: any,
+    description: any,
+    posts: [
+      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+    ],
+    tags: [],
+    subscription_count: 1,
+  })
 
   console.log(`\n${pass}/${total} passed`);
 })();

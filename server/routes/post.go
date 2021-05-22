@@ -83,8 +83,8 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
-	if err != nil {
-		panic(err)
+	if err != nil || (isUpvote != 0 && isUpvote != 1) {
+		panic(models.CheckedError{400})
 	}
 
 	p := models.Post{Id: int32(id)}
@@ -99,7 +99,7 @@ func postPostStar(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	isStar, err := strconv.Atoi(r.PostFormValue("is_star"))
-	if err != nil {
+	if err != nil || (isStar != 0 && isStar != 1) {
 		panic(models.CheckedError{400})
 	}
 

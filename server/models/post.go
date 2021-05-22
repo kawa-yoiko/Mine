@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type Post struct {
@@ -183,38 +181,12 @@ func (p *Post) Read() error {
 	return err
 }
 
-func (p *Post) processUserRel(table string, u User, add bool, count *int32) error {
-	var err error
-	if add {
-		_, err = db.Exec(
-			"INSERT INTO "+table+" (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-			p.Id, u.Id)
-	} else {
-		_, err = db.Exec(
-			"DELETE FROM "+table+" WHERE post_id = $1 AND user_id = $2",
-			p.Id, u.Id)
-	}
-	if err != nil {
-		if err, ok := err.(*pq.Error); ok && false {
-			if err.Code.Class() == "23" && err.Constraint == "post_ref" {
-				return CheckedError{404}
-			}
-		}
-		return err
-	}
-
-	err = db.QueryRow(
-		"SELECT COUNT(*) FROM "+table+" WHERE post_id = $1", p.Id,
-	).Scan(count)
-	return err
-}
-
 func (p *Post) Upvote(u User, add bool) error {
-	return p.processUserRel("post_upvote", u, add, &p.UpvoteCount)
+	return processEntityUserRel("post_upvote", "post", p.Id, u, add, &p.UpvoteCount)
 }
 
 func (p *Post) Star(u User, add bool) error {
-	return p.processUserRel("post_star", u, add, &p.StarCount)
+	return processEntityUserRel("post_star", "post", p.Id, u, add, &p.StarCount)
 }
 
 func (p *Post) SetCollection(c Collection) error {
