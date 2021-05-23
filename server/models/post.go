@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 )
 
@@ -92,11 +93,33 @@ func (p *Post) Repr() map[string]interface{} {
 	}
 }
 
+func (p *Post) truncatedContents(limit int) string {
+	// Truncate contents
+	if p.Type == 0 {
+		numRunes := 0
+		for i, _ := range p.Contents {
+			if numRunes++; numRunes > limit {
+				return p.Contents[:i]
+			}
+		}
+	} else if p.Type == 1 {
+		return strings.SplitN(p.Contents, " ", 2)[0]
+	}
+	return p.Contents
+}
+
+func (p *Post) ReprBrief() map[string]interface{} {
+	ret := p.Repr()
+	ret["id"] = p.Id
+	ret["contents"] = p.truncatedContents(300)
+	return ret
+}
+
 func (p *Post) ReprOutline() map[string]interface{} {
 	ret := map[string]interface{}{
 		"id":       p.Id,
 		"type":     p.Type,
-		"contents": p.Contents,
+		"contents": p.truncatedContents(100),
 	}
 	if p.Type == 0 {
 		ret["caption"] = p.Caption

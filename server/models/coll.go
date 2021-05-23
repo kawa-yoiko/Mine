@@ -147,8 +147,9 @@ func (c *Collection) Subscribe(u User, add bool) error {
 func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
 	rows, err := db.Query(postSelectClause+
 		`WHERE collection.id IN
-		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)`,
-		userId)
+		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
+		  LIMIT $3 OFFSET $2`,
+		userId, start, count)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +160,7 @@ func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]inte
 		if err := rows.Scan(p.fields()...); err != nil {
 			return nil, err
 		}
-		posts = append(posts, p.Repr())
+		posts = append(posts, p.ReprBrief())
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
