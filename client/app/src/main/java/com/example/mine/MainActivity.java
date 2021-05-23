@@ -24,8 +24,9 @@ public class MainActivity extends AppCompatActivity {
         Fragment squareFragment = new SquareFragment();
         Fragment postsListFragment = new PostsListFragment();
         Fragment myFragment = new MyFragment();
+        Fragment photoViewPagerFragment = new PhotoViewPagerFragment();
 //        Fragment commentFragment = new CommentFragment();
-        setCurrentFragment(myFragment);
+        setCurrentFragment(photoViewPagerFragment);
 //        View view = View.inflate(this.getBaseContext(), R.layout.search_box, null);
 //        View cv = getWindow().getDecorView();
 //        ViewGroup test = cv.findViewById(R.id.test);
