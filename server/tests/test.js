@@ -197,6 +197,7 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
 */
 
+/*
   const bio1 = '我爱吃栗子';
   const bio2 = '我爱吃寿司';
 
@@ -532,6 +533,137 @@ const check = async (method, url, params, expect, expect_status) => {
     {_ignoreRedundant: true, contents: '哈'.repeat(300)},
     {_ignoreRedundant: true, contents: `${u2img1}`},
   ])
+*/
+
+  // Sample dataset!
+  const rand = (() => {
+    let seed = 523;
+    return () => {
+      // https://stackoverflow.com/a/3428186
+      // Robert Jenkins' 32 bit integer hash function.
+      seed = ((seed + 0x7ed55d16) + (seed << 12))  & 0xffffffff;
+      seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffffffff;
+      seed = ((seed + 0x165667b1) + (seed << 5))   & 0xffffffff;
+      seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffffffff;
+      seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffffffff;
+      seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffffffff;
+      return seed & 0xfffffff;
+    };
+  })();
+  const RAND_MAX = 0x10000000;
+
+  const N = 10;   // Number of users
+  const C = 3;    // Number of collections per user (minimum)
+  const Cd = 5;   // (variation)
+  const M = 10;   // Average number of posts per collection
+  const S = 50;   // Number of stars per user (minimum)
+  const Sd = 150; // (variation)
+  const T = 100;  // Number of comments per user (minimum)
+  const Td = 500; // (variation)
+  const B = 5;    // Number of subscriptions per user (minimum)
+  const Bd = 15;  // (variation)
+
+  const token = Array(N);
+  for (let i = 0; i < N; i++) {
+    await check('POST', '/signup',
+      {nickname: `uu${i}`, email: `uu${i}@example.com`, password: `aaaaaa${i}`}, any);
+    token[i] = (await check('POST', '/login',
+      {nickname: `uu${i}`, password: `aaaaaa${i}`}, any)).token;
+  }
+
+  // Upload images
+  const images = Array.from(Array(N), () => []);
+  const dir = await require('fs/promises').readdir('fxemoji');
+  for (const file of dir) {
+    const u = rand() % N;
+    const id = (await check('PUT', '/upload',
+      {token: token[u], file: `fxemoji/${file}`},
+      {ids: [any]})).ids[0];
+    images[u].push(id);
+  }
+  console.log(images.map((a) => a.length));
+
+  // Create collections
+  const colls = Array.from(Array(N), () => []);
+  const collsAll = [];
+  for (let u = 0; u < N; u++) {
+    let cn = C + rand() % Cd;
+    for (let c = 0; c < cn; c++) {
+      const id = (await check('POST', '/collection/new', {
+        token: token[u],
+        title: `Collection ${u}-${c}`,
+        description: `A collection ${u}-${c}`,
+        tags: 'tag1,tag2',
+      }, any)).id;
+      colls[u].push(id);
+      collsAll.push(id);
+    }
+  }
+  console.log(colls.map((a) => a.length));
+
+
+  const shuffleRepeated = (N, f) => {
+    const a = [];
+    for (let u = 0; u < N; u++)
+      for (let i = f(u); i > 0; i--) {
+        const j = rand() % (a.length + 1);
+        let v = u;
+        if (j !== a.length) {
+          v = a[j];
+          a[j] = u;
+        }
+        a.push(v);
+      }
+    return a;
+  };
+
+  // Create posts
+  const postsAll = [];
+  for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
+    const contentImages = Array.from(Array(rand() % 9),
+      () => images[u][rand() % images[u].length]);
+    const id = (await check('POST', '/post/new', {
+      token: token[u],
+      type: 1,
+      caption: '今天是甜粥粥。',
+      contents: contentImages.join(' '),
+      collection: colls[u][rand() % colls[u].length],
+      tags: 'tag3,tag4',
+    }, {id: any})).id;
+    postsAll.push(id);
+  }
+
+  // Stars
+  /*
+  for (let u = 0; u < N; u++)
+    for (let s = S + rand() % Sd; s > 0; s--) {
+      await check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
+        {token: token[u], is_star: 1}, any);
+    }
+  */
+
+  // Comments
+  const postCmts = {};
+  for (let u of shuffleRepeated(N, (u) => T + rand() % Td)) {
+    const post = postsAll[rand() % postsAll.length];
+
+    let cmts = postCmts[post];
+    if (cmts === undefined) postCmts[post] = cmts = [];
+
+    const cid = (await check('POST', `/post/${post}/comment/new`, {
+      token: token[u],
+      reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
+      contents: 'No comment',
+    }, {id: any})).id;
+    cmts.push(cid);
+  }
+
+  // Subscriptions
+  for (let u = 0; u < N; u++)
+    for (let b = B + rand() % Bd; b > 0; b--) {
+      await check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
+        {token: token[u], is_subscribe: 1}, any);
+    }
 
   console.log(`\n${pass}/${total} passed`);
 })();
