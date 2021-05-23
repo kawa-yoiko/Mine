@@ -99,8 +99,10 @@ const objEqual = (a, b) => {
   if (typeof a !== 'object') return a === b;
   if ((a === null) ^ (b === null)) return false;
 
-  for (let key in a) if (!objEqual(a[key], b[key])) return false;
-  for (let key in b) if (!objEqual(a[key], b[key])) return false;
+  if (b && !b._ignoreRedundant)
+    for (let key in a) if (key[0] !== '_' && !objEqual(a[key], b[key])) return false;
+  if (a && !a._ignoreRedundant)
+    for (let key in b) if (key[0] !== '_' && !objEqual(a[key], b[key])) return false;
   return true;
 };
 
@@ -494,6 +496,42 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: [],
     subscription_count: 1,
   })
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any, any, any])
+  await check('GET', `/subscription_timeline`, {token: token1, start: 0, count: 10}, [])
+
+  await check('POST', `/collection/${lid3}/subscribe`, {token: token2, is_subscribe: 1}, {subscription_count: 1})
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any, any, any, any, any])
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 0}, {subscription_count: 0})
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any])
+
+  // Truncation in timeline
+  let lid4 = (await check('POST', '/collection/new', {
+    token: token1,
+    title: 'Truncation test',
+    description: 'Subscribe!',
+    tags: 'a,b,c',
+  }, {id: any})).id
+  await check('POST', '/post/new', {
+    token: token1,
+    type: 0,
+    caption: 'Very long text',
+    contents: '哈'.repeat(5000),
+    collection: lid4,
+    tags: 'd,e,f',
+  }, {id: any})
+  await check('POST', '/post/new', {
+    token: token1,
+    type: 1,
+    caption: 'Multiple images',
+    contents: `${u2img1} ${u2img2} ${u2img2}`,
+    collection: lid4,
+    tags: 'd,e,f',
+  }, {id: any})
+  await check('POST', `/collection/${lid4}/subscribe`, {token: token1, is_subscribe: 1}, {subscription_count: 1})
+  await check('GET', `/subscription_timeline`, {token: token1, start: 0, count: 10}, [
+    {_ignoreRedundant: true, contents: '哈'.repeat(300)},
+    {_ignoreRedundant: true, contents: `${u2img1}`},
+  ])
 
   console.log(`\n${pass}/${total} passed`);
 })();
