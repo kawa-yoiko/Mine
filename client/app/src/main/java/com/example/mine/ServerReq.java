@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -21,12 +22,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 import okhttp3.*;
 
 public class ServerReq {
     static OkHttpClient client;
+
+    static String token;
 
     static {
         client = new OkHttpClient();
@@ -81,6 +87,8 @@ public class ServerReq {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            if (response.code() >= 400 && response.code() <= 599)
+                Log.e("network", "Response code " + response);
             callback.accept(response.body().byteStream());
         }
     }
@@ -88,6 +96,7 @@ public class ServerReq {
     public static void getStream(String url, Consumer<InputStream> callbackFn) {
         Request request = new Request.Builder()
                 .url(getFullUrl(url))
+                .header("Authorization", token != null ? "Bearer " + token : "")
                 .get()
                 .build();
         Call call = client.newCall(request);
@@ -108,14 +117,14 @@ public class ServerReq {
         });
     }
 
-    public static void postStream(String url, Consumer<InputStream> callbackFn) {
-        RequestBody requestBody = new FormBody.Builder()
-                .add("nickname", "kayuyuyuko")
-                .add("email", "kayuyuyuko@kawa.moe")
-                .add("password", "9876543210")
-                .build();
+    public static void postStream(String url, List<Pair<String, String>> params, Consumer<InputStream> callbackFn) {
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
+        for (Pair<String, String> p : params)
+            requestBodyBuilder.add(p.first, p.second);
+        RequestBody requestBody = requestBodyBuilder.build();
         Request request = new Request.Builder()
                 .url(getFullUrl(url))
+                .header("Authorization", token != null ? "Bearer " + token : "")
                 .post(requestBody)
                 .build();
         Call call = client.newCall(request);
@@ -123,9 +132,35 @@ public class ServerReq {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static void post(String url, Consumer<String> callbackFn) {
-        postStream(url, (InputStream stream) -> {
+    public static void post(String url, List<Pair<String, String>> params, Consumer<String> callbackFn) {
+        postStream(url, params, (InputStream stream) -> {
             callbackFn.accept(streamToString(stream));
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void postJson(String url, List<Pair<String, String>> params, Consumer<JSONObject> callbackFn) {
+        post(url, params, (String s) -> {
+            callbackFn.accept(parseJson(s));
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void login(String nickname, String password, Consumer<Boolean> callbackFn) {
+        postJson("/login", Arrays.asList(
+                new Pair<>("nickname", nickname),
+                new Pair<>("password", password)
+        ), (JSONObject obj) -> {
+            if (obj == null) {
+                callbackFn.accept(false);
+            } else {
+                try {
+                    token = obj.getString("token");
+                    callbackFn.accept(true);
+                } catch (JSONException e) {
+                    callbackFn.accept(false);
+                }
+            }
         });
     }
 

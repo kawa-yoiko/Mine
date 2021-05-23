@@ -4,18 +4,27 @@ package com.example.mine;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
+import java.util.List;
 
 public class PostActivity extends AppCompatActivity {
     private ViewGroup fView;
@@ -36,6 +45,38 @@ public class PostActivity extends AppCompatActivity {
         comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = findViewById(R.id.star_num);
         star_num_text.setText(String.valueOf(post.getStar_num()));
+
+        EditText commentText = (EditText) findViewById(R.id.comment_edit);
+        Button commentButton = (Button) findViewById(R.id.comment_button);
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                commentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.star, 0, 0, 0);
+                commentText.setEnabled(false);
+                ServerReq.postJson("/post/" + post.id + "/comment/new", List.of(
+                        new Pair<>("reply_to", "-1"),
+                        new Pair<>("contents", commentText.getText().toString())
+                ), (JSONObject obj) -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                    }
+                    PostActivity.this.runOnUiThread(() -> {
+                        commentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.flower, 0, 0, 0);
+                        commentText.setEnabled(true);
+                    });
+                    int commentId = -1;
+                    try {
+                        commentId = obj.getInt("id");
+                    } catch (Exception e) {
+                    }
+                    if (commentId == -1)
+                        return;
+                    PostActivity.this.runOnUiThread(() -> commentText.setText(""));
+                });
+            }
+        });
     }
 
     private View getPostView(Post post) {

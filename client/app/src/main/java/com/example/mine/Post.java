@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Post implements Serializable {
+    public int id;
     private String collection;
     private int collectionID;
     private String tag;

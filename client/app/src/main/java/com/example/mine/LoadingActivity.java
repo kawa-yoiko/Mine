@@ -53,20 +53,21 @@ public class LoadingActivity extends AppCompatActivity {
         Intent inIntent = getIntent();
         DestType destType = (DestType) inIntent.getSerializableExtra("type");
         Log.d("loading", destType.toString());
+        int id = inIntent.getIntExtra("id", -1);
         switch (destType) {
             case post:
-                requestNetworkAndSetUpIntent("/post/1",
+                requestNetworkAndSetUpIntent("/post/" + id,
                         PostActivity.class,
                         (JSONObject obj, Intent intent) -> {
-                            intent.putExtra("post", new Post(obj));
+                            Post post = new Post(obj);
+                            post.id = id;
+                            intent.putExtra("post", post);
                         });
                 break;
             case collection:
-                int id = inIntent.getIntExtra("id", -1);
                 requestNetworkAndSetUpIntent("/collection/" + id,
                         CollectionActivity.class,
                         (JSONObject obj, Intent intent) -> {
-                            Log.d("loading collection", (new Collection(obj)).toString());
                             intent.putExtra("collection", new Collection(obj));
                         });
         }

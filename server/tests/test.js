@@ -581,7 +581,6 @@ const check = async (method, url, params, expect, expect_status) => {
       {ids: [any]})).ids[0];
     images[u].push(id);
   }
-  console.log(images.map((a) => a.length));
 
   // Create collections
   const colls = Array.from(Array(N), () => []);
@@ -599,8 +598,6 @@ const check = async (method, url, params, expect, expect_status) => {
       collsAll.push(id);
     }
   }
-  console.log(colls.map((a) => a.length));
-
 
   const shuffleRepeated = (N, f) => {
     const a = [];
@@ -634,13 +631,11 @@ const check = async (method, url, params, expect, expect_status) => {
   }
 
   // Stars
-  /*
   for (let u = 0; u < N; u++)
     for (let s = S + rand() % Sd; s > 0; s--) {
       await check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
         {token: token[u], is_star: 1}, any);
     }
-  */
 
   // Comments
   const postCmts = {};
@@ -664,6 +659,8 @@ const check = async (method, url, params, expect, expect_status) => {
       await check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
         {token: token[u], is_subscribe: 1}, any);
     }
+
+  console.log(token);
 
   console.log(`\n${pass}/${total} passed`);
 })();

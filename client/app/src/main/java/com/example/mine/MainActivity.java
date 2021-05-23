@@ -1,9 +1,11 @@
 package com.example.mine;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +17,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ServerReq.login("uu1", "aaaaaa1", (Boolean success) -> {
+            android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
+        });
+
 //        ButterKnife.bind(this);
         Fragment discoverFragment = new DiscoverFragment();
         Fragment squareFragment = new SquareFragment();
