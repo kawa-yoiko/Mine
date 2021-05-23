@@ -143,3 +143,7 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 func (c *Collection) Subscribe(u User, add bool) error {
 	return processEntityUserRel("collection_subscription", "collection", c.Id, u, add, &c.SubCount)
 }
+
+func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
+	return nil, nil
+}

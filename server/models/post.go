@@ -221,19 +221,23 @@ const commentSelectClause = "SELECT " +
 	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
 	"  LEFT JOIN mine_user AS reply_user ON reply_comment.author_id = reply_user.id "
 
-func (c *Comment) Read() error {
-	err := db.QueryRow(commentSelectClause+
-		"WHERE comment.id = $1", c.Id,
-	).Scan(
+func (c *Comment) Fields() []interface{} {
+	return []interface{}{
 		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
 		&c.Contents,
 		&c.Author.Nickname, &c.Author.Avatar,
 		&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
-	)
+	}
+}
+
+func (c *Comment) Read() error {
+	err := db.QueryRow(commentSelectClause+
+		"WHERE comment.id = $1", c.Id,
+	).Scan(c.Fields()...)
 	return err
 }
 
-func ReadComments(postId int, start int, count int, replyRoot int) ([]map[string]interface{}, error) {
+func ReadComments(postId int32, start int, count int, replyRoot int) ([]map[string]interface{}, error) {
 	replyRootCond := "comment.reply_root IS NULL"
 	queryArgs := []interface{}{postId, start, count}
 	if replyRoot != -1 {
@@ -253,12 +257,7 @@ func ReadComments(postId int, start int, count int, replyRoot int) ([]map[string
 	comments := []map[string]interface{}{}
 	for rows.Next() {
 		c := Comment{}
-		err := rows.Scan(
-			&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
-			&c.Contents,
-			&c.Author.Nickname, &c.Author.Avatar,
-			&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
-		)
+		err := rows.Scan(c.Fields()...)
 		if err != nil {
 			return nil, err
 		}

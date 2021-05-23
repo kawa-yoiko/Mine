@@ -71,7 +71,7 @@ func getPostComments(w http.ResponseWriter, r *http.Request) {
 		replyRoot = replyRootParsed
 	}
 
-	comments, err := models.ReadComments(id, start, count, replyRoot)
+	comments, err := models.ReadComments(int32(id), start, count, replyRoot)
 	if err != nil {
 		panic(err)
 	}
