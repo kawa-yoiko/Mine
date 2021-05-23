@@ -145,5 +145,24 @@ func (c *Collection) Subscribe(u User, add bool) error {
 }
 
 func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
-	return nil, nil
+	rows, err := db.Query(postSelectClause+
+		`WHERE collection.id IN
+		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)`,
+		userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	posts := []map[string]interface{}{}
+	for rows.Next() {
+		p := Post{}
+		if err := rows.Scan(p.fields()...); err != nil {
+			return nil, err
+		}
+		posts = append(posts, p.Repr())
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
 }

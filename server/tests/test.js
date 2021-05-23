@@ -494,6 +494,13 @@ const check = async (method, url, params, expect, expect_status) => {
     tags: [],
     subscription_count: 1,
   })
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any, any, any])
+  await check('GET', `/subscription_timeline`, {token: token1, start: 0, count: 10}, [])
+
+  await check('POST', `/collection/${lid3}/subscribe`, {token: token2, is_subscribe: 1}, {subscription_count: 1})
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any, any, any, any, any])
+  await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 0}, {subscription_count: 0})
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any])
 
   console.log(`\n${pass}/${total} passed`);
 })();

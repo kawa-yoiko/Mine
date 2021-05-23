@@ -137,20 +137,27 @@ func (p *Post) Create() error {
 	return err
 }
 
-func (p *Post) Read() error {
+const postSelectClause = `SELECT
+	post.*, mine_user.nickname, mine_user.avatar, collection.title
+	FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
+	  INNER JOIN collection ON post.collection_id = collection.id
+`
+
+func (p *Post) fields() []interface{} {
 	var collectionSeq int32
-	err := db.QueryRow("SELECT "+
-		"post.*, mine_user.nickname, mine_user.avatar, collection.title "+
-		"FROM post INNER JOIN mine_user ON post.author_id = mine_user.id "+
-		"  INNER JOIN collection ON post.collection_id = collection.id "+
-		"WHERE post.id = $1", p.Id,
-	).Scan(
+	return []interface{}{
 		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
 		&p.Caption, &p.Contents,
 		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
 		&p.Collection.Title,
-	)
+	}
+}
+
+func (p *Post) Read() error {
+	err := db.QueryRow(
+		postSelectClause+"WHERE post.id = $1", p.Id,
+	).Scan(p.fields()...)
 	if err != nil {
 		return err
 	}
@@ -221,7 +228,7 @@ const commentSelectClause = "SELECT " +
 	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
 	"  LEFT JOIN mine_user AS reply_user ON reply_comment.author_id = reply_user.id "
 
-func (c *Comment) Fields() []interface{} {
+func (c *Comment) fields() []interface{} {
 	return []interface{}{
 		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
 		&c.Contents,
@@ -233,7 +240,7 @@ func (c *Comment) Fields() []interface{} {
 func (c *Comment) Read() error {
 	err := db.QueryRow(commentSelectClause+
 		"WHERE comment.id = $1", c.Id,
-	).Scan(c.Fields()...)
+	).Scan(c.fields()...)
 	return err
 }
 
@@ -257,7 +264,7 @@ func ReadComments(postId int32, start int, count int, replyRoot int) ([]map[stri
 	comments := []map[string]interface{}{}
 	for rows.Next() {
 		c := Comment{}
-		err := rows.Scan(c.Fields()...)
+		err := rows.Scan(c.fields()...)
 		if err != nil {
 			return nil, err
 		}
