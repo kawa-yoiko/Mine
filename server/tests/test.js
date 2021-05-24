@@ -61,7 +61,7 @@ const asyncPost = (url, params) => new Promise((resolve, reject) => {
 const asyncUpload = (url, params) => new Promise((resolve, reject) => {
   const token = getToken(params);
 
-  const fileContents = fs.readFileSync(params.file);
+  const fileContents = fs.readFileSync(__dirname + '/' + params.file);
 
   const boundary = '----' +
     Math.random().toString().substr(2) + '-' +
@@ -562,8 +562,8 @@ else (async () => {
   const M = 10;   // Average number of posts per collection
   const S = 50;   // Number of stars per user (minimum)
   const Sd = 150; // (variation)
-  const T = 100;  // Number of comments per user (minimum)
-  const Td = 500; // (variation)
+  const T = 900;  // Number of comments per user (minimum)
+  const Td = 900; // (variation)
   const B = 5;    // Number of subscriptions per user (minimum)
   const Bd = 15;  // (variation)
 
@@ -577,7 +577,7 @@ else (async () => {
 
   // Upload images
   const images = Array.from(Array(N), () => []);
-  const dir = await require('fs/promises').readdir('fxemoji');
+  const dir = await require('fs/promises').readdir(__dirname + '/fxemoji');
   for (const file of dir) {
     const u = rand() % N;
     const id = (await check('PUT', '/upload',
