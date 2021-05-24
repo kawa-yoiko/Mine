@@ -160,6 +160,9 @@ func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]inte
 		if err := rows.Scan(p.fields()...); err != nil {
 			return nil, err
 		}
+		if p.Tags, err = readTags("post_tag", "post_id", p.Id); err != nil {
+			return nil, err
+		}
 		posts = append(posts, p.ReprBrief())
 	}
 	if err = rows.Err(); err != nil {

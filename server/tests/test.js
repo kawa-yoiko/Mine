@@ -496,7 +496,10 @@ if (process.env['GEN'] !== '1') (async () => {
     tags: [],
     subscription_count: 1,
   })
-  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any, any, any])
+  await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [{
+    _ignoreRedundant: true,
+    tags: [any, any, any],
+  }, any, any, any])
   await check('GET', `/subscription_timeline`, {token: token1, start: 0, count: 10}, [])
 
   await check('POST', `/collection/${lid3}/subscribe`, {token: token2, is_subscribe: 1}, {subscription_count: 1})

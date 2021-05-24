@@ -233,7 +233,7 @@ const commentSelectClause = "SELECT " +
 	"comment.contents, " +
 	"author.nickname, author.avatar, " +
 	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''), " +
-	"(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id) "+
+	"(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id) " +
 	"FROM comment " +
 	"  INNER JOIN mine_user AS author ON comment.author_id = author.id " +
 	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
