@@ -14,15 +14,13 @@ import android.widget.ImageView;
 import androidx.annotation.RequiresApi;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -63,6 +61,18 @@ public class ServerReq {
         if (s != null) {
             try {
                 return new JSONObject(s);
+            } catch (JSONException e) {
+                Log.e("network", "JSON parse " + s + " " + e.toString());
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static JSONArray parseJsonArray(String s) {
+        if (s != null) {
+            try {
+                return new JSONArray(s);
             } catch (JSONException e) {
                 Log.e("network", "JSON parse " + s + " " + e.toString());
                 return null;
@@ -114,6 +124,13 @@ public class ServerReq {
     public static void getJson(String url, Consumer<JSONObject> callbackFn) {
         get(url, (String s) -> {
             callbackFn.accept(parseJson(s));
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void getJsonArray(String url, Consumer<JSONArray> callbackFn) {
+        get(url, (String s) -> {
+            callbackFn.accept(parseJsonArray(s));
         });
     }
 

@@ -1,15 +1,20 @@
 package com.example.mine;
 
+import android.text.format.DateUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Comment {
     private int isChild; // 0 indicates comment and 1 indicates child comment
-    private int avatar;
+    private String avatar;
     private String nickname;
     private String content;
     private String date;
     private String replyNickname;
     private String flowerNum;
 
-    public Comment(int avatar, String nickname, String content, String date, String replyNickname, String flowerNum) {
+    public Comment(String avatar, String nickname, String content, String date, String replyNickname, String flowerNum) {
         this.avatar = avatar;
         this.nickname = nickname;
         this.content = content;
@@ -18,11 +23,27 @@ public class Comment {
         this.flowerNum = flowerNum;
     }
 
+    public Comment(JSONObject obj) {
+        try {
+            JSONObject author = obj.getJSONObject("author");
+            this.nickname = author.getString("nickname");
+            this.avatar = author.getString("avatar");
+            this.content = obj.getString("contents");
+            this.date = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
+            if (!obj.isNull("reply_user")) {
+                JSONObject replyUser = obj.getJSONObject("reply_user");
+                this.replyNickname = replyUser.getString("nickname");
+            }
+        } catch (JSONException e) {
+            android.util.Log.e("Comment", "Invalid JSON object " + e.toString());
+        }
+    }
+
     public String getNickname() {
         return nickname;
     }
 
-    public int getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 

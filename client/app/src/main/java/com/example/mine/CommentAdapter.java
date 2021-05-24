@@ -44,7 +44,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Comment comment = data.get(position);
         View item =holder.itemView;
         ImageView avatarView = item.findViewById(R.id.avatar);
-        avatarView.setImageResource(comment.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" + comment.getAvatar(), avatarView);
         TextView nicknameView = item.findViewById(R.id.nickname);
         nicknameView.setText(comment.getNickname());
         TextView contentView = item.findViewById(R.id.content);
@@ -59,9 +59,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             public void onClick(View v) {
                 RecyclerView recyclerView = item.findViewById(R.id.child_comment);
                 LinkedList<Comment> comments = new LinkedList<>();
-                comments.add(new Comment(R.drawable.flower, "kuriko1024", "大师兄说的对阿", "05-12", "", ""));
-                comments.add(new Comment(R.drawable.luoxiaohei, "kuriko1025", "二师兄说的对阿", "05-12", "kuriko1024", ""));
-                comments.add(new Comment(R.drawable.luoxiaohei, "kuriko1026", "三师弟说的对阿", "05-12", "kuriko1025", ""));
+                comments.add(new Comment("", "kuriko1024", "大师兄说的对阿", "05-12", "", ""));
+                comments.add(new Comment("", "kuriko1025", "二师兄说的对阿", "05-12", "kuriko1024", ""));
+                comments.add(new Comment("", "kuriko1026", "三师弟说的对阿", "05-12", "kuriko1025", ""));
                 CommentChildAdapter commentChildAdapter = new CommentChildAdapter(comments);
                 recyclerView.setAdapter(commentChildAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));

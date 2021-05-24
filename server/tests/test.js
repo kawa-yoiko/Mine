@@ -535,6 +535,8 @@ const check = async (method, url, params, expect, expect_status) => {
   ])
 */
 
+  const bullshit = require('./bullshit');
+
   // Sample dataset!
   const rand = (() => {
     let seed = 523;
@@ -582,6 +584,12 @@ const check = async (method, url, params, expect, expect_status) => {
     images[u].push(id);
   }
 
+  // Upload avatars
+  for (let u = 0; u < N; u++) {
+    const file = dir[rand() % dir.length];
+    await check('PUT', '/upload/avatar', {token: token[u], file: `fxemoji/${file}`}, any);
+  }
+
   // Create collections
   const colls = Array.from(Array(N), () => []);
   const collsAll = [];
@@ -591,7 +599,7 @@ const check = async (method, url, params, expect, expect_status) => {
       const id = (await check('POST', '/collection/new', {
         token: token[u],
         title: `Collection ${u}-${c}`,
-        description: `A collection ${u}-${c}`,
+        description: `${u}-${c} — ${bullshit.sentence(2)}`,
         tags: 'tag1,tag2',
       }, any)).id;
       colls[u].push(id);
@@ -617,12 +625,12 @@ const check = async (method, url, params, expect, expect_status) => {
   // Create posts
   const postsAll = [];
   for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
-    const contentImages = Array.from(Array(rand() % 9),
+    const contentImages = Array.from(Array(1 + rand() % 9),
       () => images[u][rand() % images[u].length]);
     const id = (await check('POST', '/post/new', {
       token: token[u],
       type: 1,
-      caption: '今天是甜粥粥。',
+      caption: bullshit.sentence(2),
       contents: contentImages.join(' '),
       collection: colls[u][rand() % colls[u].length],
       tags: 'tag3,tag4',
@@ -648,7 +656,7 @@ const check = async (method, url, params, expect, expect_status) => {
     const cid = (await check('POST', `/post/${post}/comment/new`, {
       token: token[u],
       reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
-      contents: 'No comment',
+      contents: bullshit.sentence(1),
     }, {id: any})).id;
     cmts.push(cid);
   }

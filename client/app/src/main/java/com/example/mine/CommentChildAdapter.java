@@ -41,7 +41,7 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Comment comment = data.get(position);
         View item =holder.itemView;
         ImageView avatarView = item.findViewById(R.id.avatar);
-        avatarView.setImageResource(comment.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" + comment.getAvatar(), avatarView);
         TextView nicknameView = item.findViewById(R.id.nickname);
         nicknameView.setText(comment.getNickname());
         TextView contentView = item.findViewById(R.id.content);

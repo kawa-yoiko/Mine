@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,19 +11,28 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CommentFragment extends Fragment {
     private RecyclerView recyclerView;
     private View headingView;
+    private int postId;
 
-    public CommentFragment(View headingView) { this.headingView = headingView; }
+    public CommentFragment(int postId, View headingView) {
+        this.postId = postId;
+        this.headingView = headingView;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,41 +43,38 @@ public class CommentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         LinkedList<Comment> comments = new LinkedList<>();
-        comments.add(new Comment(R.drawable.flower, "kuriko1023", "太太，饿饿，饭饭", "05-10", "", "255"));
-        comments.add(new Comment(R.drawable.luoxiaohei, "yyg", "口水从奇怪的地方流了出来", "05-10", "", "25"));
-        comments.add(new Comment(R.drawable.luoxiaohei2, "栗子", "太太下凡辛苦了", "05-9", "", "2"));
         CommentAdapter commentAdapter = new CommentAdapter(comments);
         SingleViewAdapter headingAdapter = new SingleViewAdapter(headingView);
-        SingleViewAdapter loadingAdapter = new SingleViewAdapter(View.inflate(getContext(), R.layout.loading_indicator, null));
+        SingleViewAdapter loadingAdapter = new SingleViewAdapter(
+                getLayoutInflater().inflate(R.layout.loading_indicator, (ViewGroup) view, false));
         ConcatAdapter concatAdapter = new ConcatAdapter(headingAdapter, commentAdapter, loadingAdapter);
         recyclerView.setAdapter(concatAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         Handler handler = new Handler(Looper.getMainLooper());
         recyclerView.addOnScrollListener(new InfScrollListener(recyclerView.getLayoutManager(), 3) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void load(int start) {
                 Log.d("Comment", "Load " + start);
                 InfScrollListener listener = this;
-                (new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (Exception e) {
+                ServerReq.getJsonArray("/post/" + CommentFragment.this.postId +
+                        "/comments?start=" + (start - 2) + "&count=10", (JSONArray arr) -> {
+                    try {
+                        int n = arr.length();
+                        for (int i = 0; i < n; i++) {
+                            JSONObject obj = arr.getJSONObject(i);
+                            comments.add(new Comment(obj));
                         }
-                        Log.d("comment", "current size " + comments.size());
-                        if (comments.size() < 12) {
-                            comments.add(new Comment(R.drawable.flower, "kuriko1023", "太太，饿饿，饭饭", "05-10", "", "255"));
-                            comments.add(new Comment(R.drawable.luoxiaohei, "yyg", "口水从奇怪的地方流了出来", "05-10", "", "25"));
-                            comments.add(new Comment(R.drawable.luoxiaohei2, "栗子", "太太下凡辛苦了", "05-9", "", "2"));
-                            handler.post(() -> commentAdapter.notifyItemRangeInserted(comments.size() - 3, 3));
-                            listener.finishLoad(false);
-                        } else {
-                            handler.post(() -> loadingAdapter.clear());
-                            listener.finishLoad(true);
-                        }
+                        boolean complete = (n < 10);
+                        handler.post(() -> {
+                            commentAdapter.notifyItemRangeInserted(comments.size() - n, n);
+                            if (complete) loadingAdapter.clear();
+                        });
+                        listener.finishLoad(complete);
+                    } catch (Exception e) {
+                        Log.e("CommentFragment", "During parsing: " + e);
                     }
-                }).start();
+                });
             }
         });
     }
