@@ -28,7 +28,8 @@ type Comment struct {
 	ReplyRoot int32
 	Contents  string
 
-	ReplyUser User
+	ReplyUser  User
+	ReplyCount int32
 }
 
 func init() {
@@ -128,19 +129,18 @@ func (p *Post) ReprOutline() map[string]interface{} {
 }
 
 func (c *Comment) Repr() map[string]interface{} {
-	var replyUser interface{}
+	ret := map[string]interface{}{
+		"id":        c.Id,
+		"author":    c.Author.ReprBrief(),
+		"timestamp": c.Timestamp,
+		"contents":  c.Contents,
+	}
 	if c.ReplyUser.Nickname == "" {
-		replyUser = nil
+		ret["reply_count"] = c.ReplyCount
 	} else {
-		replyUser = c.ReplyUser.ReprBrief()
+		ret["reply_user"] = c.ReplyUser.ReprBrief()
 	}
-	return map[string]interface{}{
-		"id":         c.Id,
-		"author":     c.Author.ReprBrief(),
-		"timestamp":  c.Timestamp,
-		"reply_user": replyUser,
-		"contents":   c.Contents,
-	}
+	return ret
 }
 
 func (p *Post) Create() error {
@@ -245,7 +245,8 @@ const commentSelectClause = "SELECT " +
 	"COALESCE(comment.reply_root, -1), " +
 	"comment.contents, " +
 	"author.nickname, author.avatar, " +
-	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, '') " +
+	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''), " +
+	"(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id) "+
 	"FROM comment " +
 	"  INNER JOIN mine_user AS author ON comment.author_id = author.id " +
 	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
@@ -257,6 +258,7 @@ func (c *Comment) fields() []interface{} {
 		&c.Contents,
 		&c.Author.Nickname, &c.Author.Avatar,
 		&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
+		&c.ReplyCount,
 	}
 }
 

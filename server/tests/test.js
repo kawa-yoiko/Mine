@@ -181,7 +181,7 @@ const check = async (method, url, params, expect, expect_status) => {
   return actual || {};
 };
 
-(async () => {
+if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/reset')
 
 /*
@@ -197,7 +197,6 @@ const check = async (method, url, params, expect, expect_status) => {
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
 */
 
-/*
   const bio1 = '我爱吃栗子';
   const bio2 = '我爱吃寿司';
 
@@ -325,8 +324,8 @@ const check = async (method, url, params, expect, expect_status) => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: null, contents: 'Another yes comment'},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: null, contents: 'No comment'},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment'},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment'},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -533,8 +532,11 @@ const check = async (method, url, params, expect, expect_status) => {
     {_ignoreRedundant: true, contents: '哈'.repeat(300)},
     {_ignoreRedundant: true, contents: `${u2img1}`},
   ])
-*/
 
+  console.log(`\n${pass}/${total} passed`);
+})();
+
+else (async () => {
   const bullshit = require('./bullshit');
 
   // Sample dataset!
