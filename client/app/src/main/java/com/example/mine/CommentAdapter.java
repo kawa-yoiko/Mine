@@ -62,7 +62,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView dateView = item.findViewById(R.id.date);
         dateView.setText(comment.getDate());
         TextView flowerNum = item.findViewById(R.id.flower_num);
-        flowerNum.setText(comment.getFlowerNum());
+        flowerNum.setText(String.valueOf(comment.getFlowerNum()));
 
         TextView moreButton = item.findViewById(R.id.more);
         String moreButtonTextExpand = "展开 " + comment.replyNum + " 条回复";

@@ -70,41 +70,60 @@
         android:orientation="horizontal"
         android:padding="5dp">
 
-        <ImageView
-            android:id="@+id/flower_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:src="@drawable/flower"></ImageView>
-
-        <TextView
-            android:id="@+id/flower_num"
+        <LinearLayout
+            android:id="@+id/flower_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="100"></TextView>
+            android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/star_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:src="@drawable/star"></ImageView>
+            <ImageView
+                android:id="@+id/flower_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:src="@drawable/flower"></ImageView>
 
-        <TextView
-            android:id="@+id/star_num"
+            <TextView
+                android:id="@+id/flower_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="100"></TextView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/star_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="100"></TextView>
+            android:layout_marginLeft="6dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/star_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"></ImageView>
+
+            <TextView
+                android:id="@+id/star_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="100"></TextView>
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/comment_edit"
@@ -112,6 +131,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_weight="20"
+            android:layout_marginHorizontal="6dp"
             android:background="@drawable/bt_background_grey"></EditText>
 
         <Button
