@@ -20,13 +20,14 @@ type Post struct {
 }
 
 type Comment struct {
-	Id        int32
-	Post      Post
-	Author    User
-	Timestamp int64
-	ReplyTo   int32
-	ReplyRoot int32
-	Contents  string
+	Id          int32
+	Post        Post
+	Author      User
+	Timestamp   int64
+	ReplyTo     int32
+	ReplyRoot   int32
+	Contents    string
+	UpvoteCount int32
 
 	ReplyUser  User
 	ReplyCount int32
@@ -76,6 +77,13 @@ func init() {
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT reply_to_ref FOREIGN KEY (reply_to) REFERENCES comment (id)",
 		"ADD CONSTRAINT reply_root_ref FOREIGN KEY (reply_root) REFERENCES comment (id)",
+	)
+	registerSchema("comment_upvote",
+		"comment_id INTEGER NOT NULL",
+		"user_id INTEGER NOT NULL",
+		"ADD CONSTRAINT comment_ref FOREIGN KEY (comment_id) REFERENCES comment (id)",
+		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
+		"ADD CONSTRAINT comment_upvote_uniq UNIQUE (comment_id, user_id)",
 	)
 }
 
@@ -130,10 +138,11 @@ func (p *Post) ReprOutline() map[string]interface{} {
 
 func (c *Comment) Repr() map[string]interface{} {
 	ret := map[string]interface{}{
-		"id":        c.Id,
-		"author":    c.Author.ReprBrief(),
-		"timestamp": c.Timestamp,
-		"contents":  c.Contents,
+		"id":           c.Id,
+		"author":       c.Author.ReprBrief(),
+		"timestamp":    c.Timestamp,
+		"contents":     c.Contents,
+		"upvote_count": c.UpvoteCount,
 	}
 	if c.ReplyUser.Nickname == "" {
 		ret["reply_count"] = c.ReplyCount
@@ -231,6 +240,7 @@ const commentSelectClause = "SELECT " +
 	"COALESCE(comment.reply_to, -1), " +
 	"COALESCE(comment.reply_root, -1), " +
 	"comment.contents, " +
+	"(SELECT COUNT (*) FROM comment_upvote WHERE comment_upvote.comment_id = comment.id), " +
 	"author.nickname, author.avatar, " +
 	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''), " +
 	"(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id) " +
@@ -243,6 +253,7 @@ func (c *Comment) fields() []interface{} {
 	return []interface{}{
 		&c.Id, &c.Post.Id, &c.Author.Id, &c.Timestamp, &c.ReplyTo, &c.ReplyRoot,
 		&c.Contents,
+		&c.UpvoteCount,
 		&c.Author.Nickname, &c.Author.Avatar,
 		&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
 		&c.ReplyCount,
@@ -283,4 +294,8 @@ func ReadComments(postId int32, start int, count int, replyRoot int) ([]map[stri
 		comments = append(comments, c.Repr())
 	}
 	return comments, rows.Err()
+}
+
+func (c *Comment) Upvote(u User, add bool) error {
+	return processEntityUserRel("comment_upvote", "comment", c.Id, u, add, &c.UpvoteCount)
 }

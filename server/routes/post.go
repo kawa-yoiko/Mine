@@ -132,6 +132,29 @@ func postPostSetCollection(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, jsonPayload{})
 }
 
+func postPostCommentUpvote(w http.ResponseWriter, r *http.Request) {
+	u := mustAuth(r)
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	cid, _ := strconv.Atoi(mux.Vars(r)["cid"])
+	isUpvote, err := strconv.Atoi(r.PostFormValue("is_upvote"))
+	if err != nil || (isUpvote != 0 && isUpvote != 1) {
+		panic(models.CheckedError{400})
+	}
+
+	c := models.Comment{Id: int32(cid)}
+	if err := c.Read(); err != nil {
+		panic(err)
+	}
+	if c.Post.Id != int32(id) {
+		panic(models.CheckedError{400})
+	}
+	if err := c.Upvote(u, isUpvote != 0); err != nil {
+		panic(err)
+	}
+	write(w, 200, jsonPayload{"upvote_count": c.UpvoteCount})
+}
+
 func init() {
 	registerHandler("/post/new", postPostNew, "POST")
 	registerHandler("/post/{id}", getPost, "GET")
@@ -140,4 +163,5 @@ func init() {
 	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
 	registerHandler("/post/{id}/star", postPostStar, "POST")
 	registerHandler("/post/{id}/set_collection", postPostSetCollection, "POST")
+	registerHandler("/post/{id}/comment/{cid}/upvote", postPostCommentUpvote, "POST")
 }

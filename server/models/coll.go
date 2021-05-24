@@ -143,30 +143,3 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 func (c *Collection) Subscribe(u User, add bool) error {
 	return processEntityUserRel("collection_subscription", "collection", c.Id, u, add, &c.SubCount)
 }
-
-func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
-	rows, err := db.Query(postSelectClause+
-		`WHERE collection.id IN
-		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
-		  LIMIT $3 OFFSET $2`,
-		userId, start, count)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	posts := []map[string]interface{}{}
-	for rows.Next() {
-		p := Post{}
-		if err := rows.Scan(p.fields()...); err != nil {
-			return nil, err
-		}
-		if p.Tags, err = readTags("post_tag", "post_id", p.Id); err != nil {
-			return nil, err
-		}
-		posts = append(posts, p.ReprBrief())
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return posts, nil
-}

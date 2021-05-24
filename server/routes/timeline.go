@@ -19,6 +19,23 @@ func getSubscriptionTimeline(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, posts)
 }
 
+func getDiscoverTimeline(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth(r)
+	if !ok {
+		u.Id = -1
+	}
+
+	start, _ := strconv.Atoi(query(r, "start"))
+	count, _ := strconv.Atoi(query(r, "count"))
+
+	posts, err := models.DiscoverTimeline(u.Id, start, count)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, posts)
+}
+
 func init() {
 	registerHandler("/subscription_timeline", getSubscriptionTimeline, "GET")
+	registerHandler("/discover_timeline", getDiscoverTimeline, "GET")
 }

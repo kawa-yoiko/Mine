@@ -524,6 +524,9 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 0}, {subscription_count: 0})
   await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [any, any])
 
+  // Discover
+  await check('GET', `/discover_timeline`, {token: token2, start: 0, count: 3}, [any, any, any])
+
   // Truncation in timeline
   let lid4 = (await check('POST', '/collection/new', {
     token: token1,
