@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ServerReq.login("uu1", "aaaaaa1", (Boolean success) -> {
+        ServerReq.login("uu2", "aaaaaa2", (Boolean success) -> {
             android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
         });
 

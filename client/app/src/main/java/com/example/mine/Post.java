@@ -40,6 +40,7 @@ public class Post implements Serializable {
 
     public Post(JSONObject obj) {
         try {
+            if (!obj.isNull("id")) this.id = obj.getInt("id");
             StringBuilder builder = new StringBuilder();
             JSONArray tags = obj.getJSONArray("tags");
             for (int i = 0; i < tags.length(); i++) {
