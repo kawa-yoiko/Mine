@@ -14,7 +14,7 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
         }
     }
 
-    private final View view;
+    private View view;
     public SingleViewAdapter(View view) {
         ViewGroup parent = (ViewGroup)view.getParent();
         if(parent != null) {
@@ -25,7 +25,7 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
 
     @Override
     public int getItemCount() {
-        return 1;
+        return (view != null ? 1 : 0);
     }
 
     @Override
@@ -39,5 +39,10 @@ public class SingleViewAdapter extends RecyclerView.Adapter<SingleViewAdapter.Si
 
     @Override
     public void onBindViewHolder(@NonNull SingleViewHolder holder, int position) {
+    }
+
+    public void clear() {
+        view = null;
+        this.notifyItemRemoved(0);
     }
 }
