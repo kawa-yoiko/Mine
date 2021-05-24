@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <view
+        class="com.example.mine.WidthEqualsHeightFrameLayoutView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/square_text"
+        android:background="@color/grey_yellow"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:text="五条悟跳舞"
+                android:id="@+id/caption"
+                android:layout_marginBottom="3dp"
+                ></TextView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="all the beautiful things shining all around us,
+                all the beautiful things shining all around us"
+                android:layout_below="@+id/caption"
+                android:id="@+id/content"
+                >
+            </TextView>
+        </RelativeLayout>
+    </view>
+</androidx.constraintlayout.widget.ConstraintLayout>

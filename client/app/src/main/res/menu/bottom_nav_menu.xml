@@ -6,18 +6,18 @@
     <item
         android:id="@+id/main"
         android:title="首页"
-        android:icon="@mipmap/ic_flower"/>
+        android:icon="@mipmap/ic_contacts"/>
     <item
         android:id="@+id/discover"
         android:title="发现"
-        android:icon="@mipmap/ic_flower" />
+        android:icon="@mipmap/ic_explore" />
     <item
         android:id="@+id/message"
         android:title="消息"
-        android:icon="@mipmap/ic_flower"/>
+        android:icon="@mipmap/ic_message"/>
     <item
         android:id="@+id/my"
         android:title="我的"
-        android:icon="@drawable/flower"
+        android:icon="@mipmap/ic_person"
         />
 </menu>

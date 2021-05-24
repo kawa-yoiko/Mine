@@ -15,6 +15,7 @@ import java.util.LinkedList;
 public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private static final int DATE = 0;
     private static final int PICTURE = 1;
+    private static final int TEXT = 2;
     private LinkedList<Object> data;
     private int itemsBefore = 0;
 
@@ -34,6 +35,16 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    public static class TextHolder extends RecyclerView.ViewHolder {
+        TextView captionView;
+        TextView contentView;
+        public TextHolder(@NonNull View itemView) {
+            super(itemView);
+            captionView = itemView.findViewById(R.id.caption);
+            contentView = itemView.findViewById(R.id.content);
+        }
+    }
+
     public SquareAdapter(LinkedList<Object> data)
     {
         this.data = data;
@@ -48,8 +59,12 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public int getItemViewType(int position) {
         if (data.get(position) instanceof String) {
             return DATE;
-        } else {
+        }
+        else if (data.get(position) instanceof Integer){
             return PICTURE;
+        }
+        else{
+            return TEXT;
         }
     }
 
@@ -61,8 +76,12 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new DateHolder(mItemView);
         }
         else if (viewType == PICTURE) {
-            View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_square, parent, false);
+            View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_square_image, parent, false);
             return new ImageHolder(mItemView);
+        }
+        else if (viewType == TEXT) {
+            View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_square_text, parent, false);
+            return new TextHolder(mItemView);
         }
         return null;
     }
@@ -77,6 +96,13 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         else if (holder instanceof ImageHolder) {
              int image = (int)data.get(position);
             ((ImageHolder)holder).imageView.setImageResource(image);
+        }
+        else if (holder instanceof TextHolder) {
+            String[] text = (String[])data.get(position);
+            String caption = text[0];
+            String content = text[1];
+            ((TextHolder)holder).captionView.setText(caption);
+            ((TextHolder)holder).contentView.setText(content);
         }
     }
 

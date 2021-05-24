@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginRight="60dp"
-                android:background="@drawable/bt_background_yellow"
+                android:background="@color/yellow"
                 android:padding="6dp"
                 android:text="粥粥可爱"
                 android:textSize="16dp"
