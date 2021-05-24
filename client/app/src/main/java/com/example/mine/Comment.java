@@ -13,9 +13,9 @@ public class Comment {
     private String date;
     private String replyNickname;
     public int replyNum;
-    private String flowerNum;
+    private int flowerNum;
 
-    public Comment(String avatar, String nickname, String content, String date, String replyNickname, String flowerNum) {
+    public Comment(String avatar, String nickname, String content, String date, String replyNickname, int flowerNum) {
         this.avatar = avatar;
         this.nickname = nickname;
         this.content = content;
@@ -39,6 +39,7 @@ public class Comment {
                 JSONObject replyUser = obj.getJSONObject("reply_user");
                 this.replyNickname = replyUser.getString("nickname");
             }
+            this.flowerNum = obj.getInt("upvote_count");
         } catch (JSONException e) {
             android.util.Log.e("Comment", "Invalid JSON object " + e.toString());
         }
@@ -64,7 +65,7 @@ public class Comment {
         return replyNickname;
     }
 
-    public String getFlowerNum() {
+    public int getFlowerNum() {
         return flowerNum;
     }
 }

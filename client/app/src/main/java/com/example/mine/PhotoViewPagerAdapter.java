@@ -43,7 +43,6 @@ public class PhotoViewPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         WidthEqualsHeightPhotoView imageView = new WidthEqualsHeightPhotoView(context);
-        //imageView.setImageResource(images.get(position));
         ServerReq.Utils.loadImage("/upload/" + images.get(position), imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         container.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));

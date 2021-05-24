@@ -51,7 +51,7 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView replyNicknameView = item.findViewById(R.id.reply_nickname);
         replyNicknameView.setText(comment.getReplyNickname());
         TextView flowerNum = item.findViewById(R.id.flower_num);
-        flowerNum.setText(comment.getFlowerNum());
+        flowerNum.setText(String.valueOf(comment.getFlowerNum()));
     }
 
     @Override

@@ -6,7 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +50,38 @@ public class PostActivity extends AppCompatActivity {
         comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = findViewById(R.id.star_num);
         star_num_text.setText(String.valueOf(post.getStar_num()));
+
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        View flowerButton = findViewById(R.id.flower_button);
+        ImageView flowerIcon = findViewById(R.id.flower_icon);
+        flowerButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                flowerButton.setEnabled(false);
+                flowerIcon.setImageResource(R.drawable.comment);
+                ServerReq.postJson("/post/" + post.id + "/upvote", List.of(
+                        new Pair<>("is_upvote", "1")
+                ), (JSONObject obj) -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                    }
+                    try {
+                        int count = obj.getInt("upvote_count");
+                        Log.d("PostActivity", "upvote_count " + count);
+                        handler.post(() -> flower_num_text.setText(String.valueOf(count)));
+                    } catch (JSONException e) {
+                        Log.e("PostActivity", e.toString());
+                    }
+                    handler.post(() -> {
+                        flowerButton.setEnabled(true);
+                        flowerIcon.setImageResource(R.drawable.flower);
+                    });
+                });
+            }
+        });
 
         EditText commentText = (EditText) findViewById(R.id.comment_edit);
         Button commentButton = (Button) findViewById(R.id.comment_button);
