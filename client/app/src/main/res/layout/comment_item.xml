@@ -17,45 +17,55 @@
             android:id="@+id/avatar"
             android:layout_marginRight="20dp"
             android:adjustViewBounds="true"></ImageView>
+
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/avatar"
             android:layout_marginBottom="15dp"
+            android:layout_toRightOf="@+id/avatar"
             android:orientation="vertical">
+
             <TextView
+                android:id="@+id/nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16dp"
-                android:textColor="#999999"
-                android:textStyle="bold"
-                android:text="kuriko"
                 android:layout_marginBottom="3dp"
-                android:id="@+id/nickname"></TextView>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="太太 饿饿 饭饭！"
-                android:layout_marginBottom="5dp"
-                android:id="@+id/content"></TextView>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:text="kuriko"
                 android:textColor="#999999"
-                android:text="05-28"
-                android:layout_marginBottom="8dp"
-                android:id="@+id/date"></TextView>
+                android:textSize="16dp"
+                android:textStyle="bold"></TextView>
+
             <TextView
+                android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:id="@+id/more"
+                android:layout_marginBottom="5dp"
+                android:text="太太 饿饿 饭饭！"></TextView>
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="更多回复"></TextView>
-            <androidx.recyclerview.widget.RecyclerView
+                android:text="05-28"
+                android:textColor="#999999"></TextView>
+
+            <TextView
+                android:id="@+id/more"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/child_comment"></androidx.recyclerview.widget.RecyclerView>
+                android:layout_marginBottom="8dp"
+                android:text="更多回复"
+                android:textColor="#AAAAAA"></TextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/child_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
+
+            <include
+                android:id="@+id/loading_indicator"
+                layout="@layout/loading_indicator" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"

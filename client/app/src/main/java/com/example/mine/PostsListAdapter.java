@@ -96,7 +96,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 Intent intent = new Intent();
                 intent.setClass(v.getContext(), LoadingActivity.class);
                 intent.putExtra("type", LoadingActivity.DestType.post);
-                intent.putExtra("id", 1);
+                intent.putExtra("id", 524);
                 v.getContext().startActivity(intent);
             }
         });

@@ -43,7 +43,7 @@ public class CommentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         LinkedList<Comment> comments = new LinkedList<>();
-        CommentAdapter commentAdapter = new CommentAdapter(comments);
+        CommentAdapter commentAdapter = new CommentAdapter(this.postId, comments);
         SingleViewAdapter headingAdapter = new SingleViewAdapter(headingView);
         SingleViewAdapter loadingAdapter = new SingleViewAdapter(
                 getLayoutInflater().inflate(R.layout.loading_indicator, (ViewGroup) view, false));

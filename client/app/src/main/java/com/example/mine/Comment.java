@@ -6,12 +6,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Comment {
-    private int isChild; // 0 indicates comment and 1 indicates child comment
+    public int id;
     private String avatar;
     private String nickname;
     private String content;
     private String date;
     private String replyNickname;
+    public int replyNum;
     private String flowerNum;
 
     public Comment(String avatar, String nickname, String content, String date, String replyNickname, String flowerNum) {
@@ -25,11 +26,15 @@ public class Comment {
 
     public Comment(JSONObject obj) {
         try {
+            this.id = obj.getInt("id");
             JSONObject author = obj.getJSONObject("author");
             this.nickname = author.getString("nickname");
             this.avatar = author.getString("avatar");
             this.content = obj.getString("contents");
             this.date = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
+            if (!obj.isNull("reply_count")) {
+                this.replyNum = obj.getInt("reply_count");
+            }
             if (!obj.isNull("reply_user")) {
                 JSONObject replyUser = obj.getJSONObject("reply_user");
                 this.replyNickname = replyUser.getString("nickname");
@@ -45,10 +50,6 @@ public class Comment {
 
     public String getAvatar() {
         return avatar;
-    }
-
-    public int getIsChild() {
-        return isChild;
     }
 
     public String getContent() {
