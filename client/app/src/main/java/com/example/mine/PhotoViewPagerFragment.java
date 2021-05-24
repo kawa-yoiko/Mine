@@ -15,17 +15,18 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class PhotoViewPagerFragment extends Fragment {
     private int imageNum;
 //    private int currentPage;
     private ImageView[] dots;
-    private ArrayList<Integer> images;
+    private List<String> images;
     private int currentPage = 0;
 
-    public PhotoViewPagerFragment() {
-        images = new ArrayList<Integer>(Arrays.asList(R.drawable.luoxiaohei, R.drawable.luoxiaohei2,R.drawable.luoxiaohei, R.drawable.luoxiaohei2, R.drawable.luoxiaohei));
-        imageNum = 5;
+    public PhotoViewPagerFragment(List<String> images) {
+        this.images = images;
+        imageNum = images.size();
         dots = new ImageView[imageNum];
     }
 

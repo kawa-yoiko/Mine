@@ -60,7 +60,7 @@
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="@id/avatar"></TextView>
 
-        <ImageView
+        <FrameLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,8 +70,8 @@
             android:layout_marginBottom="30px"
             android:adjustViewBounds="true"
             android:maxHeight="300dp"
-            android:src="@drawable/luoxiaohei"
-            app:layout_constraintLeft_toLeftOf="@id/avatar"></ImageView>
+            app:layout_constraintLeft_toLeftOf="@id/avatar"
+            />
 
         <TextView
             android:id="@+id/tag"

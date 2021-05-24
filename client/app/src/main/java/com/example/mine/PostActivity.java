@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 public class PostActivity extends AppCompatActivity {
@@ -99,8 +101,10 @@ public class PostActivity extends AppCompatActivity {
             case 0:
                 break;
             case 1:
-                ImageView content_image = postView.findViewById(R.id.content);
-                ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content,
+                        new PhotoViewPagerFragment(Arrays.asList(post.getContent().split(" ")))).commit();
+//                ImageView content_image = postView.findViewById(R.id.content);
+//                ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
                 break;
         }
 

@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.List;
+
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment squareFragment = new SquareFragment();
         Fragment postsListFragment = new PostsListFragment();
         Fragment myFragment = new MyFragment();
-        Fragment photoViewPagerFragment = new PhotoViewPagerFragment();
+        Fragment photoViewPagerFragment = new PhotoViewPagerFragment(List.of());
 //        Fragment commentFragment = new CommentFragment();
         setCurrentFragment(photoViewPagerFragment);
 //        View view = View.inflate(this.getBaseContext(), R.layout.search_box, null);

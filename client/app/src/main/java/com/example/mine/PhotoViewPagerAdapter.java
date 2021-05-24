@@ -10,15 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PhotoViewPagerAdapter extends PagerAdapter {
-    private ArrayList<Integer> images;
+    private List<String> images;
     private Context context;
 
-    public PhotoViewPagerAdapter(Context context, ArrayList<Integer> images){
+    public PhotoViewPagerAdapter(Context context, List<String> images){
         this.images = images;
         this.context = context;
     }
@@ -42,7 +43,8 @@ public class PhotoViewPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         WidthEqualsHeightPhotoView imageView = new WidthEqualsHeightPhotoView(context);
-        imageView.setImageResource(images.get(position));
+        //imageView.setImageResource(images.get(position));
+        ServerReq.Utils.loadImage("/upload/" + images.get(position), imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         container.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 //        imageView.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
