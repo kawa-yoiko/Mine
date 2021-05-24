@@ -246,14 +246,14 @@ if (process.env['GEN'] !== '1') (async () => {
   // Posts
   let lid1 = u1.user.collections[0].id
   let lid2 = u2.user.collections[0].id
-  await check('POST', '/post/new', {
+  let pid0 = (await check('POST', '/post/new', {
     token: token2,
     type: 1,
     caption: '今天是甜粥粥。',
     contents: `${u2img1} ${u2img2}`,
     collection: lid2,
     tags: '美食,狗粮,每周粥粥',
-  }, {id: any})
+  }, {id: any})).id
   let pid1 = (await check('POST', '/post/new', {
     token: token1,
     type: 0,
@@ -324,8 +324,8 @@ if (process.env['GEN'] !== '1') (async () => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment'},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment'},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment', upvote_count: 0},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment', upvote_count: 0},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -333,8 +333,8 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 10,
     reply_root: cid1,
   }, [
-    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment'},
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment', upvote_count: 0},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -342,7 +342,24 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 1,
     reply_root: cid1,
   }, [
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment'},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
+  ])
+
+  // Comment upvote
+  await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 0});
+  await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1});
+  await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 2});
+  await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1});
+  await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 2});
+  await check('POST', `/post/${pid0}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, undefined, 400);
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token1,
+    start: 0,
+    count: 10,
+    reply_root: cid1,
+  }, [
+    any,
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 2},
   ])
 
   // Upvote
