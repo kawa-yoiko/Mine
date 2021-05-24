@@ -160,8 +160,12 @@ func (p *Post) Create() error {
 	return err
 }
 
+// TODO: Optimize comment counting
 const postSelectClause = `SELECT
-	post.*, mine_user.nickname, mine_user.avatar, collection.title
+	post.*, mine_user.nickname, mine_user.avatar, collection.title,
+	(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
+	(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
+	(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id)
 	FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
 	  INNER JOIN collection ON post.collection_id = collection.id
 `
@@ -174,6 +178,7 @@ func (p *Post) fields() []interface{} {
 		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
 		&p.Collection.Title,
+		&p.UpvoteCount, &p.StarCount, &p.CommentCount,
 	}
 }
 
@@ -190,25 +195,7 @@ func (p *Post) Read() error {
 		return err
 	}
 
-	err = db.QueryRow(
-		"SELECT COUNT(*) FROM post_upvote WHERE post_id = $1", p.Id,
-	).Scan(&p.UpvoteCount)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow(
-		"SELECT COUNT(*) FROM post_star WHERE post_id = $1", p.Id,
-	).Scan(&p.StarCount)
-	if err != nil {
-		return err
-	}
-
-	// TODO: optimize
-	err = db.QueryRow(
-		"SELECT COUNT(*) FROM comment WHERE post_id = $1", p.Id,
-	).Scan(&p.CommentCount)
-	return err
+	return nil
 }
 
 func (p *Post) Upvote(u User, add bool) error {
