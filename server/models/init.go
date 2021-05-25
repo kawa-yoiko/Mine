@@ -96,6 +96,9 @@ func insertTags(table, field string, id int32, tags []string) error {
 		fmt.Fprintf(&placeholders, "($%d, $%d)", i*2+1, i*2+2)
 		values = append(values, id, tag)
 	}
+	if len(values) == 0 {
+		return nil
+	}
 	_, err := db.Exec(
 		"INSERT INTO "+table+" ("+field+", tag) VALUES "+placeholders.String(),
 		values...)
