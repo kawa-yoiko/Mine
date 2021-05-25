@@ -87,6 +87,9 @@ func insertTags(table, field string, id int32, tags []string) error {
 	placeholders := strings.Builder{}
 	values := []interface{}{}
 	for i, tag := range tags {
+		if tag == "" {
+			continue
+		}
 		if i != 0 {
 			fmt.Fprintf(&placeholders, ", ")
 		}
