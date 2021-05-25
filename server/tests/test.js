@@ -437,7 +437,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
@@ -475,7 +475,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
@@ -519,7 +519,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
