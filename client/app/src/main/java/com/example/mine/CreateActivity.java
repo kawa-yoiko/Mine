@@ -1,12 +1,14 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -31,7 +33,9 @@ public class CreateActivity extends AppCompatActivity {
     private static int IMAGE_PICKER = 0;
 
     private String tags = "";
+    private User.CollectionBrief collection = null;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,18 +91,24 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
+        View popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
+        FrameLayout collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
+        collectionContainer.removeAllViews();
+        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), (User.CollectionBrief sel, Boolean init) -> {
+            if (init && collection != null) return;
+            android.util.Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
+            collection = sel;
+            if (!init) popupWindowCollection.dismiss();
+        }));
+
         View setCollectionButton = findViewById(R.id.add_collection);
         setCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View popView = getLayoutInflater().inflate(R.layout.popup_collection, null);
-                Button finishButton = popView.findViewById(R.id.create);
+                Button finishButton = popViewCollection.findViewById(R.id.create);
                 finishButton.setOnClickListener((View v1) -> {
                 });
-                FrameLayout collectionContainer = popView.findViewById(R.id.fl_collection);
-                collectionContainer.removeAllViews();
-                collectionContainer.addView(CollectionListView.inflate(popView.getContext()));
-                popupWindowCollection = new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                popupWindowCollection = new PopupWindow(popViewCollection, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);
                 popupWindowCollection.setFocusable(true);
                 popupWindowCollection.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
