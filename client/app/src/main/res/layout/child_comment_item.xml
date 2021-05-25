@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,16 +18,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
+                android:paddingRight="21dp"
                 >
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/luoxiaohei"
-                    android:scaleType="centerCrop"
-                    android:layout_alignParentLeft="true"
-                    android:id="@+id/avatar"
-                    android:layout_marginRight="10dp"
-                    android:adjustViewBounds="true"></ImageView>
+<!--                <ImageView-->
+<!--                    android:layout_width="25dp"-->
+<!--                    android:layout_height="25dp"-->
+<!--                    android:src="@drawable/luoxiaohei"-->
+<!--                    android:scaleType="centerCrop"-->
+<!--                    android:layout_alignParentLeft="true"-->
+<!--                    android:id="@+id/avatar"-->
+<!--                    android:layout_marginRight="10dp"-->
+<!--                    android:adjustViewBounds="true"></ImageView>-->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/avatar_layout"
+                    >
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/luoxiaohei"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/avatar"
+                        android:adjustViewBounds="true"
+                        app:layout_constraintCircle="@id/test"
+                        tools:ignore="MissingConstraints"></ImageView>
+                    <View
+                        android:id="@+id/test"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/imageview_corner1"
+                        app:layout_constraintCircle="@id/test1"
+                        tools:ignore="MissingConstraints">
+                    </View>
+                    <View
+                        android:id="@+id/test1"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/imageview_stroke"
+                        app:layout_constraintCircle="@id/avatar"
+                        tools:ignore="MissingConstraints">  </View>
+                </androidx.constraintlayout.widget.ConstraintLayout>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -33,8 +67,8 @@
                     android:textColor="#999999"
                     android:textStyle="bold"
                     android:text="kuriko"
-                    android:layout_toRightOf="@+id/avatar"
-                    android:layout_alignBaseline="@+id/avatar"
+                    android:layout_toRightOf="@+id/avatar_layout"
+                    android:layout_alignBaseline="@+id/avatar_layout"
                     android:layout_marginRight="5dp"
                     android:id="@+id/nickname"></TextView>
                 <TextView
@@ -59,8 +93,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="太太 饿饿 饭饭！太太 饿饿 饭饭！"
+                android:text="太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！"
                 android:layout_marginBottom="3dp"
+                android:paddingRight="21dp"
                 android:id="@+id/content"></TextView>
             <TextView
                 android:layout_width="match_parent"
@@ -92,6 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="2"
+                android:textSize="12dp"
                 android:textColor="#999999"></TextView>
         </LinearLayout>
     </RelativeLayout>

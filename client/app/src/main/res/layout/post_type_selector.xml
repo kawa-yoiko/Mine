@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:ignore="MissingConstraints"
-        android:background="@drawable/rectangle_corner"
+        android:background="@drawable/yellow_corner_rectangle"
         android:padding="10dp"
         app:layout_constraintLeft_toRightOf="@+id/triangle"
         >
