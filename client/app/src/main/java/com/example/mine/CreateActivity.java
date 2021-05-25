@@ -100,7 +100,7 @@ public class CreateActivity extends AppCompatActivity {
                 popupWindowTag.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
                 popupWindowTag.setOnDismissListener(() -> {
                     tags = tagInput.getText().toString();
-                    ((TextView) cv.findViewById(R.id.tag)).setText(tags);
+                    CreateActivity.this.runOnUiThread(() -> ((TextView) cv.findViewById(R.id.tag)).setText(tags));
                 });
             }
         });
@@ -113,7 +113,7 @@ public class CreateActivity extends AppCompatActivity {
             if (init && collection != null) return;
             Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
             collection = sel;
-            ((TextView) cv.findViewById(R.id.collection)).setText(sel.title);
+            CreateActivity.this.runOnUiThread(() -> ((TextView) cv.findViewById(R.id.collection)).setText(sel.title));
             if (!init) popupWindowCollection.dismiss();
         }));
 

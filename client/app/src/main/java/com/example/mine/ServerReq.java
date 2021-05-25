@@ -102,7 +102,7 @@ public class ServerReq {
         @Override
         public void onFailure(@NotNull Call call, @NotNull IOException e) {
             Log.e("network", "IOException " + e.toString());
-            callback.accept(null);
+            // callback.accept(null);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
