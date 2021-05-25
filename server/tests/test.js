@@ -111,7 +111,7 @@ let total = 0, pass = 0;
 const check = async (method, url, params, expect, expect_status) => {
   const baseUrl = process.env['HOST'] || 'http://localhost:2317';
   const info = `${method + ' '.repeat(4 - method.length)} ` +
-    `${url + ' '.repeat(25 - url.length)} | `;
+    `${url + ' '.repeat(url.length < 25 ? (25 - url.length) : (5 - url.length % 5))} | `;
   const [status, response, headers] =
     await (
       method === 'POST' ? asyncPost :
@@ -574,6 +574,9 @@ if (process.env['GEN'] !== '1') (async () => {
 })();
 
 else (async () => {
+  await check('POST', '/reset')
+  http.globalAgent.maxSockets = 64;
+
   const bullshit = require('./bullshit');
 
   // Sample dataset!
@@ -601,6 +604,8 @@ else (async () => {
   const Sd = 150; // (variation)
   const T = 900;  // Number of comments per user (minimum)
   const Td = 900; // (variation)
+  const V = 900;  // Number of comment upvotes per user (minimum)
+  const Vd = 900; // (variation)
   const B = 5;    // Number of subscriptions per user (minimum)
   const Bd = 15;  // (variation)
 
@@ -678,34 +683,59 @@ else (async () => {
   }
 
   // Stars
+  const promisesStars = [];
   for (let u = 0; u < N; u++)
     for (let s = S + rand() % Sd; s > 0; s--) {
-      await check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
-        {token: token[u], is_star: 1}, any);
+      promisesStars.push(check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
+        {token: token[u], is_star: 1}, any));
     }
+  await Promise.all(promisesStars);
 
   // Comments
+  const promisesComments = [];
   const postCmts = {};
   for (let u of shuffleRepeated(N, (u) => T + rand() % Td)) {
-    const post = postsAll[rand() % postsAll.length];
+    promisesComments.push((async () => {
+      const post = postsAll[rand() % postsAll.length];
 
-    let cmts = postCmts[post];
-    if (cmts === undefined) postCmts[post] = cmts = [];
+      let cmts = postCmts[post];
+      if (cmts === undefined) postCmts[post] = cmts = [];
 
-    const cid = (await check('POST', `/post/${post}/comment/new`, {
-      token: token[u],
-      reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
-      contents: bullshit.sentence(1),
-    }, {id: any})).id;
-    cmts.push(cid);
+      const cid = (await check('POST', `/post/${post}/comment/new`, {
+        token: token[u],
+        reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
+        contents: bullshit.sentence(1),
+      }, {id: any})).id;
+      if (cid !== undefined) cmts.push(cid);
+    })());
   }
+  await Promise.all(promisesComments);
+
+  // Comment upvotes
+  const promisesCommentUpvotes = [];
+  for (let u = 0; u < N; u++)
+    for (let v = V + rand() % Vd; v > 0; v--) {
+      const post = postsAll[rand() % postsAll.length];
+
+      const cmts = postCmts[post];
+      if (cmts === undefined) continue;
+
+      const cid = cmts[rand() % cmts.length];
+      promisesCommentUpvotes.push(check('POST', `/post/${post}/comment/${cid}/upvote`, {
+        token: token[u],
+        is_upvote: 1,
+      }, any));
+    }
+  await Promise.all(promisesStars);
 
   // Subscriptions
+  const promisesSubscriptions = [];
   for (let u = 0; u < N; u++)
     for (let b = B + rand() % Bd; b > 0; b--) {
-      await check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
-        {token: token[u], is_subscribe: 1}, any);
+      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
+        {token: token[u], is_subscribe: 1}, any));
     }
+  await Promise.all(promisesSubscriptions);
 
   console.log(token);
 
