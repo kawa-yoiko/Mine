@@ -8,6 +8,8 @@ type Collection struct {
 	Tags        []string
 	Posts       []Post
 	SubCount    int32
+
+	PostCount int32
 }
 
 func init() {
@@ -49,8 +51,9 @@ func (c *Collection) Repr() map[string]interface{} {
 
 func (c *Collection) ReprBrief() map[string]interface{} {
 	return map[string]interface{}{
-		"id":    c.Id,
-		"title": c.Title,
+		"id":         c.Id,
+		"title":      c.Title,
+		"post_count": c.PostCount,
 	}
 }
 
@@ -119,7 +122,8 @@ func (c *Collection) Read() error {
 }
 
 func readCollections(userId int32) ([]map[string]interface{}, error) {
-	rows, err := db.Query(`SELECT id, title, description
+	rows, err := db.Query(`SELECT id, title, description,
+		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id)
 		FROM collection WHERE author_id = $1`, userId)
 	if err != nil {
 		return nil, err
@@ -128,7 +132,7 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 	collections := []map[string]interface{}{}
 	for rows.Next() {
 		c := Collection{}
-		err := rows.Scan(&c.Id, &c.Title, &c.Description)
+		err := rows.Scan(&c.Id, &c.Title, &c.Description, &c.PostCount)
 		if err != nil {
 			return nil, err
 		}
