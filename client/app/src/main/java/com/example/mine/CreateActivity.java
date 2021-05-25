@@ -28,8 +28,10 @@ import android.widget.PopupWindow;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CreateActivity extends AppCompatActivity {
     PopupWindow popupWindowTag;
@@ -127,7 +129,24 @@ public class CreateActivity extends AppCompatActivity {
         });
 
         // Post button
+        Consumer<JSONObject> goToCreatedPost = (JSONObject obj) -> {
+            Log.d("CreateActivity", obj.toString());
+            int id = -1;
+            try {
+                id = obj.getInt("id");
+            } catch (JSONException e) {
+                Log.e("CreateActivity", e.toString());
+                return;
+            }
+            Intent intentOut = new Intent(this, LoadingActivity.class);
+            intentOut.putExtra("type", LoadingActivity.DestType.post);
+            intentOut.putExtra("id", id);
+            intentOut.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intentOut);
+            this.finish();
+        };
         ((Button) findViewById(R.id.post_button)).setOnClickListener((View v) -> {
+            v.setEnabled(false);
             if (createType.equals("text")) {
                 ServerReq.postJson("/post/new", List.of(
                         new Pair<>("type", "0"),
@@ -135,22 +154,42 @@ public class CreateActivity extends AppCompatActivity {
                         new Pair<>("contents", ((EditText) createAreaView.findViewById(R.id.contents_input)).getText().toString()),
                         new Pair<>("collection", String.valueOf(collection.id)),
                         new Pair<>("tags", tags)
-                ), (JSONObject obj) -> {
-                    Log.d("CreateActivity", obj.toString());
-                    int id = -1;
-                    try {
-                        id = obj.getInt("id");
-                    } catch (JSONException e) {
-                        Log.e("CreateActivity", e.toString());
-                        return;
-                    }
-                    Intent intentOut = new Intent(this, LoadingActivity.class);
-                    intentOut.putExtra("type", LoadingActivity.DestType.post);
-                    intentOut.putExtra("id", id);
-                    intentOut.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intentOut);
-                    this.finish();
-                });
+                ), goToCreatedPost);
+            } else if (createType.equals("image")) {
+                String[] ids = new String[imageItems.size()];
+                int i = 0;
+                for (ImageItem item : imageItems) {
+                    int j = i++;
+                    ServerReq.uploadFile("/upload", new File(item.path), (JSONObject obj) -> {
+                        try {
+                            ids[j] = obj.getJSONArray("ids").getString(0);
+                        } catch (JSONException e) {
+                            Log.e("CreateActivity", e.toString());
+                        }
+                        Log.d("CreateActivity", "upload " + j + " = " + ids[j]);
+                        // Check: is ids full?
+                        boolean full = true;
+                        for (String s : ids)
+                            if (s == null) {
+                                full = false;
+                                break;
+                            }
+                        if (full) {
+                            StringBuilder idsJoined = new StringBuilder();
+                            for (String s : ids) {
+                                if (idsJoined.length() != 0) idsJoined.append(" ");
+                                idsJoined.append(s);
+                            }
+                            ServerReq.postJson("/post/new", List.of(
+                                    new Pair<>("type", "1"),
+                                    new Pair<>("caption", ((EditText) createAreaView.findViewById(R.id.caption_input)).getText().toString()),
+                                    new Pair<>("contents", idsJoined.toString()),
+                                    new Pair<>("collection", String.valueOf(collection.id)),
+                                    new Pair<>("tags", tags)
+                            ), goToCreatedPost);
+                        }
+                    });
+                }
             }
         });
     }

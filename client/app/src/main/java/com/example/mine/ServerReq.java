@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -179,6 +180,24 @@ public class ServerReq {
                 }
             }
         });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFile(String url, File file, Consumer<JSONObject> callbackFn) {
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("fileqwqwqwq", "filequququq",
+                        RequestBody.create(file, MediaType.parse("application/octet-stream")))
+                .build();
+        Request request = new Request.Builder()
+                .url(getFullUrl(url))
+                .header("Authorization", token != null ? "Bearer " + token : "")
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+        call.enqueue(new ReqCallback((InputStream stream) -> {
+            callbackFn.accept(parseJson(streamToString(stream)));
+        }));
     }
 
     public static class Utils {
