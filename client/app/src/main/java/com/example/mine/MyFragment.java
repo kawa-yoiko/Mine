@@ -69,13 +69,14 @@ public class MyFragment  extends Fragment {
             }
         });
 
-        Button btn = (Button)view.findViewById(R.id.settings_button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SettingActivity.class);
-                getActivity().startActivity(intent);
-            }
+        ((Button) view.findViewById(R.id.settings_button)).setOnClickListener((View v) -> {
+            Intent intent = new Intent(getActivity(), SettingActivity.class);
+            getActivity().startActivity(intent);
+        });
+
+        ((Button) view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
+            Intent intent = new Intent(getActivity(), StarActivity.class);
+            getActivity().startActivity(intent);
         });
 
         View gotoHomePageBtn = view.findViewById(R.id.goto_homepage);

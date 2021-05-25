@@ -105,7 +105,7 @@
                 android:textAlignment="textStart" />
 
             <Button
-                android:id="@+id/marks_button"
+                android:id="@+id/stars_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
