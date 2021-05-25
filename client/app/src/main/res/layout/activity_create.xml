@@ -63,6 +63,20 @@
             android:paddingHorizontal="10dp"
             android:layout_below="@id/progress"
             ></FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/collection"
+            android:text="Collection"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tag"
+            android:text="#tag"
+            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
