@@ -67,10 +67,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentBottom="true"
+            android:layout_below="@id/create_area"
             android:paddingTop="20dp"
             android:paddingHorizontal="20dp"
-            android:layout_marginBottom="200dp"
             android:divider="@drawable/divider_grey_light"
             android:showDividers="beginning|middle|end"
             >
