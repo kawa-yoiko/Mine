@@ -104,6 +104,7 @@ public class CreateActivity extends AppCompatActivity {
                 });
             }
         });
+        ((TextView) cv.findViewById(R.id.tag)).setText("");
 
         View popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
         FrameLayout collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
