@@ -199,6 +199,7 @@ public class ServerReq {
                 Log.e("network", "Hosting activity is null");
                 return;
             }
+            imageView.setImageDrawable(null);
             ServerReq.getStream(url, (InputStream stream) -> {
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 activity.runOnUiThread(() -> imageView.setImageBitmap(bitmap));

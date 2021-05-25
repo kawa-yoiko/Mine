@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:text="kuriko"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textStyle="bold"></TextView>
 
             <TextView
@@ -56,7 +56,7 @@
             android:layout_marginLeft="50px"
             android:layout_marginRight="50px"
             android:text="粥粥与草莓"
-            android:textSize="16dp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="@id/avatar"></TextView>
 
@@ -80,7 +80,7 @@
             android:layout_marginLeft="50px"
             android:layout_marginBottom="8dp"
             android:text="#猫猫 #狗粮 #摄影 #1234567891234"
-            android:textSize="16dp"></TextView>
+            android:textSize="16sp"></TextView>
 
         <TextView
             android:id="@+id/collection"
@@ -92,7 +92,7 @@
             android:drawableLeft="@drawable/flower"
             android:padding="6dp"
             android:text="粥粥可爱"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold"></TextView>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

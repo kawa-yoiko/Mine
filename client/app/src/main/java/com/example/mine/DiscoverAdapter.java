@@ -3,6 +3,7 @@ package com.example.mine;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,14 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
         }
 //        ImageView avatarIcon = item.findViewById(R.id.avatar_icon);
 //        avatarIcon.setImageResource(contact.getAvatarIcon());
+
+        item.setOnClickListener((View v) -> {
+            Intent intent = new Intent();
+            intent.setClass(v.getContext(), LoadingActivity.class);
+            intent.putExtra("type", LoadingActivity.DestType.post);
+            intent.putExtra("id", post.id);
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
