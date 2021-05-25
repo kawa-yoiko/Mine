@@ -673,16 +673,27 @@ else (async () => {
   // Create posts
   const postsAll = [];
   for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
-    const contentImages = Array.from(Array(1 + rand() % 9),
-      () => images[u][rand() % images[u].length]);
-    const id = (await check('POST', '/post/new', {
+    const args = {
       token: token[u],
-      type: 1,
-      caption: bullshit.sentence(2),
-      contents: contentImages.join(' '),
       collection: colls[u][rand() % colls[u].length],
       tags: 'tag3,tag4',
-    }, {id: any})).id;
+    };
+    if (rand() % 3 !== 0) {
+      const contentImages = Array.from(Array(1 + rand() % 9),
+        () => images[u][rand() % images[u].length]);
+      Object.assign(args, {
+        type: 1,
+        caption: bullshit.sentence(2),
+        contents: contentImages.join(' '),
+      });
+    } else {
+      Object.assign(args, {
+        type: 0,
+        caption: bullshit.sentence(1).substr(0, 10),
+        contents: bullshit.passage(500),
+      });
+    }
+    const id = (await check('POST', '/post/new', args, {id: any})).id;
     postsAll.push(id);
   }
 
