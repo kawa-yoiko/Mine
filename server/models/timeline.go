@@ -25,7 +25,7 @@ func postsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, error) {
 }
 
 func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
-	rows, err := db.Query(postSelectClause+
+	rows, err := db.Query(postSelectClause(userId)+
 		`WHERE collection.id IN
 		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
 		  ORDER BY post.timestamp
@@ -38,7 +38,7 @@ func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]inte
 }
 
 func DiscoverTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
-	rows, err := db.Query(postSelectClause+
+	rows, err := db.Query(postSelectClause(userId)+
 		`WHERE collection.id NOT IN
 		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
 		  ORDER BY post.timestamp

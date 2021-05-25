@@ -20,10 +20,7 @@ func getSubscriptionTimeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDiscoverTimeline(w http.ResponseWriter, r *http.Request) {
-	u, ok := auth(r)
-	if !ok {
-		u.Id = -1
-	}
+	u, _ := auth(r)
 
 	start, _ := strconv.Atoi(query(r, "start"))
 	count, _ := strconv.Atoi(query(r, "count"))

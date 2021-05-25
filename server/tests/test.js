@@ -274,6 +274,8 @@ if (process.env['GEN'] !== '1') (async () => {
     upvote_count: 0,
     comment_count: 0,
     star_count: 0,
+    my_star: false,
+    my_upvote: false,
   })
   await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
 
@@ -324,8 +326,8 @@ if (process.env['GEN'] !== '1') (async () => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment', upvote_count: 0},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment', upvote_count: 0},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment', upvote_count: 0, my_upvote: false},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment', upvote_count: 0, my_upvote: false},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -333,8 +335,8 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 10,
     reply_root: cid1,
   }, [
-    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment', upvote_count: 0},
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment', upvote_count: 0, my_upvote: false},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0, my_upvote: false},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -342,7 +344,7 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 1,
     reply_root: cid1,
   }, [
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0, my_upvote: false},
   ])
 
   // Comment upvote
@@ -352,14 +354,24 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1});
   await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 2});
   await check('POST', `/post/${pid0}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, undefined, 400);
+  await check('POST', `/post/${pid1}/comment/${cid3}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1});
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
     start: 0,
     count: 10,
     reply_root: cid1,
   }, [
-    any,
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 2},
+    {_ignoreRedundant: true, upvote_count: 1, my_upvote: false},
+    {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token2,
+    start: 0,
+    count: 10,
+    reply_root: cid1,
+  }, [
+    {_ignoreRedundant: true, upvote_count: 1, my_upvote: true},
+    {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
   ])
 
   // Upvote
@@ -373,7 +385,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
   await check('POST', `/post/${no_pid}/upvote`, {token: token2, is_upvote: 1}, undefined, 400)
 
-  // Mark
+  // Star
   await check('POST', `/post/${pid1}/star`, {token: token1, is_star: 0}, {star_count: 0})
   await check('POST', `/post/${pid1}/star`, {token: token1, is_star: 1}, {star_count: 1})
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 1}, {star_count: 2})
@@ -382,7 +394,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 1}, {star_count: 2})
 
   // Upvote and comment counts
-  await check('GET', `/post/${pid1}`, undefined, {
+  await check('GET', `/post/${pid1}`, {token: token1}, {
     author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
@@ -393,6 +405,8 @@ if (process.env['GEN'] !== '1') (async () => {
     upvote_count: 1,
     comment_count: 4,
     star_count: 2,
+    my_star: true,
+    my_upvote: true,
   })
 
   // More posts for collections
