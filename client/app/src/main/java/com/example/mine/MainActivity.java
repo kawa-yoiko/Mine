@@ -36,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
         ServerReq.login("uu2", "aaaaaa2", (Boolean success) -> {
             android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
+            this.runOnUiThread(this::setUpAllViews);
         });
+    }
 
+    private void setUpAllViews() {
 //        ButterKnife.bind(this);
         titleView = findViewById(R.id.title);
         toolbar = findViewById(R.id.toolbar);
