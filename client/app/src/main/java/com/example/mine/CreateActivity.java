@@ -1,19 +1,13 @@
 package com.example.mine;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +16,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
 import java.util.ArrayList;
@@ -35,6 +30,8 @@ public class CreateActivity extends AppCompatActivity {
     WidthEqualsHeightImageView addImage;
     private static int IMAGE_PICKER = 0;
 
+    private String tags = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +41,7 @@ public class CreateActivity extends AppCompatActivity {
         ViewGroup area = cv.findViewById(R.id.create_area);
         Intent intent = getIntent();
         String createType = intent.getStringExtra("create_type");
+
         if(createType.equals("text")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_text, null);
         }
@@ -76,16 +74,16 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View v) {
                 View popView = getLayoutInflater().inflate(R.layout.popup_tag, null);
                 Button finishButton = popView.findViewById(R.id.finish);
-                finishButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
+                EditText tagInput = popView.findViewById(R.id.tag_input);
+                tagInput.setText(tags);
+                finishButton.setOnClickListener((View v1) -> popupWindowTag.dismiss());
                 popupWindowTag = new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowTag.setOutsideTouchable(true);
                 popupWindowTag.setFocusable(true);
                 popupWindowTag.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
+                popupWindowTag.setOnDismissListener(() -> {
+                    tags = tagInput.getText().toString();
+                });
             }
         });
 
@@ -94,19 +92,18 @@ public class CreateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 View popView = getLayoutInflater().inflate(R.layout.popup_collection, null);
-                Fragment discoverFragment = new DiscoverFragment();
                 Button finishButton = popView.findViewById(R.id.create);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fl_collection, discoverFragment).commit();
-                finishButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
+                finishButton.setOnClickListener((View v1) -> {
                 });
+                FrameLayout collectionContainer = popView.findViewById(R.id.fl_collection);
+                collectionContainer.removeAllViews();
+                collectionContainer.addView(CollectionListView.inflate(popView.getContext()));
                 popupWindowCollection = new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);
                 popupWindowCollection.setFocusable(true);
                 popupWindowCollection.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
+                popupWindowCollection.setOnDismissListener(() -> {
+                });
             }
         });
     }

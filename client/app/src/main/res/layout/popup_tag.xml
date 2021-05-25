@@ -48,11 +48,13 @@
             android:background="@color/grey_1"
             android:layout_marginBottom="8dp"
             ></View>
+
         <EditText
+            android:id="@+id/tag_input"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:gravity="top"
             android:background="@drawable/background_white"
+            android:gravity="top"
             android:hint="输入标签..."></EditText>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
