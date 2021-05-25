@@ -157,10 +157,17 @@ public class CreateActivity extends AppCompatActivity {
                 ), goToCreatedPost);
             } else if (createType.equals("image")) {
                 String[] ids = new String[imageItems.size()];
+                double[] progress = new double[imageItems.size()];
                 int i = 0;
                 for (ImageItem item : imageItems) {
                     int j = i++;
-                    ServerReq.uploadFile("/upload", new File(item.path), (JSONObject obj) -> {
+                    ServerReq.uploadFile("/upload", new File(item.path), (Long len, Long sent) -> {
+                        progress[j] = (double)sent / len;
+                        double totalProgress = 0;
+                        for (double p : progress) totalProgress += p;
+                        totalProgress /= progress.length;
+                        Log.d("CreateActivity", "image upload progress = " + totalProgress);
+                    }, (JSONObject obj) -> {
                         try {
                             ids[j] = obj.getJSONArray("ids").getString(0);
                         } catch (JSONException e) {
