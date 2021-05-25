@@ -19,12 +19,6 @@ public class CollectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);
 
-        squareFragment = new SquareFragment(this.findViewById(R.id.heading));
-        FrameLayout layout = (FrameLayout)this.findViewById(R.id.squares_container);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.squares_container, squareFragment)
-                .commit();
-
         Collection collection = (Collection) getIntent().getSerializableExtra("collection");
         ((TextView) findViewById(R.id.title)).setText(collection.title);
         ((TextView) findViewById(R.id.description)).setText(collection.description);
@@ -35,5 +29,11 @@ public class CollectionActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.count)).setText(
                 String.format(Locale.CHINESE, "%d 篇作品", collection.posts.size())
         );
+
+        squareFragment = new SquareFragment(this.findViewById(R.id.heading), collection.posts);
+        FrameLayout layout = (FrameLayout)this.findViewById(R.id.squares_container);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.squares_container, squareFragment)
+                .commit();
     }
 }
