@@ -44,7 +44,7 @@ public class PostActivity extends AppCompatActivity {
         View postView = getPostView(post);
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
-        Fragment commentFragment = new CommentFragment(post.id, findViewById(R.id.post_content_heading));
+        CommentFragment commentFragment = new CommentFragment(post.id, findViewById(R.id.post_content_heading));
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
         TextView comment_num_text = findViewById(R.id.comment_num);
         comment_num_text.setText(String.valueOf(post.getComment_num()));
@@ -96,7 +96,10 @@ public class PostActivity extends AppCompatActivity {
                     }
                     if (commentId == -1)
                         return;
-                    PostActivity.this.runOnUiThread(() -> commentText.setText(""));
+                    PostActivity.this.runOnUiThread(() -> {
+                        commentText.setText("");
+                        commentFragment.refresh();
+                    });
                 });
             }
         });

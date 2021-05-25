@@ -29,6 +29,8 @@ public class CommentFragment extends Fragment {
     private View headingView;
     private int postId;
 
+    private LinkedList<Comment> comments;
+
     public CommentFragment(int postId, View headingView) {
         this.postId = postId;
         this.headingView = headingView;
@@ -42,7 +44,7 @@ public class CommentFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
-        LinkedList<Comment> comments = new LinkedList<>();
+        comments = new LinkedList<>();
         CommentAdapter commentAdapter = new CommentAdapter(this.postId, comments);
         SingleViewAdapter headingAdapter = new SingleViewAdapter(headingView);
         SingleViewAdapter loadingAdapter = new SingleViewAdapter(
@@ -77,6 +79,10 @@ public class CommentFragment extends Fragment {
                 });
             }
         });
+    }
+
+    public void refresh() {
+        this.onViewCreated(getView(), null);
     }
 
     @Override
