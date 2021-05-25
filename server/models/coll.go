@@ -145,5 +145,5 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 }
 
 func (c *Collection) Subscribe(u User, add bool) error {
-	return processEntityUserRel("collection_subscription", "collection", c.Id, u, add, &c.SubCount)
+	return processEntityUserRel("collection_subscription", "collection", false, c.Id, u, add, &c.SubCount)
 }

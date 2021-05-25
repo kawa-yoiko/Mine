@@ -393,6 +393,11 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 0}, {star_count: 1})
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 1}, {star_count: 2})
 
+  await check('GET', `/star_timeline`, {token: token2, start: 0, count: 10}, [{
+    post: {_ignoreRedundant: true, id: 2},
+    timestamp: any,
+  }])
+
   // Upvote and comment counts
   await check('GET', `/post/${pid1}`, {token: token1}, {
     author: {nickname: 'kayuyuko', avatar: avt1},

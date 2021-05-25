@@ -2,17 +2,24 @@ package models
 
 import (
 	"github.com/lib/pq"
+	"time"
 )
 
 func processEntityUserRel(
-	rel string, ent string, entId int32,
-	u User, add bool, count *int32,
+	rel string, ent string, hasTimestamp bool,
+	entId int32, u User, add bool, count *int32,
 ) error {
 	var err error
 	if add {
-		_, err = db.Exec(
-			"INSERT INTO "+rel+" ("+ent+"_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-			entId, u.Id)
+		if hasTimestamp {
+			_, err = db.Exec(
+				"INSERT INTO "+rel+" ("+ent+"_id, user_id, timestamp) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+				entId, u.Id, time.Now().Unix())
+		} else {
+			_, err = db.Exec(
+				"INSERT INTO "+rel+" ("+ent+"_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+				entId, u.Id)
+		}
 	} else {
 		_, err = db.Exec(
 			"DELETE FROM "+rel+" WHERE "+ent+"_id = $1 AND user_id = $2",

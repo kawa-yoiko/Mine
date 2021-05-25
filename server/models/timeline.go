@@ -49,3 +49,34 @@ func DiscoverTimeline(userId int32, start int, count int) ([]map[string]interfac
 	}
 	return postsReprBriefFromRows(rows)
 }
+
+func StarTimeline(userId int32, start int, count int) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT
+		post.id, post.type, post.caption, post.contents, post_star.timestamp
+		FROM post
+		  INNER JOIN post_star ON post.id = post_star.post_id
+		WHERE post_star.user_id = $1
+		ORDER BY post_star.timestamp DESC
+		LIMIT $3 OFFSET $2
+	`, userId, start, count)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	posts := []map[string]interface{}{}
+	for rows.Next() {
+		p := Post{}
+		var timestamp int64
+		if err := rows.Scan(&p.Id, &p.Type, &p.Caption, &p.Contents, &timestamp); err != nil {
+			return nil, err
+		}
+		posts = append(posts, map[string]interface{}{
+			"post":      p.ReprOutline(),
+			"timestamp": timestamp,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
