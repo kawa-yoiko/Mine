@@ -64,7 +64,7 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView = createAreaView.findViewById(R.id.recyclerview);
             addImage = new WidthEqualsHeightImageView(getApplicationContext());
             addImage.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            addImage.setImageResource(R.drawable.luoxiaohei);
+            addImage.setImageResource(R.drawable.plus);
             addImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

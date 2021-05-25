@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         tools:ignore="MissingConstraints"
         android:padding="5dp"
         >
@@ -29,14 +29,10 @@
                 android:background="@drawable/bt_background_grey"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
-                android:paddingHorizontal="18dp"
-                android:paddingVertical="6dp"
-                android:paddingLeft="15dp"
-                android:paddingTop="5dp"
-                android:paddingRight="15dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="4dp"
                 android:text="返回"
-                android:textSize="18dp"></Button>
+                android:textSize="16dp"></Button>
 
             <Button
                 android:id="@+id/post_button"
@@ -46,25 +42,27 @@
                 android:background="@drawable/bt_background_yellow"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
-                android:paddingHorizontal="18dp"
-                android:paddingVertical="6dp"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="4dp"
                 android:text="发布"
                 android:textColor="#FDFDFD"
-                android:textSize="18dp"></Button>
+                android:textSize="16dp"></Button>
         </RelativeLayout>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/create_area"
             android:layout_below="@id/buttons_container"
+            android:paddingHorizontal="10dp"
             ></FrameLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_below="@id/create_area"
+            android:layout_alignParentBottom="true"
             android:paddingTop="20dp"
             android:paddingHorizontal="20dp"
+            android:layout_marginBottom="200dp"
             android:divider="@drawable/divider_grey_light"
             android:showDividers="beginning|middle|end"
             >
@@ -85,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/book_icon"
                     android:layout_centerVertical="true"
-                    android:textSize="18dp"
+                    android:textSize="16dp"
                     android:textStyle="bold"
                     android:layout_marginLeft="8dp"
                     android:text="存入合集"></TextView>
@@ -113,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/tag_icon"
                     android:layout_centerVertical="true"
-                    android:textSize="18dp"
+                    android:textSize="16dp"
                     android:textStyle="bold"
                     android:layout_marginLeft="8dp"
                     android:text="添加标签"></TextView>
