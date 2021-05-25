@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int DATE = 0;
     private static final int PICTURE = 1;
     private static final int TEXT = 2;
-    private LinkedList<Object> data;
+    private LinkedList<SquareFragment.Item> data;
     private int itemsBefore = 0;
 
     public static class DateHolder extends RecyclerView.ViewHolder {
@@ -45,24 +46,24 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public SquareAdapter(LinkedList<Object> data)
+    public SquareAdapter(LinkedList<SquareFragment.Item> data)
     {
         this.data = data;
     }
 
-    public SquareAdapter(LinkedList<Object> data, int itemsBefore) {
+    public SquareAdapter(LinkedList<SquareFragment.Item> data, int itemsBefore) {
         this.data = data;
         this.itemsBefore = itemsBefore;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (data.get(position) instanceof String) {
-            String s = (String) data.get(position);
-            return (s.startsWith("+") ? PICTURE : DATE);
-        }
-        else{
+        if (data.get(position) instanceof SquareFragment.ImageItem) {
+            return PICTURE;
+        } else if (data.get(position) instanceof SquareFragment.TextItem) {
             return TEXT;
+        } else {
+            return DATE;
         }
     }
 
@@ -87,23 +88,32 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        SquareFragment.Item item = data.get(position);
         if (holder instanceof DateHolder) {
-            String date = (String)data.get(position);
+            String date = ((SquareFragment.DateItem) item).date;
             ((DateHolder)holder).textView.setText(date);
         }
         else if (holder instanceof ImageHolder) {
-            String image = ((String)data.get(position)).substring(1);
+            String image = ((SquareFragment.ImageItem) item).image;
             ServerReq.Utils.loadImage(
                     "/upload/" + image,
                     ((ImageHolder)holder).imageView);
         }
         else if (holder instanceof TextHolder) {
-            String[] text = (String[])data.get(position);
-            String caption = text[0];
-            String content = text[1];
+            String caption = ((SquareFragment.TextItem) item).caption;
+            String content = ((SquareFragment.TextItem) item).contents;
             ((TextHolder)holder).captionView.setText(caption);
             ((TextHolder)holder).contentView.setText(content);
         }
+        holder.itemView.setOnClickListener((View v) -> {
+            if (item instanceof SquareFragment.PostItem) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), LoadingActivity.class);
+                intent.putExtra("type", LoadingActivity.DestType.post);
+                intent.putExtra("id", ((SquareFragment.PostItem) item).id);
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
 
