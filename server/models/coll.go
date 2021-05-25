@@ -88,7 +88,7 @@ func (c *Collection) Read() error {
 
 	// Read posts
 	rows, err := db.Query(`SELECT
-		id, caption, contents
+		id, type, caption, contents
 		FROM post
 		WHERE collection_id = $1 ORDER BY collection_seq`, c.Id)
 	if err != nil {
@@ -98,7 +98,7 @@ func (c *Collection) Read() error {
 	posts := []Post{}
 	for rows.Next() {
 		p := Post{}
-		err := rows.Scan(&p.Id, &p.Caption, &p.Contents)
+		err := rows.Scan(&p.Id, &p.Type, &p.Caption, &p.Contents)
 		if err != nil {
 			return err
 		}

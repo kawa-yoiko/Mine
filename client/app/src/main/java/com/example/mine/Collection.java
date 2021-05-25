@@ -24,9 +24,9 @@ public class Collection implements Serializable {
         PostBrief(JSONObject obj) throws JSONException {
             this.id = obj.getInt("id");
             this.type = obj.getInt("type");
-            this.caption = obj.getString("caption");
-            if (obj.has("contents"))
-                this.contents = obj.getString("contents");
+            this.contents = obj.getString("contents");
+            if (obj.has("caption"))
+                this.caption = obj.getString("caption");
         }
     }
 

@@ -36,9 +36,11 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPost(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	p := models.Post{Id: int32(id)}
-	if err := p.Read(); err != nil {
+	if err := p.Read(u.Id); err != nil {
 		panic(err)
 	}
 
@@ -63,6 +65,8 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPostComments(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	start, _ := strconv.Atoi(query(r, "start"))
 	count, _ := strconv.Atoi(query(r, "count"))
@@ -71,7 +75,7 @@ func getPostComments(w http.ResponseWriter, r *http.Request) {
 		replyRoot = replyRootParsed
 	}
 
-	comments, err := models.ReadComments(int32(id), start, count, replyRoot)
+	comments, err := models.ReadComments(int32(id), start, count, int32(replyRoot), u.Id)
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +122,7 @@ func postPostSetCollection(w http.ResponseWriter, r *http.Request) {
 	c := referredCollection(u, r.PostFormValue("collection_id"))
 
 	p := models.Post{Id: int32(id)}
-	if err := p.Read(); err != nil {
+	if err := p.Read(u.Id); err != nil {
 		panic(err)
 	}
 
@@ -143,7 +147,7 @@ func postPostCommentUpvote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := models.Comment{Id: int32(cid)}
-	if err := c.Read(); err != nil {
+	if err := c.Read(u.Id); err != nil {
 		panic(err)
 	}
 	if c.Post.Id != int32(id) {

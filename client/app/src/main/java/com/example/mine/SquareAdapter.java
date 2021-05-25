@@ -58,10 +58,8 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemViewType(int position) {
         if (data.get(position) instanceof String) {
-            return DATE;
-        }
-        else if (data.get(position) instanceof Integer){
-            return PICTURE;
+            String s = (String) data.get(position);
+            return (s.startsWith("+") ? PICTURE : DATE);
         }
         else{
             return TEXT;
@@ -94,8 +92,10 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ((DateHolder)holder).textView.setText(date);
         }
         else if (holder instanceof ImageHolder) {
-             int image = (int)data.get(position);
-            ((ImageHolder)holder).imageView.setImageResource(image);
+            String image = ((String)data.get(position)).substring(1);
+            ServerReq.Utils.loadImage(
+                    "/upload/" + image,
+                    ((ImageHolder)holder).imageView);
         }
         else if (holder instanceof TextHolder) {
             String[] text = (String[])data.get(position);

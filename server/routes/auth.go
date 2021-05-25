@@ -75,27 +75,27 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 func auth(r *http.Request) (models.User, bool) {
 	authorization := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 	if len(authorization) != 2 || authorization[0] != "Bearer" {
-		return models.User{}, false
+		return models.User{Id: -1}, false
 	}
 	tokenString := authorization[1]
 	token, err := jwt.Parse(tokenString,
 		func(*jwt.Token) (interface{}, error) { return JwtSecret, nil })
 	if err != nil {
-		return models.User{}, false
+		return models.User{Id: -1}, false
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return models.User{}, false
+		return models.User{Id: -1}, false
 	}
 	uid, ok := claims["uid"].(float64)
 	if !ok {
-		return models.User{}, false
+		return models.User{Id: -1}, false
 	}
 
 	u := models.User{Id: int32(uid)}
 	if err := u.ReadById(); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.User{}, false
+			return models.User{Id: -1}, false
 		}
 		panic(err)
 	}

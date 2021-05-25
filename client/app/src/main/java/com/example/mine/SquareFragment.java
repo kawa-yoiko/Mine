@@ -13,13 +13,33 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class SquareFragment extends Fragment {
     private RecyclerView recyclerView;
     private View headingView;
+    private LinkedList<Object> dateAndImages;
 
-    public SquareFragment() {}
-    public SquareFragment(View headingView) { this.headingView = headingView; }
+    public SquareFragment() {
+        this.dateAndImages = new LinkedList<>();
+        for (int i = 0; i < 1; i++) {
+            dateAndImages.add("2021年5月");
+            dateAndImages.add("2021年6月");
+            dateAndImages.add(new String[]{"五条悟跳舞", "ll the beautiful things shining all around us,\n" +
+                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
+        }
+    }
+    public SquareFragment(View headingView, List<Collection.PostBrief> posts) {
+        this.headingView = headingView;
+        this.dateAndImages = new LinkedList<>();
+        for (Collection.PostBrief post : posts) {
+            if (post.type == 0) {
+                dateAndImages.add(new String[]{post.caption, post.contents});
+            } else if (post.type == 1) {
+                dateAndImages.add("+" + post.contents);
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

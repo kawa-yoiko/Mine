@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,6 +18,9 @@ type Post struct {
 	UpvoteCount  int32
 	CommentCount int32
 	StarCount    int32
+
+	MyUpvote bool
+	MyStar   bool
 }
 
 type Comment struct {
@@ -31,6 +35,7 @@ type Comment struct {
 
 	ReplyUser  User
 	ReplyCount int32
+	MyUpvote   bool
 }
 
 func init() {
@@ -99,6 +104,8 @@ func (p *Post) Repr() map[string]interface{} {
 		"upvote_count":  p.UpvoteCount,
 		"comment_count": p.CommentCount,
 		"star_count":    p.StarCount,
+		"my_upvote":     p.MyUpvote,
+		"my_star":       p.MyStar,
 	}
 }
 
@@ -143,6 +150,7 @@ func (c *Comment) Repr() map[string]interface{} {
 		"timestamp":    c.Timestamp,
 		"contents":     c.Contents,
 		"upvote_count": c.UpvoteCount,
+		"my_upvote":    c.MyUpvote,
 	}
 	if c.ReplyUser.Nickname == "" {
 		ret["reply_count"] = c.ReplyCount
@@ -170,14 +178,19 @@ func (p *Post) Create() error {
 }
 
 // TODO: Optimize comment counting
-const postSelectClause = `SELECT
-	post.*, mine_user.nickname, mine_user.avatar, collection.title,
-	(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
-	(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
-	(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id)
-	FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
-	  INNER JOIN collection ON post.collection_id = collection.id
-`
+func postSelectClause(userId int32) string {
+	u := strconv.FormatInt(int64(userId), 10)
+	return `SELECT
+		post.*, mine_user.nickname, mine_user.avatar, collection.title,
+		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
+		(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
+		(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id),
+		(SELECT COUNT (*) <> 0 FROM post_upvote WHERE post_upvote.post_id = post.id AND post_upvote.user_id = ` + u + `),
+		(SELECT COUNT (*) <> 0 FROM post_star WHERE post_star.post_id = post.id AND post_star.user_id = ` + u + `)
+		FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
+		  INNER JOIN collection ON post.collection_id = collection.id
+	`
+}
 
 func (p *Post) fields() []interface{} {
 	var collectionSeq int32
@@ -188,12 +201,13 @@ func (p *Post) fields() []interface{} {
 		&p.Author.Nickname, &p.Author.Avatar,
 		&p.Collection.Title,
 		&p.UpvoteCount, &p.StarCount, &p.CommentCount,
+		&p.MyUpvote, &p.MyStar,
 	}
 }
 
-func (p *Post) Read() error {
+func (p *Post) Read(userId int32) error {
 	err := db.QueryRow(
-		postSelectClause+"WHERE post.id = $1", p.Id,
+		postSelectClause(userId)+"WHERE post.id = $1", p.Id,
 	).Scan(p.fields()...)
 	if err != nil {
 		return err
@@ -235,19 +249,24 @@ func (c *Comment) Create() error {
 	return err
 }
 
-const commentSelectClause = "SELECT " +
-	"comment.id, comment.post_id, comment.author_id, comment.timestamp, " +
-	"COALESCE(comment.reply_to, -1), " +
-	"COALESCE(comment.reply_root, -1), " +
-	"comment.contents, " +
-	"(SELECT COUNT (*) FROM comment_upvote WHERE comment_upvote.comment_id = comment.id), " +
-	"author.nickname, author.avatar, " +
-	"COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''), " +
-	"(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id) " +
-	"FROM comment " +
-	"  INNER JOIN mine_user AS author ON comment.author_id = author.id " +
-	"  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id " +
-	"  LEFT JOIN mine_user AS reply_user ON reply_comment.author_id = reply_user.id "
+func commentSelectClause(userId int32) string {
+	u := strconv.FormatInt(int64(userId), 10)
+	return `SELECT
+		comment.id, comment.post_id, comment.author_id, comment.timestamp,
+		COALESCE(comment.reply_to, -1),
+		COALESCE(comment.reply_root, -1),
+		comment.contents,
+		(SELECT COUNT (*) FROM comment_upvote WHERE comment_upvote.comment_id = comment.id),
+		author.nickname, author.avatar,
+		COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''),
+		(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id),
+		(SELECT COUNT (*) <> 0 FROM comment_upvote WHERE comment_upvote.comment_id = comment.id AND comment_upvote.user_id = ` + u + `)
+		FROM comment
+		  INNER JOIN mine_user AS author ON comment.author_id = author.id
+		  LEFT JOIN comment AS reply_comment ON comment.reply_to = reply_comment.id
+		  LEFT JOIN mine_user AS reply_user ON reply_comment.author_id = reply_user.id
+	`
+}
 
 func (c *Comment) fields() []interface{} {
 	return []interface{}{
@@ -257,24 +276,25 @@ func (c *Comment) fields() []interface{} {
 		&c.Author.Nickname, &c.Author.Avatar,
 		&c.ReplyUser.Nickname, &c.ReplyUser.Avatar,
 		&c.ReplyCount,
+		&c.MyUpvote,
 	}
 }
 
-func (c *Comment) Read() error {
-	err := db.QueryRow(commentSelectClause+
+func (c *Comment) Read(userId int32) error {
+	err := db.QueryRow(commentSelectClause(userId)+
 		"WHERE comment.id = $1", c.Id,
 	).Scan(c.fields()...)
 	return err
 }
 
-func ReadComments(postId int32, start int, count int, replyRoot int) ([]map[string]interface{}, error) {
+func ReadComments(postId int32, start int, count int, replyRoot int32, userId int32) ([]map[string]interface{}, error) {
 	replyRootCond := "comment.reply_root IS NULL"
 	queryArgs := []interface{}{postId, start, count}
 	if replyRoot != -1 {
 		replyRootCond = "comment.reply_root = $4"
 		queryArgs = append(queryArgs, replyRoot)
 	}
-	rows, err := db.Query(commentSelectClause+
+	rows, err := db.Query(commentSelectClause(userId)+
 		"WHERE comment.post_id = $1 AND "+replyRootCond+" "+
 		"ORDER BY comment.timestamp DESC, comment.id DESC "+
 		"LIMIT $3 OFFSET $2",

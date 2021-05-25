@@ -111,7 +111,7 @@ let total = 0, pass = 0;
 const check = async (method, url, params, expect, expect_status) => {
   const baseUrl = process.env['HOST'] || 'http://localhost:2317';
   const info = `${method + ' '.repeat(4 - method.length)} ` +
-    `${url + ' '.repeat(25 - url.length)} | `;
+    `${url + ' '.repeat(url.length < 25 ? (25 - url.length) : (5 - url.length % 5))} | `;
   const [status, response, headers] =
     await (
       method === 'POST' ? asyncPost :
@@ -274,6 +274,8 @@ if (process.env['GEN'] !== '1') (async () => {
     upvote_count: 0,
     comment_count: 0,
     star_count: 0,
+    my_star: false,
+    my_upvote: false,
   })
   await check('GET', `/post/${no_pid}`, undefined, undefined, 404)
 
@@ -324,8 +326,8 @@ if (process.env['GEN'] !== '1') (async () => {
     start: 0,
     count: 10,
   }, [
-    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment', upvote_count: 0},
-    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment', upvote_count: 0},
+    {id: cid4, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_count: 0, contents: 'Another yes comment', upvote_count: 0, my_upvote: false},
+    {id: cid1, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_count: 2, contents: 'No comment', upvote_count: 0, my_upvote: false},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -333,8 +335,8 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 10,
     reply_root: cid1,
   }, [
-    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment', upvote_count: 0},
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
+    {id: cid3, author: {nickname: 'kurikoneko', avatar: avt2}, timestamp: any, reply_user: {nickname: 'kayuyuko', avatar: avt1}, contents: 'Unknown comment', upvote_count: 0, my_upvote: false},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0, my_upvote: false},
   ])
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
@@ -342,7 +344,7 @@ if (process.env['GEN'] !== '1') (async () => {
     count: 1,
     reply_root: cid1,
   }, [
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0},
+    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 0, my_upvote: false},
   ])
 
   // Comment upvote
@@ -352,14 +354,24 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1});
   await check('POST', `/post/${pid1}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 2});
   await check('POST', `/post/${pid0}/comment/${cid2}/upvote`, {token: token2, is_upvote: 1}, undefined, 400);
+  await check('POST', `/post/${pid1}/comment/${cid3}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1});
   await check('GET', `/post/${pid1}/comments`, {
     token: token1,
     start: 0,
     count: 10,
     reply_root: cid1,
   }, [
-    any,
-    {id: cid2, author: {nickname: 'kayuyuko', avatar: avt1}, timestamp: any, reply_user: {nickname: 'kurikoneko', avatar: avt2}, contents: 'Yes comment', upvote_count: 2},
+    {_ignoreRedundant: true, upvote_count: 1, my_upvote: false},
+    {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
+  ])
+  await check('GET', `/post/${pid1}/comments`, {
+    token: token2,
+    start: 0,
+    count: 10,
+    reply_root: cid1,
+  }, [
+    {_ignoreRedundant: true, upvote_count: 1, my_upvote: true},
+    {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
   ])
 
   // Upvote
@@ -373,7 +385,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/upvote`, {token: token2, is_upvote: 0}, {upvote_count: 1})
   await check('POST', `/post/${no_pid}/upvote`, {token: token2, is_upvote: 1}, undefined, 400)
 
-  // Mark
+  // Star
   await check('POST', `/post/${pid1}/star`, {token: token1, is_star: 0}, {star_count: 0})
   await check('POST', `/post/${pid1}/star`, {token: token1, is_star: 1}, {star_count: 1})
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 1}, {star_count: 2})
@@ -382,7 +394,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/post/${pid1}/star`, {token: token2, is_star: 1}, {star_count: 2})
 
   // Upvote and comment counts
-  await check('GET', `/post/${pid1}`, undefined, {
+  await check('GET', `/post/${pid1}`, {token: token1}, {
     author: {nickname: 'kayuyuko', avatar: avt1},
     timestamp: any,
     type: 0,
@@ -393,6 +405,8 @@ if (process.env['GEN'] !== '1') (async () => {
     upvote_count: 1,
     comment_count: 4,
     star_count: 2,
+    my_star: true,
+    my_upvote: true,
   })
 
   // More posts for collections
@@ -423,7 +437,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
@@ -461,7 +475,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
@@ -505,7 +519,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 0, caption: '今天是甜粥粥。', contents: any},
+      {id: any, type: 1, contents: any},
       {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
       {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
       {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
@@ -560,6 +574,9 @@ if (process.env['GEN'] !== '1') (async () => {
 })();
 
 else (async () => {
+  await check('POST', '/reset')
+  http.globalAgent.maxSockets = 64;
+
   const bullshit = require('./bullshit');
 
   // Sample dataset!
@@ -579,16 +596,18 @@ else (async () => {
   })();
   const RAND_MAX = 0x10000000;
 
-  const N = 10;   // Number of users
-  const C = 3;    // Number of collections per user (minimum)
-  const Cd = 5;   // (variation)
-  const M = 10;   // Average number of posts per collection
-  const S = 50;   // Number of stars per user (minimum)
-  const Sd = 150; // (variation)
-  const T = 900;  // Number of comments per user (minimum)
-  const Td = 900; // (variation)
-  const B = 5;    // Number of subscriptions per user (minimum)
-  const Bd = 15;  // (variation)
+  const N = 10;    // Number of users
+  const C = 3;     // Number of collections per user (minimum)
+  const Cd = 5;    // (variation)
+  const M = 10;    // Average number of posts per collection
+  const S = 50;    // Number of stars per user (minimum)
+  const Sd = 150;  // (variation)
+  const T = 1000;  // Number of comments per user (minimum)
+  const Td = 1500; // (variation)
+  const V = 2000;  // Number of comment upvotes per user (minimum)
+  const Vd = 2000; // (variation)
+  const B = 5;     // Number of subscriptions per user (minimum)
+  const Bd = 15;   // (variation)
 
   const token = Array(N);
   for (let i = 0; i < N; i++) {
@@ -599,15 +618,19 @@ else (async () => {
   }
 
   // Upload images
+  const promisesUploads = [];
   const images = Array.from(Array(N), () => []);
   const dir = await require('fs/promises').readdir(__dirname + '/fxemoji');
   for (const file of dir) {
     const u = rand() % N;
-    const id = (await check('PUT', '/upload',
-      {token: token[u], file: `fxemoji/${file}`},
-      {ids: [any]})).ids[0];
-    images[u].push(id);
+    promisesUploads.push((async () => {
+      const id = (await check('PUT', '/upload',
+        {token: token[u], file: `fxemoji/${file}`},
+        {ids: [any]})).ids[0];
+      images[u].push(id);
+    })());
   }
+  await Promise.all(promisesUploads);
 
   // Upload avatars
   for (let u = 0; u < N; u++) {
@@ -650,48 +673,89 @@ else (async () => {
   // Create posts
   const postsAll = [];
   for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
-    const contentImages = Array.from(Array(1 + rand() % 9),
-      () => images[u][rand() % images[u].length]);
-    const id = (await check('POST', '/post/new', {
+    const args = {
       token: token[u],
-      type: 1,
-      caption: bullshit.sentence(2),
-      contents: contentImages.join(' '),
       collection: colls[u][rand() % colls[u].length],
       tags: 'tag3,tag4',
-    }, {id: any})).id;
+    };
+    if (rand() % 3 !== 0) {
+      const contentImages = Array.from(Array(1 + rand() % 9),
+        () => images[u][rand() % images[u].length]);
+      Object.assign(args, {
+        type: 1,
+        caption: bullshit.sentence(2),
+        contents: contentImages.join(' '),
+      });
+    } else {
+      Object.assign(args, {
+        type: 0,
+        caption: bullshit.sentence(1).substr(0, 10),
+        contents: bullshit.passage(500),
+      });
+    }
+    const id = (await check('POST', '/post/new', args, {id: any})).id;
     postsAll.push(id);
   }
 
   // Stars
+  const promisesStars = [];
   for (let u = 0; u < N; u++)
     for (let s = S + rand() % Sd; s > 0; s--) {
-      await check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
-        {token: token[u], is_star: 1}, any);
+      promisesStars.push(check('POST', `/post/${postsAll[rand() % postsAll.length]}/star`,
+        {token: token[u], is_star: 1}, any));
     }
+  await Promise.all(promisesStars);
 
   // Comments
+  const promisesComments = [];
   const postCmts = {};
   for (let u of shuffleRepeated(N, (u) => T + rand() % Td)) {
     const post = postsAll[rand() % postsAll.length];
+    const r1 = rand();
 
-    let cmts = postCmts[post];
-    if (cmts === undefined) postCmts[post] = cmts = [];
+    promisesComments.push((async () => {
+      let cmts = postCmts[post];
+      if (cmts === undefined) postCmts[post] = cmts = [];
 
-    const cid = (await check('POST', `/post/${post}/comment/new`, {
-      token: token[u],
-      reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
-      contents: bullshit.sentence(1),
-    }, {id: any})).id;
-    cmts.push(cid);
+      const cid = (await check('POST', `/post/${post}/comment/new`, {
+        token: token[u],
+        reply_to: (cmts.length === 0 || r1 % 2 == 0) ? -1 : cmts[(r1 >> 1) % cmts.length],
+        contents: bullshit.sentence(1),
+      }, {id: any})).id;
+      if (cid !== undefined) cmts.push(cid);
+    })());
+    if (promisesComments.length === http.globalAgent.maxSockets) {
+      await Promise.all(promisesComments);
+      promisesComments.splice(0)
+    }
   }
+  await Promise.all(promisesComments);
+
+  // Comment upvotes
+  const promisesCommentUpvotes = [];
+  for (let u = 0; u < N; u++)
+    for (let v = V + rand() % Vd; v > 0; v--) {
+      const post = postsAll[rand() % postsAll.length];
+
+      const cmts = postCmts[post];
+      if (cmts === undefined) continue;
+
+      const cid = cmts[rand() % cmts.length];
+      promisesCommentUpvotes.push(check('POST', `/post/${post}/comment/${cid}/upvote`, {
+        token: token[u],
+        is_upvote: 1,
+      }, any));
+    }
+  await Promise.all(promisesStars);
 
   // Subscriptions
+  const promisesSubscriptions = [];
   for (let u = 0; u < N; u++)
     for (let b = B + rand() % Bd; b > 0; b--) {
-      await check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
-        {token: token[u], is_subscribe: 1}, any);
+      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
+        {token: token[u], is_subscribe: 1}, any));
     }
+  await Promise.all(promisesSubscriptions);
 
   console.log(token);
 

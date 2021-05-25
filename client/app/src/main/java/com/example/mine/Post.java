@@ -22,6 +22,8 @@ public class Post implements Serializable {
     private int flower_num;
     private int comment_num;
     private int star_num;
+    public boolean myUpvote;
+    public boolean myStar;
 
     public Post(String collection, String tag, String avatar, String nickname, String timestamp, String caption, String content, int contentType,
                 int flower_num, int comment_num, int star_num) {
@@ -58,6 +60,8 @@ public class Post implements Serializable {
             this.flower_num = obj.getInt("upvote_count");
             this.comment_num = obj.getInt("comment_count");
             this.star_num = obj.getInt("star_count");
+            this.myUpvote = obj.getBoolean("my_upvote");
+            this.myStar = obj.getBoolean("my_star");
 
             JSONObject collection = obj.getJSONObject("collection");
             this.collection = collection.getString("title");

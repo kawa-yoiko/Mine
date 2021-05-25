@@ -67,23 +67,28 @@
                 android:id="@+id/loading_indicator"
                 layout="@layout/loading_indicator" />
         </LinearLayout>
+
         <LinearLayout
+            android:id="@+id/flower_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:orientation="vertical">
+
             <ImageView
+                android:id="@+id/flower_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:src="@drawable/flower"></ImageView>
+
             <TextView
+                android:id="@+id/flower_num"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#999999"
-                android:text="255"
                 android:layout_gravity="center"
-                android:id="@+id/flower_num"></TextView>
+                android:text="255"
+                android:textColor="#999999"></TextView>
         </LinearLayout>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

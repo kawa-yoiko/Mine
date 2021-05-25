@@ -61,8 +61,16 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         contentView.setText(comment.getContent());
         TextView dateView = item.findViewById(R.id.date);
         dateView.setText(comment.getDate());
-        TextView flowerNum = item.findViewById(R.id.flower_num);
-        flowerNum.setText(String.valueOf(comment.getFlowerNum()));
+
+        // Flower button
+        ToggleReqButton toggleFlower = new ToggleReqButton(
+                item.findViewById(R.id.flower_button),
+                item.findViewById(R.id.flower_icon),
+                item.findViewById(R.id.flower_num),
+                R.drawable.flower, R.drawable.star,
+                "/post/" + this.postId + "/comment/" + comment.id + "/upvote",
+                "upvote");
+        toggleFlower.setState(comment.myUpvote ? 1 : 0, comment.getFlowerNum());
 
         TextView moreButton = item.findViewById(R.id.more);
         String moreButtonTextExpand = "展开 " + comment.replyNum + " 条回复";
@@ -83,7 +91,8 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     moreButton.setText(expanded ? moreButtonTextCollapse : moreButtonTextExpand);
                     if (expanded) {
                         LinkedList<Comment> subcomments = new LinkedList<>();
-                        CommentChildAdapter commentChildAdapter = new CommentChildAdapter(subcomments);
+                        CommentChildAdapter commentChildAdapter = new CommentChildAdapter(
+                                CommentAdapter.this.postId, subcomments);
                         recyclerView.setAdapter(commentChildAdapter);
                         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
                         loadingIndicator.setVisibility(View.VISIBLE);

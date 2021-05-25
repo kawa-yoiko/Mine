@@ -14,6 +14,7 @@ public class Comment {
     private String replyNickname;
     public int replyNum;
     private int flowerNum;
+    public boolean myUpvote;
 
     public Comment(String avatar, String nickname, String content, String date, String replyNickname, int flowerNum) {
         this.avatar = avatar;
@@ -40,6 +41,7 @@ public class Comment {
                 this.replyNickname = replyUser.getString("nickname");
             }
             this.flowerNum = obj.getInt("upvote_count");
+            this.myUpvote = obj.getBoolean("my_upvote");
         } catch (JSONException e) {
             android.util.Log.e("Comment", "Invalid JSON object " + e.toString());
         }
