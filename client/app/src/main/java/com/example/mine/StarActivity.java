@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +22,7 @@ public class StarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_star);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -42,6 +44,7 @@ public class StarActivity extends AppCompatActivity {
                 }
             }
             // TODO: Reduce duplication
+            items.add(new SquareFragment.DateItem("2021 年 5 月"));
             for (Collection.PostBrief post : posts) {
                 if (post.type == 0) {
                     items.add(new SquareFragment.TextItem(post.id, post.caption, post.contents));

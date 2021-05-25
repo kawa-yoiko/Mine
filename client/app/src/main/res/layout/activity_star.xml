@@ -6,8 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".StarActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/grey_1"
+        android:id="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="收藏夹"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/grey_4"
+                android:id="@+id/title"></TextView>
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/recyclerview" />
+        android:layout_height="0dp"
+        android:id="@+id/recyclerview"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
