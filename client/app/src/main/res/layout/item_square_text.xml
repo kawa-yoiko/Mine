@@ -7,35 +7,37 @@
     android:padding="3dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
+
     <view
+        android:id="@+id/square_text"
         class="com.example.mine.WidthEqualsHeightFrameLayoutView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/square_text"
+        android:layout_height="0dp"
         android:background="@drawable/corner_square"
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="3dp">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="5dp"
-            >
+            android:padding="5dp">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16dp"
-                android:textStyle="bold"
                 android:id="@+id/caption"
-                android:layout_marginBottom="3dp"
-                ></TextView>
-            <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="all the beautiful things shining all around us,
-                all the beautiful things shining all around us"
-                android:layout_below="@+id/caption"
+                android:layout_marginBottom="3dp"
+                android:textSize="16dp"
+                android:textStyle="bold"></TextView>
+
+            <TextView
                 android:id="@+id/content"
-                >
-            </TextView>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/caption"
+                android:text="all the beautiful things shining all around us,
+                all the beautiful things shining all around us"></TextView>
         </RelativeLayout>
     </view>
 </androidx.constraintlayout.widget.ConstraintLayout>
