@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -167,6 +168,8 @@ public class CreateActivity extends AppCompatActivity {
                         for (double p : progress) totalProgress += p;
                         totalProgress /= progress.length;
                         Log.d("CreateActivity", "image upload progress = " + totalProgress);
+                        ((ProgressBar) cv.findViewById(R.id.progress)).setMax(1000);
+                        ((ProgressBar) cv.findViewById(R.id.progress)).setProgress((int) Math.round(1000 * totalProgress), true);
                     }, (JSONObject obj) -> {
                         try {
                             ids[j] = obj.getJSONArray("ids").getString(0);
