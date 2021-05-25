@@ -48,12 +48,20 @@
                 android:textColor="#FDFDFD"
                 android:textSize="16dp"></Button>
         </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/buttons_container" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/create_area"
-            android:layout_below="@id/buttons_container"
             android:paddingHorizontal="10dp"
+            android:layout_below="@id/progress"
             ></FrameLayout>
         <LinearLayout
             android:layout_width="match_parent"

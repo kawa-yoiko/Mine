@@ -11,6 +11,7 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +20,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import okhttp3.*;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.ForwardingSink;
+import okio.ForwardingSource;
+import okio.Okio;
+import okio.Sink;
+import okio.Source;
 
 public class ServerReq {
     static OkHttpClient client;
@@ -179,6 +190,78 @@ public class ServerReq {
                 }
             }
         });
+    }
+
+    // https://github.com/square/okhttp/blob/master/samples/guide/src/main/java/okhttp3/recipes/Progress.java
+    private static class ProgressRequestBody extends RequestBody {
+        private final RequestBody requestBody;
+        private final ProgressListener progressListener;
+        private BufferedSink bufferedCountingSink;
+
+        ProgressRequestBody(RequestBody requestBody, ProgressListener progressListener) {
+            this.requestBody = requestBody;
+            this.progressListener = progressListener;
+        }
+
+        @Override public MediaType contentType() {
+            return requestBody.contentType();
+        }
+
+        @Override public long contentLength() {
+            try {
+                return requestBody.contentLength();
+            } catch (IOException e) {
+                return -1;
+            }
+        }
+
+        @Override
+        public void writeTo(@NotNull BufferedSink bufferedSink) throws IOException {
+            if (bufferedCountingSink == null) {
+                CountingSink countingSink = new CountingSink(bufferedSink);
+                bufferedCountingSink = Okio.buffer(countingSink);
+            }
+            requestBody.writeTo(bufferedCountingSink);
+            bufferedCountingSink.flush();
+        }
+
+        private class CountingSink extends ForwardingSink {
+            private long bytesWritten = 0;
+
+            CountingSink(Sink sink) { super(sink); }
+
+            @Override
+            public void write(@NonNull Buffer source, long byteCount) throws IOException {
+                super.write(source, byteCount);
+                bytesWritten += byteCount;
+                progressListener.update(contentLength(), bytesWritten);
+            }
+        }
+
+        interface ProgressListener {
+            void update(long contentLength, long bytesWritten);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFile(String url, File file, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("fileqwqwqwq", "filequququq",
+                        RequestBody.create(file, MediaType.parse("application/octet-stream")))
+                .build();
+        Request request = new Request.Builder()
+                .url(getFullUrl(url))
+                .header("Authorization", token != null ? "Bearer " + token : "")
+                .post(new ProgressRequestBody(requestBody, (long contentLength, long bytesWritten) -> {
+                    Log.d("ServerReq", "content = " + contentLength + ", written = " + bytesWritten);
+                    progressFn.accept(contentLength, bytesWritten);
+                }))
+                .build();
+        Call call = client.newCall(request);
+        call.enqueue(new ReqCallback((InputStream stream) -> {
+            callbackFn.accept(parseJson(streamToString(stream)));
+        }));
     }
 
     public static class Utils {
