@@ -1,6 +1,9 @@
 package com.example.mine;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +13,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.ServiceConfigurationError;
@@ -31,16 +38,41 @@ public class DiscoverFragment extends Fragment  {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
-        LinkedList<Discover> discovers = new LinkedList<>();
-        discovers.add(new Discover("粥粥可爱子", "#狗粮", "221", R.drawable.content1));
-        discovers.add(new Discover("栗子可爱子", "#狗粮", "221", R.drawable.content2));
-        discovers.add(new Discover("简介简介简介简介", "#手绘", "1k", R.drawable.content1));
-        discovers.add(new Discover("简介简介简介", "#音乐", "1k", R.drawable.content3));
-        discovers.add(new Discover("五跳舞跳舞跳舞", "#五条悟", "1023", R.drawable.content1));
-        DiscoverAdapter discoverAdapter = new DiscoverAdapter(discovers);
+        LinkedList<Post> posts = new LinkedList<>();
+        DiscoverAdapter discoverAdapter = new DiscoverAdapter(posts);
         StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setAdapter(discoverAdapter);
         recyclerView.setLayoutManager(gridLayoutManager);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        recyclerView.addOnScrollListener(new InfScrollListener(recyclerView.getLayoutManager(), 3) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void load(int start) {
+                Log.d("Subscription timeline", "Load " + start);
+                InfScrollListener listener = this;
+                ServerReq.getJsonArray("/discover_timeline?start=" + start + "&count=10", (JSONArray arr) -> {
+                    try {
+                        int n = arr.length();
+                        for (int i = 0; i < n; i++) {
+                            JSONObject obj = arr.getJSONObject(i);
+                            Log.d("Discover timeline", obj.toString());
+                            posts.add(new Post(obj));
+                        }
+                        boolean complete = (n < 10);
+                        handler.post(() -> {
+                            if (posts.size() == n)
+                                discoverAdapter.notifyDataSetChanged();
+                            discoverAdapter.notifyItemRangeInserted(posts.size() - n, n);
+                            // if (complete) loadingAdapter.clear();
+                        });
+                        listener.finishLoad(complete);
+                    } catch (Exception e) {
+                        Log.e("CommentFragment", "During parsing: " + e);
+                    }
+                });
+            }
+        });
     }
 
     @Override

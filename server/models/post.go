@@ -182,6 +182,7 @@ func postSelectClause(userId int32) string {
 	u := strconv.FormatInt(int64(userId), 10)
 	return `SELECT
 		post.*, mine_user.nickname, mine_user.avatar, collection.title,
+		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id),
 		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
 		(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
 		(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id),
@@ -199,7 +200,7 @@ func (p *Post) fields() []interface{} {
 		&p.Caption, &p.Contents,
 		&p.Collection.Id, &collectionSeq,
 		&p.Author.Nickname, &p.Author.Avatar,
-		&p.Collection.Title,
+		&p.Collection.Title, &p.Collection.PostCount,
 		&p.UpvoteCount, &p.StarCount, &p.CommentCount,
 		&p.MyUpvote, &p.MyStar,
 	}

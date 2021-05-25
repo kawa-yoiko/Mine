@@ -118,12 +118,15 @@ public class PostActivity extends AppCompatActivity {
         switch (post.getContentType()) {
             default:
             case 0:
+                FrameLayout container = postView.findViewById(R.id.content);
+                TextView text = new TextView(container.getContext());
+                text.setText(post.getContent());
+                text.setTextSize(16);
+                container.addView(text);
                 break;
             case 1:
                 getSupportFragmentManager().beginTransaction().replace(R.id.content,
                         new PhotoViewPagerFragment(Arrays.asList(post.getContent().split(" ")))).commit();
-//                ImageView content_image = postView.findViewById(R.id.content);
-//                ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
                 break;
         }
 

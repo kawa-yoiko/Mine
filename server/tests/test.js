@@ -269,7 +269,7 @@ if (process.env['GEN'] !== '1') (async () => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    collection: {id: lid1, title: any},
+    collection: {id: lid1, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 0,
     comment_count: 0,
@@ -400,7 +400,7 @@ if (process.env['GEN'] !== '1') (async () => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    collection: {id: lid1, title: any},
+    collection: {id: lid1, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
     comment_count: 4,
@@ -600,6 +600,8 @@ else (async () => {
   const C = 3;     // Number of collections per user (minimum)
   const Cd = 5;    // (variation)
   const M = 10;    // Average number of posts per collection
+  const P = 50;    // Number of post upvotes per user (minimum)
+  const Pd = 150;  // (variation)
   const S = 50;    // Number of stars per user (minimum)
   const Sd = 150;  // (variation)
   const T = 1000;  // Number of comments per user (minimum)
@@ -696,6 +698,15 @@ else (async () => {
     const id = (await check('POST', '/post/new', args, {id: any})).id;
     postsAll.push(id);
   }
+
+  // Post upvotes
+  const promisesUpvotes = [];
+  for (let u = 0; u < N; u++)
+    for (let p = P + rand() % Pd; p > 0; p--) {
+      promisesUpvotes.push(check('POST', `/post/${postsAll[rand() % postsAll.length]}/upvote`,
+        {token: token[u], is_upvote: 1}, any));
+    }
+  await Promise.all(promisesUpvotes);
 
   // Stars
   const promisesStars = [];

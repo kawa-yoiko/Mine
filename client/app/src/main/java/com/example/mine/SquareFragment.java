@@ -16,17 +16,42 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SquareFragment extends Fragment {
+    public static class Item { }
+    public static class DateItem extends Item {
+        public String date;
+        public DateItem(String date) { this.date = date; }
+    }
+    public static class PostItem extends Item {
+        public int id;
+    }
+    public static class TextItem extends PostItem {
+        public String caption;
+        public String contents;
+        public TextItem(int id, String caption, String contents) {
+            this.id = id;
+            this.caption = caption;
+            this.contents = contents;
+        }
+    }
+    public static class ImageItem extends PostItem {
+        public String image;
+        public ImageItem(int id, String image) {
+            this.id = id;
+            this.image = image;
+        }
+    }
+
     private RecyclerView recyclerView;
     private View headingView;
-    private LinkedList<Object> dateAndImages;
+    private LinkedList<Item> dateAndImages;
 
     public SquareFragment() {
         this.dateAndImages = new LinkedList<>();
         for (int i = 0; i < 1; i++) {
-            dateAndImages.add("2021年5月");
-            dateAndImages.add("2021年6月");
-            dateAndImages.add(new String[]{"五条悟跳舞", "ll the beautiful things shining all around us,\n" +
-                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
+            dateAndImages.add(new DateItem("2021年5月"));
+            dateAndImages.add(new DateItem("2021年6月"));
+            dateAndImages.add(new TextItem(1, "五条悟跳舞", "ll the beautiful things shining all around us,\n" +
+                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"));
         }
     }
     public SquareFragment(View headingView, List<Collection.PostBrief> posts) {
@@ -34,9 +59,9 @@ public class SquareFragment extends Fragment {
         this.dateAndImages = new LinkedList<>();
         for (Collection.PostBrief post : posts) {
             if (post.type == 0) {
-                dateAndImages.add(new String[]{post.caption, post.contents});
+                dateAndImages.add(new TextItem(post.id, post.caption, post.contents));
             } else if (post.type == 1) {
-                dateAndImages.add("+" + post.contents);
+                dateAndImages.add(new ImageItem(post.id, post.contents));
             }
         }
     }
@@ -49,21 +74,6 @@ public class SquareFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
-        LinkedList<Object> dateAndImages = new LinkedList<>();
-        for (int i = 0; i < 5; i++) {
-            dateAndImages.add("2021年5月");
-            dateAndImages.add(R.drawable.content2);
-            dateAndImages.add(R.drawable.content1);
-            dateAndImages.add(new String[]{"五条悟跳舞", "all the beautiful things shining all around us,\n" +
-                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
-            dateAndImages.add(R.drawable.content2);
-            dateAndImages.add(R.drawable.content1);
-            dateAndImages.add("2021年6月");
-            dateAndImages.add(R.drawable.content1);
-            dateAndImages.add(R.drawable.content2);
-            dateAndImages.add(new String[]{"五条悟跳舞", "all the beautiful things shining all around us,\n" +
-                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
-        }
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(),3);
         recyclerView.setLayoutManager(gridLayoutManager);
         if (headingView != null) {

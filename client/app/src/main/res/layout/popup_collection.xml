@@ -1,57 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:paddingLeft="25dp"
-    android:paddingRight="25dp"
-    android:paddingTop="15dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/popupwindow_background"
-    >
+    android:paddingLeft="25dp"
+    android:paddingTop="15dp"
+    android:paddingRight="25dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@drawable/divider_grey"
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            >
+            android:layout_marginBottom="8dp">
+
             <TextView
+                android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:text="添加合集"
                 android:textSize="18dp"
-                android:id="@+id/text"
-                android:layout_centerVertical="true"
                 android:textStyle="bold"></TextView>
+
             <Button
+                android:id="@+id/create"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bt_background_whiteyellow"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:padding="5dp"
-                android:background="@drawable/bt_background_whiteyellow"
                 android:text="新建"
-                android:textColor="@color/brown"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:id="@+id/create"
-                ></Button>
+                android:textColor="@color/brown"></Button>
         </RelativeLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/grey_1"
-            android:layout_marginBottom="8dp"
-            ></View>
+
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:id="@+id/fl_collection"
-            ></FrameLayout>
+            android:layout_width="match_parent"
+            android:layout_height="300dp"></FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

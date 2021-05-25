@@ -1,31 +1,34 @@
 package com.example.mine;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class CreateActivity extends AppCompatActivity {
     PopupWindow popupWindowTag;
@@ -35,19 +38,23 @@ public class CreateActivity extends AppCompatActivity {
     WidthEqualsHeightImageView addImage;
     private static int IMAGE_PICKER = 0;
 
+    private String tags = "";
+    private User.CollectionBrief collection = null;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
-        View createAreaView = null;
+        final View createAreaView;
         View cv = getWindow().getDecorView();
         ViewGroup area = cv.findViewById(R.id.create_area);
         Intent intent = getIntent();
         String createType = intent.getStringExtra("create_type");
+
         if(createType.equals("text")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_text, null);
-        }
-        if(createType.equals("image")) {
+        } else if(createType.equals("image")) {
             ImagePickerGenerator imagePickerGenerator = new ImagePickerGenerator(9 - imageItems.size());
             ImagePicker imagePicker = imagePickerGenerator.getImagePicker();
 
@@ -66,6 +73,8 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView.setAdapter(new ConcatAdapter(new ImagePickerAdapter(imageItems), new SingleViewAdapter(addImage)));
             recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
 //            recyclerView.setAdapter(new ImagePickerAdapter(imageItems));
+        } else {
+            createAreaView = null;
         }
 
         area.addView(createAreaView);
@@ -76,37 +85,70 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View v) {
                 View popView = getLayoutInflater().inflate(R.layout.popup_tag, null);
                 Button finishButton = popView.findViewById(R.id.finish);
-                finishButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
+                EditText tagInput = popView.findViewById(R.id.tag_input);
+                tagInput.setText(tags);
+                finishButton.setOnClickListener((View v1) -> popupWindowTag.dismiss());
                 popupWindowTag = new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowTag.setOutsideTouchable(true);
                 popupWindowTag.setFocusable(true);
                 popupWindowTag.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
+                popupWindowTag.setOnDismissListener(() -> {
+                    tags = tagInput.getText().toString();
+                });
             }
         });
+
+        View popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
+        FrameLayout collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
+        collectionContainer.removeAllViews();
+        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), (User.CollectionBrief sel, Boolean init) -> {
+            if (init && collection != null) return;
+            Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
+            collection = sel;
+            if (!init) popupWindowCollection.dismiss();
+        }));
 
         View setCollectionButton = findViewById(R.id.add_collection);
         setCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View popView = getLayoutInflater().inflate(R.layout.popup_collection, null);
-                Fragment discoverFragment = new DiscoverFragment();
-                Button finishButton = popView.findViewById(R.id.create);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fl_collection, discoverFragment).commit();
-                finishButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
+                Button finishButton = popViewCollection.findViewById(R.id.create);
+                finishButton.setOnClickListener((View v1) -> {
                 });
-                popupWindowCollection = new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                popupWindowCollection = new PopupWindow(popViewCollection, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);
                 popupWindowCollection.setFocusable(true);
                 popupWindowCollection.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
+                popupWindowCollection.setOnDismissListener(() -> {
+                });
+            }
+        });
+
+        // Post button
+        ((Button) findViewById(R.id.post_button)).setOnClickListener((View v) -> {
+            if (createType.equals("text")) {
+                ServerReq.postJson("/post/new", List.of(
+                        new Pair<>("type", "0"),
+                        new Pair<>("caption", ((EditText) createAreaView.findViewById(R.id.caption_input)).getText().toString()),
+                        new Pair<>("contents", ((EditText) createAreaView.findViewById(R.id.contents_input)).getText().toString()),
+                        new Pair<>("collection", String.valueOf(collection.id)),
+                        new Pair<>("tags", tags)
+                ), (JSONObject obj) -> {
+                    Log.d("CreateActivity", obj.toString());
+                    int id = -1;
+                    try {
+                        id = obj.getInt("id");
+                    } catch (JSONException e) {
+                        Log.e("CreateActivity", e.toString());
+                        return;
+                    }
+                    Intent intentOut = new Intent(this, LoadingActivity.class);
+                    intentOut.putExtra("type", LoadingActivity.DestType.post);
+                    intentOut.putExtra("id", id);
+                    intentOut.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intentOut);
+                    this.finish();
+                });
             }
         });
     }
