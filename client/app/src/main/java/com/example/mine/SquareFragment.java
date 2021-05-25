@@ -30,14 +30,18 @@ public class SquareFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         LinkedList<Object> dateAndImages = new LinkedList<>();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 5; i++) {
             dateAndImages.add("2021年5月");
-            dateAndImages.add(R.drawable.content1);
             dateAndImages.add(R.drawable.content2);
+            dateAndImages.add(R.drawable.content1);
+            dateAndImages.add(new String[]{"五条悟跳舞", "all the beautiful things shining all around us,\n" +
+                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
+            dateAndImages.add(R.drawable.content2);
+            dateAndImages.add(R.drawable.content1);
             dateAndImages.add("2021年6月");
             dateAndImages.add(R.drawable.content1);
             dateAndImages.add(R.drawable.content2);
-            dateAndImages.add(new String[]{"五条悟跳舞", "ll the beautiful things shining all around us,\n" +
+            dateAndImages.add(new String[]{"五条悟跳舞", "all the beautiful things shining all around us,\n" +
                     "                all the beautiful things shining all around us; all the beautiful things shining all around us"});
         }
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(),3);

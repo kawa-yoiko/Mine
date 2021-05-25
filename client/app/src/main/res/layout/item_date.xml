@@ -8,6 +8,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2021年5月"
+        android:textSize="16dp"
+        android:textStyle="bold"
         android:id="@+id/date"
-        tools:ignore="MissingConstraints"></TextView>
+        tools:ignore="MissingConstraints"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        ></TextView>
 </androidx.constraintlayout.widget.ConstraintLayout>
