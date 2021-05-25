@@ -596,18 +596,18 @@ else (async () => {
   })();
   const RAND_MAX = 0x10000000;
 
-  const N = 10;   // Number of users
-  const C = 3;    // Number of collections per user (minimum)
-  const Cd = 5;   // (variation)
-  const M = 10;   // Average number of posts per collection
-  const S = 50;   // Number of stars per user (minimum)
-  const Sd = 150; // (variation)
-  const T = 900;  // Number of comments per user (minimum)
-  const Td = 900; // (variation)
-  const V = 900;  // Number of comment upvotes per user (minimum)
-  const Vd = 900; // (variation)
-  const B = 5;    // Number of subscriptions per user (minimum)
-  const Bd = 15;  // (variation)
+  const N = 10;    // Number of users
+  const C = 3;     // Number of collections per user (minimum)
+  const Cd = 5;    // (variation)
+  const M = 10;    // Average number of posts per collection
+  const S = 50;    // Number of stars per user (minimum)
+  const Sd = 150;  // (variation)
+  const T = 1000;  // Number of comments per user (minimum)
+  const Td = 1500; // (variation)
+  const V = 2000;  // Number of comment upvotes per user (minimum)
+  const Vd = 2000; // (variation)
+  const B = 5;     // Number of subscriptions per user (minimum)
+  const Bd = 15;   // (variation)
 
   const token = Array(N);
   for (let i = 0; i < N; i++) {
@@ -618,15 +618,19 @@ else (async () => {
   }
 
   // Upload images
+  const promisesUploads = [];
   const images = Array.from(Array(N), () => []);
   const dir = await require('fs/promises').readdir(__dirname + '/fxemoji');
   for (const file of dir) {
     const u = rand() % N;
-    const id = (await check('PUT', '/upload',
-      {token: token[u], file: `fxemoji/${file}`},
-      {ids: [any]})).ids[0];
-    images[u].push(id);
+    promisesUploads.push((async () => {
+      const id = (await check('PUT', '/upload',
+        {token: token[u], file: `fxemoji/${file}`},
+        {ids: [any]})).ids[0];
+      images[u].push(id);
+    })());
   }
+  await Promise.all(promisesUploads);
 
   // Upload avatars
   for (let u = 0; u < N; u++) {
@@ -695,19 +699,24 @@ else (async () => {
   const promisesComments = [];
   const postCmts = {};
   for (let u of shuffleRepeated(N, (u) => T + rand() % Td)) {
-    promisesComments.push((async () => {
-      const post = postsAll[rand() % postsAll.length];
+    const post = postsAll[rand() % postsAll.length];
+    const r1 = rand();
 
+    promisesComments.push((async () => {
       let cmts = postCmts[post];
       if (cmts === undefined) postCmts[post] = cmts = [];
 
       const cid = (await check('POST', `/post/${post}/comment/new`, {
         token: token[u],
-        reply_to: (cmts.length === 0 || rand() % 2 === 0) ? -1 : cmts[rand() % cmts.length],
+        reply_to: (cmts.length === 0 || r1 % 2 == 0) ? -1 : cmts[(r1 >> 1) % cmts.length],
         contents: bullshit.sentence(1),
       }, {id: any})).id;
       if (cid !== undefined) cmts.push(cid);
     })());
+    if (promisesComments.length === http.globalAgent.maxSockets) {
+      await Promise.all(promisesComments);
+      promisesComments.splice(0)
+    }
   }
   await Promise.all(promisesComments);
 
