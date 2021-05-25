@@ -54,7 +54,7 @@ public class PostActivity extends AppCompatActivity {
                 findViewById(R.id.flower_button),
                 findViewById(R.id.flower_icon),
                 findViewById(R.id.flower_num),
-                R.drawable.flower, R.drawable.star,
+                R.drawable.flower_monochrome, R.drawable.flower, R.drawable.flower_semi,
                 "/post/" + post.id + "/upvote",
                 "upvote");
         toggleFlower.setState(post.myUpvote ? 1 : 0, post.getFlower_num());
@@ -64,7 +64,7 @@ public class PostActivity extends AppCompatActivity {
                 findViewById(R.id.star_button),
                 findViewById(R.id.star_icon),
                 findViewById(R.id.star_num),
-                R.drawable.flower, R.drawable.star,
+                R.drawable.star_monochrome, R.drawable.star, R.drawable.star_semi,
                 "/post/" + post.id + "/star",
                 "star");
         toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());

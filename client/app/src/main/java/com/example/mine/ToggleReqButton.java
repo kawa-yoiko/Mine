@@ -24,12 +24,12 @@ public class ToggleReqButton {
     private final ImageView icon;
     private final TextView text;
 
-    private static final int iconLoading = R.drawable.comment;
     private final int iconNormal;
     private final int iconActive;
+    private final int iconPending;
 
     public ToggleReqButton(View button, ImageView icon, TextView text,
-                           int iconNormal, int iconActive,
+                           int iconNormal, int iconActive, int iconPending,
                            String url, String key) {
         handler = new Handler(Looper.getMainLooper());
         this.state = 0;
@@ -39,6 +39,7 @@ public class ToggleReqButton {
 
         this.iconNormal = iconNormal;
         this.iconActive = iconActive;
+        this.iconPending = iconPending;
 
         button.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -69,7 +70,7 @@ public class ToggleReqButton {
         handler.post(() -> {
             button.setEnabled(state != -1);
             icon.setImageResource(
-                    state == -1 ? iconLoading :
+                    state == -1 ? iconPending :
                     state == 0 ? iconNormal : iconActive);
             if (number != -1) text.setText(String.valueOf(number));
         });
