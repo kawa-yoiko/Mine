@@ -74,7 +74,8 @@ public class PostsListFragment extends Fragment {
                         handler.post(() -> {
                             if (posts.size() == n)
                                 postsListAdapter.notifyDataSetChanged();
-                            postsListAdapter.notifyItemRangeInserted(posts.size() - n, n);
+                            else
+                                postsListAdapter.notifyItemRangeInserted(posts.size() - n, n);
                             if (complete) loadingAdapter.clear();
                         });
                         listener.finishLoad(complete);
