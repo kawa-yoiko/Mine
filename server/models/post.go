@@ -66,6 +66,7 @@ func init() {
 	registerSchema("post_star",
 		"post_id INTEGER NOT NULL",
 		"user_id INTEGER NOT NULL",
+		"timestamp BIGINT NOT NULL",
 		"ADD CONSTRAINT post_ref FOREIGN KEY (post_id) REFERENCES post (id)",
 		"ADD CONSTRAINT user_ref FOREIGN KEY (user_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT post_star_uniq UNIQUE (post_id, user_id)",
@@ -223,11 +224,11 @@ func (p *Post) Read(userId int32) error {
 }
 
 func (p *Post) Upvote(u User, add bool) error {
-	return processEntityUserRel("post_upvote", "post", p.Id, u, add, &p.UpvoteCount)
+	return processEntityUserRel("post_upvote", "post", false, p.Id, u, add, &p.UpvoteCount)
 }
 
 func (p *Post) Star(u User, add bool) error {
-	return processEntityUserRel("post_star", "post", p.Id, u, add, &p.StarCount)
+	return processEntityUserRel("post_star", "post", true, p.Id, u, add, &p.StarCount)
 }
 
 func (p *Post) SetCollection(c Collection) error {
@@ -318,5 +319,5 @@ func ReadComments(postId int32, start int, count int, replyRoot int32, userId in
 }
 
 func (c *Comment) Upvote(u User, add bool) error {
-	return processEntityUserRel("comment_upvote", "comment", c.Id, u, add, &c.UpvoteCount)
+	return processEntityUserRel("comment_upvote", "comment", false, c.Id, u, add, &c.UpvoteCount)
 }
