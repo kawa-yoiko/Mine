@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +100,7 @@ public class CreateActivity extends AppCompatActivity {
                 popupWindowTag.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
                 popupWindowTag.setOnDismissListener(() -> {
                     tags = tagInput.getText().toString();
+                    ((TextView) cv.findViewById(R.id.tag)).setText(tags);
                 });
             }
         });
@@ -110,6 +112,7 @@ public class CreateActivity extends AppCompatActivity {
             if (init && collection != null) return;
             Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
             collection = sel;
+            ((TextView) cv.findViewById(R.id.collection)).setText(sel.title);
             if (!init) popupWindowCollection.dismiss();
         }));
 
@@ -117,8 +120,8 @@ public class CreateActivity extends AppCompatActivity {
         setCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Button finishButton = popViewCollection.findViewById(R.id.create);
-                finishButton.setOnClickListener((View v1) -> {
+                Button createButton = popViewCollection.findViewById(R.id.create);
+                createButton.setOnClickListener((View v1) -> {
                 });
                 popupWindowCollection = new PopupWindow(popViewCollection, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);
