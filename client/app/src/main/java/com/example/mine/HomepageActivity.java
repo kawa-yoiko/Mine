@@ -2,6 +2,7 @@ package com.example.mine;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,7 @@ public class HomepageActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_homepage);
         Fragment squareFragment = new SquareFragment();
         Fragment discoverFragment = new DiscoverFragment();

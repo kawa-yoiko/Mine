@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ public class CollectionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_collection);
 
         Collection collection = (Collection) getIntent().getSerializableExtra("collection");
