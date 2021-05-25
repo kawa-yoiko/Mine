@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.LinkedList;
 
 public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+    private final int postId;
     private LinkedList<Comment> data;
 
     public static class CommentChildHolder extends RecyclerView.ViewHolder {
@@ -22,8 +23,8 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public CommentChildAdapter(LinkedList<Comment> data)
-    {
+    public CommentChildAdapter(int postId, LinkedList<Comment> data) {
+        this.postId = postId;
         this.data = data;
     }
 
@@ -50,8 +51,16 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         dateView.setText(comment.getDate());
         TextView replyNicknameView = item.findViewById(R.id.reply_nickname);
         replyNicknameView.setText(comment.getReplyNickname());
-        TextView flowerNum = item.findViewById(R.id.flower_num);
-        flowerNum.setText(String.valueOf(comment.getFlowerNum()));
+
+        // Flower button
+        ToggleReqButton toggleFlower = new ToggleReqButton(
+                item.findViewById(R.id.flower_button),
+                item.findViewById(R.id.flower_icon),
+                item.findViewById(R.id.flower_num),
+                R.drawable.flower, R.drawable.star,
+                "/post/" + this.postId + "/comment/" + comment.id + "/upvote",
+                "upvote");
+        toggleFlower.setState(comment.myUpvote ? 1 : 0, comment.getFlowerNum());
     }
 
     @Override

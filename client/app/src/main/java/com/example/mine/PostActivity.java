@@ -44,44 +44,28 @@ public class PostActivity extends AppCompatActivity {
         fView.addView(postView);
         Fragment commentFragment = new CommentFragment(post.id, findViewById(R.id.post_content_heading));
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
-        TextView flower_num_text = findViewById(R.id.flower_num);
-        flower_num_text.setText(String.valueOf(post.getFlower_num()));
         TextView comment_num_text = findViewById(R.id.comment_num);
         comment_num_text.setText(String.valueOf(post.getComment_num()));
-        TextView star_num_text = findViewById(R.id.star_num);
-        star_num_text.setText(String.valueOf(post.getStar_num()));
 
-        Handler handler = new Handler(Looper.getMainLooper());
+        // Flower button
+        ToggleReqButton toggleFlower = new ToggleReqButton(
+                findViewById(R.id.flower_button),
+                findViewById(R.id.flower_icon),
+                findViewById(R.id.flower_num),
+                R.drawable.flower, R.drawable.star,
+                "/post/" + post.id + "/upvote",
+                "upvote");
+        toggleFlower.setState(post.myUpvote ? 1 : 0, post.getFlower_num());
 
-        View flowerButton = findViewById(R.id.flower_button);
-        ImageView flowerIcon = findViewById(R.id.flower_icon);
-        flowerButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onClick(View v) {
-                flowerButton.setEnabled(false);
-                flowerIcon.setImageResource(R.drawable.comment);
-                ServerReq.postJson("/post/" + post.id + "/upvote", List.of(
-                        new Pair<>("is_upvote", "1")
-                ), (JSONObject obj) -> {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (Exception e) {
-                    }
-                    try {
-                        int count = obj.getInt("upvote_count");
-                        Log.d("PostActivity", "upvote_count " + count);
-                        handler.post(() -> flower_num_text.setText(String.valueOf(count)));
-                    } catch (JSONException e) {
-                        Log.e("PostActivity", e.toString());
-                    }
-                    handler.post(() -> {
-                        flowerButton.setEnabled(true);
-                        flowerIcon.setImageResource(R.drawable.flower);
-                    });
-                });
-            }
-        });
+        // Star button
+        ToggleReqButton toggleStar = new ToggleReqButton(
+                findViewById(R.id.star_button),
+                findViewById(R.id.star_icon),
+                findViewById(R.id.star_num),
+                R.drawable.flower, R.drawable.star,
+                "/post/" + post.id + "/star",
+                "star");
+        toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());
 
         EditText commentText = (EditText) findViewById(R.id.comment_edit);
         Button commentButton = (Button) findViewById(R.id.comment_button);
