@@ -54,7 +54,9 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/buttons_container" />
+            android:layout_below="@id/buttons_container"
+            android:layout_marginHorizontal="10dp"
+            />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -63,25 +65,49 @@
             android:paddingHorizontal="10dp"
             android:layout_below="@id/progress"
             ></FrameLayout>
-
-        <TextView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/collection"
-            android:text="Collection"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tag"
-            android:text="#tag"
-            />
+            android:layout_below="@+id/create_area"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="10dp"
+            android:id="@+id/info_area"
+            >
+            <TextView
+                android:id="@+id/collection"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginRight="60dp"
+                android:background="@color/yellow"
+                android:padding="6dp"
+                android:text="粥粥可爱"
+                android:textSize="16dp"
+                android:layout_centerVertical="true"
+                android:textStyle="bold"></TextView>
 
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scrollbars="none"
+                android:layout_toRightOf="@id/collection"
+                android:layout_centerVertical="true"
+                >
+
+                <TextView
+                    android:id="@+id/tag"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:text="#猫猫 #狗粮 #摄影 #1234567891235555554"
+                    android:textSize="16dp"></TextView>
+            </HorizontalScrollView>
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_below="@id/create_area"
+            android:layout_below="@id/info_area"
             android:paddingTop="20dp"
             android:paddingHorizontal="20dp"
             android:divider="@drawable/divider_grey_light"
