@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.LinkedList;
 
 public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.DiscoverViewHolder> {
-    private LinkedList<Discover> data;
+    private LinkedList<Post> data;
 
     public static class DiscoverViewHolder extends RecyclerView.ViewHolder {
         public DiscoverViewHolder(@NonNull View itemView) {
@@ -20,7 +20,7 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
         }
     }
 
-    public DiscoverAdapter(LinkedList<Discover> data)
+    public DiscoverAdapter(LinkedList<Post> data)
     {
         this.data = data;
     }
@@ -34,23 +34,32 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
 
     @Override
     public void onBindViewHolder(@NonNull DiscoverViewHolder holder, int position) {
-        Discover discover = data.get(position);
+        Post post = data.get(position);
         View item = holder.itemView;
         TextView captionText = item.findViewById(R.id.caption);
-        captionText.setText(discover.getCaption());
+        captionText.setText(post.getCaption());
         TextView tagText = item.findViewById(R.id.tag);
-        tagText.setText(discover.getTag());
+        tagText.setText(post.getTag());
         TextView fondNumText = item.findViewById(R.id.fond_num);
-        fondNumText.setText(discover.getFondNum());
+        fondNumText.setText(String.valueOf(post.getFlower_num()));
+
+        TextView text = item.findViewById(R.id.text);
         ImageView image = item.findViewById(R.id.image);
-        image.setImageResource(discover.getImage());
+        if (post.getContentType() == 0) {
+            text.setVisibility(View.VISIBLE);
+            image.setVisibility(View.GONE);
+            text.setText(post.getContent());
+        } else if (post.getContentType() == 1) {
+            text.setVisibility(View.GONE);
+            image.setVisibility(View.VISIBLE);
+            ServerReq.Utils.loadImage("/upload/" + post.getContent(), image);
+        }
 //        ImageView avatarIcon = item.findViewById(R.id.avatar_icon);
 //        avatarIcon.setImageResource(contact.getAvatarIcon());
     }
 
     @Override
     public int getItemCount() {
-        // TODO
         return data.size();
     }
 }

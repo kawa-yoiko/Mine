@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 public abstract class InfScrollListener extends RecyclerView.OnScrollListener {
     protected RecyclerView.LayoutManager _layoutManager;
@@ -17,6 +18,7 @@ public abstract class InfScrollListener extends RecyclerView.OnScrollListener {
         _threshold = threshold;
         _isLoading = false;
         _isComplete = false;
+        this.onScrolled(null, 0, 0);
     }
 
     public abstract void load(int start);
@@ -29,6 +31,9 @@ public abstract class InfScrollListener extends RecyclerView.OnScrollListener {
         int lastVisible = 0;
         if (_layoutManager instanceof LinearLayoutManager) {
             lastVisible = ((LinearLayoutManager) _layoutManager).findLastVisibleItemPosition();
+        } else if (_layoutManager instanceof StaggeredGridLayoutManager) {
+            for (int x : ((StaggeredGridLayoutManager) _layoutManager).findLastVisibleItemPositions(null))
+                if (x > lastVisible) lastVisible = x;
         }
 
         if (!_isComplete && !_isLoading && lastVisible > totalItems - _threshold) {
