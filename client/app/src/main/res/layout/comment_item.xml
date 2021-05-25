@@ -1,28 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="20dp"
+        android:paddingLeft="15dp"
         android:paddingRight="20dp"
         >
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/luoxiaohei"
-            android:scaleType="centerCrop"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:id="@+id/avatar"
-            android:layout_marginRight="20dp"
-            android:adjustViewBounds="true"></ImageView>
-
+            android:layout_marginRight="15dp"
+            android:id="@+id/avatar_layout"
+            >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/luoxiaohei"
+                android:scaleType="centerCrop"
+                android:id="@+id/avatar"
+                android:adjustViewBounds="true"
+                app:layout_constraintCircle="@id/test"
+                tools:ignore="MissingConstraints"></ImageView>
+            <View
+                android:id="@+id/test"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/imageview_corner"
+                app:layout_constraintCircle="@id/test1"
+                tools:ignore="MissingConstraints">
+            </View>
+            <View
+                android:id="@+id/test1"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/image_view_stroke"
+                app:layout_constraintCircle="@id/avatar"
+                tools:ignore="MissingConstraints">  </View>
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:layout_toRightOf="@+id/avatar"
+            android:layout_toRightOf="@+id/avatar_layout"
             android:orientation="vertical">
 
             <TextView
@@ -33,6 +57,7 @@
                 android:text="kuriko"
                 android:textColor="#999999"
                 android:textSize="16dp"
+                android:paddingRight="25dp"
                 android:textStyle="bold"></TextView>
 
             <TextView
@@ -40,7 +65,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:text="太太 饿饿 饭饭！"></TextView>
+                android:paddingRight="25dp"
+                android:text="太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！太太 饿饿 饭饭！"></TextView>
 
             <TextView
                 android:id="@+id/date"
@@ -87,6 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textSize="12dp"
                 android:text="255"
                 android:textColor="#999999"></TextView>
         </LinearLayout>
