@@ -73,7 +73,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="20dp"
             android:background="@drawable/bt_background_whiteyellow"
-            android:drawableLeft="@drawable/flower"
+            android:drawableLeft="@drawable/plus1"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingLeft="25dp"
@@ -81,6 +81,7 @@
             android:paddingRight="25dp"
             android:paddingBottom="10dp"
             android:text="发布作品"
+            android:textSize="16dp"
             tools:ignore="MissingConstraints" />
 
         <LinearLayout

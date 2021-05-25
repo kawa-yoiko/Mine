@@ -101,6 +101,7 @@
             android:layout_height="20dp"
             android:orientation="horizontal"
             android:layout_marginLeft="400px"
+            android:layout_marginBottom="150px"
             >
             <ImageView
                 android:layout_width="match_parent"
