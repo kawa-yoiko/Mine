@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,11 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class CreateActivity extends AppCompatActivity {
     PopupWindow popupWindowTag;
@@ -40,7 +46,7 @@ public class CreateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
-        View createAreaView = null;
+        final View createAreaView;
         View cv = getWindow().getDecorView();
         ViewGroup area = cv.findViewById(R.id.create_area);
         Intent intent = getIntent();
@@ -48,8 +54,7 @@ public class CreateActivity extends AppCompatActivity {
 
         if(createType.equals("text")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_text, null);
-        }
-        if(createType.equals("image")) {
+        } else if(createType.equals("image")) {
             ImagePickerGenerator imagePickerGenerator = new ImagePickerGenerator(9 - imageItems.size());
             ImagePicker imagePicker = imagePickerGenerator.getImagePicker();
 
@@ -68,6 +73,8 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView.setAdapter(new ConcatAdapter(new ImagePickerAdapter(imageItems), new SingleViewAdapter(addImage)));
             recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
 //            recyclerView.setAdapter(new ImagePickerAdapter(imageItems));
+        } else {
+            createAreaView = null;
         }
 
         area.addView(createAreaView);
@@ -96,7 +103,7 @@ public class CreateActivity extends AppCompatActivity {
         collectionContainer.removeAllViews();
         collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), (User.CollectionBrief sel, Boolean init) -> {
             if (init && collection != null) return;
-            android.util.Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
+            Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
             collection = sel;
             if (!init) popupWindowCollection.dismiss();
         }));
@@ -113,6 +120,34 @@ public class CreateActivity extends AppCompatActivity {
                 popupWindowCollection.setFocusable(true);
                 popupWindowCollection.showAtLocation(cv, Gravity.BOTTOM, 0, 0);
                 popupWindowCollection.setOnDismissListener(() -> {
+                });
+            }
+        });
+
+        // Post button
+        ((Button) findViewById(R.id.post_button)).setOnClickListener((View v) -> {
+            if (createType.equals("text")) {
+                ServerReq.postJson("/post/new", List.of(
+                        new Pair<>("type", "0"),
+                        new Pair<>("caption", ((EditText) createAreaView.findViewById(R.id.caption_input)).getText().toString()),
+                        new Pair<>("contents", ((EditText) createAreaView.findViewById(R.id.contents_input)).getText().toString()),
+                        new Pair<>("collection", String.valueOf(collection.id)),
+                        new Pair<>("tags", tags)
+                ), (JSONObject obj) -> {
+                    Log.d("CreateActivity", obj.toString());
+                    int id = -1;
+                    try {
+                        id = obj.getInt("id");
+                    } catch (JSONException e) {
+                        Log.e("CreateActivity", e.toString());
+                        return;
+                    }
+                    Intent intentOut = new Intent(this, LoadingActivity.class);
+                    intentOut.putExtra("type", LoadingActivity.DestType.post);
+                    intentOut.putExtra("id", id);
+                    intentOut.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intentOut);
+                    this.finish();
                 });
             }
         });

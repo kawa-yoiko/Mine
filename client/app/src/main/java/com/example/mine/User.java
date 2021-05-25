@@ -41,7 +41,7 @@ public class User {
             try {
                 id = obj.getInt("id");
                 title = obj.getString("title");
-                postCount = 1;
+                postCount = obj.getInt("post_count");
             } catch (JSONException e) {
                 Log.e("CollectionBrief", e.toString());
             }
