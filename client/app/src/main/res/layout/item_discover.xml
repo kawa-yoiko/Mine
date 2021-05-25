@@ -3,13 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingVertical="9dp"
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="30px"
-        android:layout_marginLeft="30px"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
         android:padding="12dp"
         tools:ignore="MissingConstraints"
         android:background="@drawable/background_corner_white"

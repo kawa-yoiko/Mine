@@ -17,7 +17,7 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints"
         android:background="@drawable/yellow_corner_rectangle"
-        android:padding="10dp"
+        android:padding="15dp"
         app:layout_constraintLeft_toRightOf="@+id/triangle"
         >
         <RelativeLayout
