@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 public class CollectionActivity extends AppCompatActivity {
-    Fragment squareFragment;
+    SquareFragment squareFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,5 +38,16 @@ public class CollectionActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.squares_container, squareFragment)
                 .commit();
+
+        ((Button) findViewById(R.id.order_button)).setOnClickListener(
+                new View.OnClickListener() {
+                    boolean asc = false;
+                    @Override
+                    public void onClick(View v) {
+                        asc = !asc;
+                        ((Button) v).setText(asc ? "正序" : "倒序");
+                        squareFragment.reverse();
+                    }
+                });
     }
 }
