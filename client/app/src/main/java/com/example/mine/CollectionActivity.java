@@ -33,6 +33,14 @@ public class CollectionActivity extends AppCompatActivity {
                 String.format(Locale.CHINESE, "%d 篇作品", collection.posts.size())
         );
 
+        // Reverse list
+        int n = collection.posts.size();
+        for (int i = 0; i < n / 2; i++) {
+            Collection.PostBrief t = collection.posts.get(i);
+            collection.posts.set(i, collection.posts.get(n - i - 1));
+            collection.posts.set(n - i - 1, t);
+        }
+
         squareFragment = new SquareFragment(this.findViewById(R.id.heading), collection.posts);
         FrameLayout layout = (FrameLayout)this.findViewById(R.id.squares_container);
         getSupportFragmentManager().beginTransaction()
