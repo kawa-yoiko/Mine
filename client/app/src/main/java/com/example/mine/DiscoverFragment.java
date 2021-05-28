@@ -24,7 +24,7 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.ServiceConfigurationError;
 
-public class DiscoverFragment extends Fragment  {
+public class    DiscoverFragment extends Fragment  {
     private RecyclerView recyclerView;
 
     public DiscoverFragment() {}

@@ -32,6 +32,7 @@
         <activity android:name=".SelectorActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".TestActivity" />
+        <activity android:name=".LoginActivity"></activity>
     </application>
 
 </manifest>

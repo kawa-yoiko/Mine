@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -24,12 +25,33 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private TextView titleView;
     private androidx.appcompat.widget.Toolbar toolbar;
+    //TODO maybe need modify
+    private int isLogin = 0;
+    private int LOGIN = 0;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+
+        if (intent.getStringExtra("isLogin") != null) {
+            String str = intent.getStringExtra("isLogin");
+            if(str.equals("true")) {
+                // already login
+                isLogin = 1;
+            }
+        }
+        if(isLogin == 0) {
+            //goto LoginActivity
+            Intent intentNew = new Intent();
+            intentNew.setClass(MainActivity.this, LoginActivity.class);
+            MainActivity.this.startActivity(intentNew);
+        }
+
+
+
 //
 //        Window window = this.getWindow();
 //        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -50,15 +72,14 @@ public class MainActivity extends AppCompatActivity {
         Fragment postsListFragment = new PostsListFragment();
         Fragment myFragment = new MyFragment();
         Fragment photoViewPagerFragment = new PhotoViewPagerFragment(List.of());
+        Fragment messageFragment = new MessageFragment();
 //        Fragment commentFragment = new CommentFragment();
         setCurrentFragment(postsListFragment);
 //        View view = View.inflate(this.getBaseContext(), R.layout.search_box, null);
 //        View cv = getWindow().getDecorView();
 //        ViewGroup test = cv.findViewById(R.id.test);
 //        test.addView(view);
-//        Intent intent = new Intent();
-//        intent.setClass(MainActivity.this, TestActivity.class);
-//        MainActivity.this.startActivity(intent);
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -74,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                             titleView.setText("发现");
                             return true;
                         case R.id.message:
-                            setCurrentFragment(squareFragment);
+                            setCurrentFragment(messageFragment);
                             toolbar.setVisibility(View.VISIBLE);
                             titleView.setText("消息");
                             return true;
@@ -92,4 +113,14 @@ public class MainActivity extends AppCompatActivity {
     private void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, fragment).commit();
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(resultCode == LOGIN){
+//            if(data.getStringExtra("Login") == "true") {
+//                isLogin = 1;
+//            }
+//        }
+//    }
 }

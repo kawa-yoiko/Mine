@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,8 +50,10 @@ public class SquareFragment extends Fragment {
         this.dateAndImages = new LinkedList<>();
         for (int i = 0; i < 1; i++) {
             dateAndImages.add(new DateItem("2021年5月"));
-            dateAndImages.add(new DateItem("2021年6月"));
             dateAndImages.add(new TextItem(1, "五条悟跳舞", "ll the beautiful things shining all around us,\n" +
+                    "                all the beautiful things shining all around us; all the beautiful things shining all around us"));
+            dateAndImages.add(new DateItem("2021年6月"));
+            dateAndImages.add(new TextItem(2, "五条悟跳舞", "ll the beautiful things shining all around us,\n" +
                     "                all the beautiful things shining all around us; all the beautiful things shining all around us"));
         }
     }
