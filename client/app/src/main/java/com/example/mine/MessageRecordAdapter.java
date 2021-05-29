@@ -54,6 +54,16 @@ public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdap
         avatarImage.setImageResource(messageRecord.getAvatar());
         TextView dateText = item.findViewById(R.id.date);
         dateText.setText(messageRecord.getDate());
+
+        item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), ChatActivity.class);
+                intent.putExtra("username", messageRecord.getUsername());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override

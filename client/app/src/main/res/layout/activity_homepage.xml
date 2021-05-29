@@ -126,27 +126,27 @@
 <!--            app:elevation="0dp"-->
 <!--            >-->
         <com.google.android.material.tabs.TabLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabIndicatorColor="@color/yellow"
-            app:tabTextAppearance="@style/Navigation"
-            app:tabSelectedTextColor="#666666"
-            app:tabTextColor="#AAAAAA"
             android:id="@+id/tab_layout"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            app:tabIndicatorColor="@color/yellow"
+            app:tabSelectedTextColor="#666666"
+            app:tabTextAppearance="@style/Navigation"
+            app:tabTextColor="#AAAAAA">
+
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="作品"
-                ></com.google.android.material.tabs.TabItem>
+                android:text="作品"></com.google.android.material.tabs.TabItem>
+
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="合集"></com.google.android.material.tabs.TabItem>
-<!--            <androidx.viewpager2.widget.ViewPager2-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:id="@+id/viewPager"></androidx.viewpager2.widget.ViewPager2>-->
+            <!--            <androidx.viewpager2.widget.ViewPager2-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:id="@+id/viewPager"></androidx.viewpager2.widget.ViewPager2>-->
         </com.google.android.material.tabs.TabLayout>
         <androidx.viewpager.widget.ViewPager
             android:layout_width="match_parent"

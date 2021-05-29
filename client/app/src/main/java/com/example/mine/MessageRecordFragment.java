@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,9 +34,18 @@ public class MessageRecordFragment extends Fragment {
         records.add(new MessageRecord("栗子", "中午去哪吃", "1", "3h前", R.drawable.luoxiaohei));
         records.add(new MessageRecord("kuriko", "不想起床", "2", "3h前", R.drawable.luoxiaohei));
 
-
-        MessageRecordAdapter adapter = new MessageRecordAdapter(records);
         recyclerView = view.findViewById(R.id.recyclerview);
+
+        Button bt = view.findViewById(R.id.test);
+        bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                records.remove(0);
+                MessageRecordAdapter adapterNew = new MessageRecordAdapter(records);
+                recyclerView.setAdapter(adapterNew);
+            }
+        });
+        MessageRecordAdapter adapter = new MessageRecordAdapter(records);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }

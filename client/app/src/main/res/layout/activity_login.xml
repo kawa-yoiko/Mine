@@ -25,30 +25,30 @@
             ></TextView>
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:hint="用户名"
             android:background="@drawable/bt_background_white1"
             android:id="@+id/username"
             android:layout_marginBottom="15dp"
             android:layout_below="@+id/mine"
-            android:padding="8dp"
+            android:paddingHorizontal="15dp"
             >
         </EditText>
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:background="@drawable/bt_background_white1"
             android:hint="密码"
             android:inputType="numberPassword"
             android:id="@+id/password"
             android:layout_below="@+id/username"
             android:layout_marginVertical="15dp"
-            android:padding="8dp"
+            android:paddingHorizontal="15dp"
             >
         </EditText>
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="50dp"
             android:background="@drawable/bt_background_white1"
             android:hint="新密码"
             android:textStyle="bold"
@@ -63,7 +63,7 @@
         </EditText>
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="50dp"
             android:background="@drawable/bt_background_white1"
             android:hint="邮箱"
             android:id="@+id/email"
@@ -115,9 +115,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/yellow_corner_rectangle1"
+            android:minHeight="0dp"
             android:layout_marginTop="25dp"
             android:text="登录"
             android:paddingHorizontal="35dp"
+            android:paddingVertical="8dp"
             android:textColor="@color/white"
             android:textSize="20dp"
             android:textStyle="bold"
@@ -129,10 +131,12 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="0dp"
             android:background="@drawable/themeyellow_corner_rectangle"
             android:layout_marginTop="25dp"
             android:text="注册"
             android:paddingHorizontal="35dp"
+            android:paddingVertical="8dp"
             android:textColor="@color/white"
             android:textSize="20dp"
             android:textStyle="bold"

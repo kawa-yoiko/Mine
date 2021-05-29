@@ -28,6 +28,15 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/grey_4"
                     android:id="@+id/title"></TextView>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/flower"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:visibility="gone"
+                    android:id="@+id/bt_search"></ImageView>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
         <FrameLayout

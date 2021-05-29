@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,11 +7,13 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="15dp"
+            android:padding="13dp"
+            tools:ignore="MissingConstraints"
+            android:id="@+id/layout"
             >
             <androidx.cardview.widget.CardView
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:padding="0dp"
                 app:cardPreventCornerOverlap="false"
                 app:cardUseCompatPadding="false"
@@ -21,8 +23,8 @@
                 android:layout_centerVertical="true"
                 >
                 <com.example.mine.WidthEqualsHeightImageView
-                    android:layout_width="55dp"
-                    android:layout_height="55dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:id="@+id/avatar"
                     android:src="@drawable/luoxiaohei"
                     android:scaleType="centerCrop"
@@ -33,18 +35,19 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/avatar_layout"
                 android:layout_marginRight="60dp"
+                android:layout_centerVertical="true"
                 >
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     android:textStyle="bold"
                     android:id="@+id/username"
                     android:text="kuriko"></TextView>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18dp"
+                    android:textSize="15dp"
                     android:id="@+id/content"
                     android:layout_below="@id/username"
                     android:text="粥粥可爱"></TextView>
@@ -57,25 +60,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5h前"
-                    android:textSize="16dp"
                     android:id="@+id/date"
                    android:layout_alignParentRight="true"
                     ></TextView>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="7.5dp"
-                    android:paddingVertical="1dp"
+                    android:paddingHorizontal="6dp"
                     android:layout_below="@+id/date"
                     android:layout_alignParentRight="true"
                     android:text="1"
-                    android:textSize="15dp"
                     android:layout_marginVertical="4dp"
                     android:textColor="@color/white"
-                    android:textStyle="bold"
                     android:background="@drawable/background_circle_red"
                     android:id="@+id/message_num"
                     ></TextView>
             </RelativeLayout>
         </RelativeLayout>
-</androidx.cardview.widget.CardView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.6dp"
+        android:background="@color/grey_2"
+        app:layout_constraintTop_toBottomOf="@+id/layout"
+        ></View>
+</androidx.constraintlayout.widget.ConstraintLayout>

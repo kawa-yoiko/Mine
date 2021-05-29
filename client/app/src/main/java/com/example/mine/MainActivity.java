@@ -25,6 +25,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private TextView titleView;
     private androidx.appcompat.widget.Toolbar toolbar;
+    private View searchButton;
     //TODO maybe need modify
     private int isLogin = 0;
     private int LOGIN = 0;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 //        ButterKnife.bind(this);
         titleView = findViewById(R.id.title);
         toolbar = findViewById(R.id.toolbar);
+        searchButton = findViewById(R.id.bt_search);
 
         Fragment discoverFragment = new DiscoverFragment();
         Fragment squareFragment = new SquareFragment();
@@ -88,16 +90,17 @@ public class MainActivity extends AppCompatActivity {
                             setCurrentFragment(postsListFragment);
                             toolbar.setVisibility(View.VISIBLE);
                             titleView.setText("首页");
+                            searchButton.setVisibility(View.GONE);
                             return true;
                         case R.id.discover:
                             setCurrentFragment(discoverFragment);
                             toolbar.setVisibility(View.VISIBLE);
                             titleView.setText("发现");
+                            searchButton.setVisibility(View.VISIBLE);
                             return true;
                         case R.id.message:
                             setCurrentFragment(messageFragment);
-                            toolbar.setVisibility(View.VISIBLE);
-                            titleView.setText("消息");
+                            toolbar.setVisibility(View.GONE);
                             return true;
                         case R.id.my:
                             setCurrentFragment(myFragment);
@@ -107,6 +110,15 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
         );
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentNew = new Intent();
+                intentNew.setClass(MainActivity.this, SearchActivity.class);
+                MainActivity.this.startActivity(intentNew);
+            }
+        });
 
     }
 

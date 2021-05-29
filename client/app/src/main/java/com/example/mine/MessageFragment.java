@@ -33,12 +33,12 @@ public class MessageFragment extends Fragment {
         //TODO
         Fragment messageRecordFragment = new MessageRecordFragment();
         Fragment notificationFragment = new NotificationFragment();
-        fragmentList.add(messageRecordFragment);
         fragmentList.add(notificationFragment);
+        fragmentList.add(messageRecordFragment);
         viewPager = view.findViewById(R.id.view_pager);
         tabLayout = view.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-        viewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager(), fragmentList, tabText));
+        viewPager.setAdapter(new ViewPagerAdapter(getActivity().getSupportFragmentManager(), fragmentList, tabText));
     }
 
     @Nullable

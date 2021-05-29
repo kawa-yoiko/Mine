@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp"
+        tools:ignore="MissingConstraints"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:id="@+id/layout"
         >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,8 +20,8 @@
         tools:ignore="MissingConstraints"
         >
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:id="@+id/type_icon"
             android:src="@drawable/flower"
             android:layout_marginRight="10dp"
@@ -26,15 +30,15 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
+            android:textSize="16dp"
             android:id="@+id/content"
             android:layout_toRightOf="@+id/type_icon"
             android:layout_marginRight="63dp"
-            android:text="kuriko点赞了你的文章。啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦"></TextView>
+            android:text="kuriko点赞了你的文章。啦啦啦"></TextView>
 
         <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:padding="0dp"
             app:cardPreventCornerOverlap="false"
             app:cardUseCompatPadding="false"
@@ -42,7 +46,7 @@
             android:layout_alignParentRight="true"
             >
             <com.example.mine.WidthEqualsHeightImageView
-                android:layout_width="60dp"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/luoxiaohei"
                 android:scaleType="centerCrop"
@@ -55,9 +59,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5h前"
-            android:textSize="16dp"
             android:id="@+id/date"
             android:layout_marginLeft="40dp"
             ></TextView>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.6dp"
+        android:background="@color/grey_2"
+        app:layout_constraintTop_toBottomOf="@+id/layout"
+        ></View>
+</androidx.constraintlayout.widget.ConstraintLayout>
