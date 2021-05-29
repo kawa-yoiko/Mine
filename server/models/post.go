@@ -47,7 +47,6 @@ func init() {
 		"caption TEXT NOT NULL",
 		"contents TEXT NOT NULL",
 		"collection_id INTEGER NOT NULL",
-		"collection_seq INTEGER NOT NULL",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT collection_ref FOREIGN KEY (collection_id) REFERENCES collection (id)",
 	)
@@ -164,11 +163,10 @@ func (c *Comment) Repr() map[string]interface{} {
 func (p *Post) Create() error {
 	p.Timestamp = time.Now().Unix()
 	err := db.QueryRow("INSERT INTO "+
-		"post (author_id, timestamp, type, caption, contents, "+
-		"  collection_id, collection_seq) "+
-		"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		"post (author_id, timestamp, type, caption, contents, collection_id) "+
+		"VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		p.Author.Id, p.Timestamp, p.Type, p.Caption, p.Contents,
-		p.Collection.Id, 1234,
+		p.Collection.Id,
 	).Scan(&p.Id)
 	if err != nil {
 		return err
@@ -195,11 +193,10 @@ func postSelectClause(userId int32) string {
 }
 
 func (p *Post) fields() []interface{} {
-	var collectionSeq int32
 	return []interface{}{
 		&p.Id, &p.Author.Id, &p.Timestamp, &p.Type,
 		&p.Caption, &p.Contents,
-		&p.Collection.Id, &collectionSeq,
+		&p.Collection.Id,
 		&p.Author.Nickname, &p.Author.Avatar,
 		&p.Collection.Title, &p.Collection.PostCount,
 		&p.UpvoteCount, &p.StarCount, &p.CommentCount,
@@ -232,10 +229,7 @@ func (p *Post) Star(u User, add bool) error {
 }
 
 func (p *Post) SetCollection(c Collection) error {
-	_, err := db.Exec(`UPDATE post SET
-		collection_id = $1, collection_seq = $2
-		WHERE id = $3`,
-		c.Id, 1234, p.Id)
+	_, err := db.Exec(`UPDATE post SET collection_id = $1 WHERE id = $2`, c.Id, p.Id)
 	return err
 }
 

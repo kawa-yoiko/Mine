@@ -93,7 +93,7 @@ func (c *Collection) Read() error {
 	rows, err := db.Query(`SELECT
 		id, type, caption, contents
 		FROM post
-		WHERE collection_id = $1 ORDER BY collection_seq`, c.Id)
+		WHERE collection_id = $1 ORDER BY timestamp`, c.Id)
 	if err != nil {
 		return err
 	}

@@ -45,6 +45,7 @@ public class SquareFragment extends Fragment {
     private RecyclerView recyclerView;
     private View headingView;
     private LinkedList<Item> dateAndImages;
+    private SquareAdapter adapter;
 
     public SquareFragment() {
         this.dateAndImages = new LinkedList<>();
@@ -81,11 +82,11 @@ public class SquareFragment extends Fragment {
         recyclerView.setLayoutManager(gridLayoutManager);
         if (headingView != null) {
             SingleViewAdapter adapterHeading = new SingleViewAdapter(headingView);
-            SquareAdapter adapter = new SquareAdapter(dateAndImages, 1);
+            adapter = new SquareAdapter(dateAndImages, 1);
             ConcatAdapter adapterConcat = new ConcatAdapter(adapterHeading, adapter);
             recyclerView.setAdapter(adapterConcat);
         } else {
-            SquareAdapter adapter = new SquareAdapter(dateAndImages, 0);
+            adapter = new SquareAdapter(dateAndImages, 0);
             recyclerView.setAdapter(adapter);
         }
     }
@@ -95,5 +96,16 @@ public class SquareFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.square_fragment, container, false);
+    }
+
+    public void reverse() {
+        int n = dateAndImages.size();
+        for (int i = 0; i < n / 2; i++) {
+            Item t = dateAndImages.get(i);
+            dateAndImages.set(i, dateAndImages.get(n - i - 1));
+            dateAndImages.set(n - i - 1, t);
+            adapter.notifyItemMoved(i, n - i - 1);
+            adapter.notifyItemMoved(n - i - 2, i);
+        }
     }
 }

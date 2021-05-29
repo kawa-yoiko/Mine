@@ -28,7 +28,7 @@ func SubscriptionTimeline(userId int32, start int, count int) ([]map[string]inte
 	rows, err := db.Query(postSelectClause(userId)+
 		`WHERE collection.id IN
 		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
-		  ORDER BY post.timestamp
+		  ORDER BY post.timestamp DESC
 		  LIMIT $3 OFFSET $2`,
 		userId, start, count)
 	if err != nil {
@@ -41,7 +41,7 @@ func DiscoverTimeline(userId int32, start int, count int) ([]map[string]interfac
 	rows, err := db.Query(postSelectClause(userId)+
 		`WHERE collection.id NOT IN
 		  (SELECT collection_id FROM collection_subscription WHERE user_id = $1)
-		  ORDER BY post.timestamp
+		  ORDER BY post.timestamp DESC
 		  LIMIT $3 OFFSET $2`,
 		userId, start, count)
 	if err != nil {
