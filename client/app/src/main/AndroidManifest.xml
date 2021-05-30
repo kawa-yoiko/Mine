@@ -34,6 +34,8 @@
         <activity android:name=".TestActivity" />
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".DiscoverActivity"></activity>
     </application>
 
 </manifest>

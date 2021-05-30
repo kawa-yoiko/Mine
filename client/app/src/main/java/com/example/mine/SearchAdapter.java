@@ -41,7 +41,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         contentText.setText(search);
         item.setOnClickListener((View v) -> {
             Intent intent = new Intent();
-            //GO TO activity corresponding to the serach
+            //TODO: GO TO activity corresponding to the serach
             intent.setClass(v.getContext(), DiscoverActivity.class);
             intent.putExtra("search", search);
             v.getContext().startActivity(intent);
