@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,10 +17,17 @@ import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PhotoViewPagerAdapter extends PagerAdapter {
-    private List<String> images;
+    private ArrayList<String> images;
     private Context context;
+    private String type = "square";
 
-    public PhotoViewPagerAdapter(Context context, List<String> images){
+    public PhotoViewPagerAdapter(Context context, ArrayList<String> images, String type){
+        this.images = images;
+        this.context = context;
+        this.type = type;
+    }
+
+    public PhotoViewPagerAdapter(Context context, ArrayList<String> images){
         this.images = images;
         this.context = context;
     }
@@ -42,21 +50,34 @@ public class PhotoViewPagerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        WidthEqualsHeightPhotoView imageView = new WidthEqualsHeightPhotoView(context);
-        ServerReq.Utils.loadImage("/upload/" + images.get(position), imageView);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        container.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//        imageView.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
-//            @Override
-//            public void onPhotoTap(View view, float x, float y) {
-//
-//            }
-//
-//            @Override
-//            public void onOutsidePhotoTap() {
-//
-//            }
-//        });
-        return imageView;
+        if (type.equals("square")) {
+            WidthEqualsHeightPhotoView imageView = new WidthEqualsHeightPhotoView(context);
+            ServerReq.Utils.loadImage("/upload/" + images.get(position), imageView);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            container.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            imageView.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
+                @Override
+                public void onPhotoTap(View view, float x, float y) {
+                    Intent intent = new Intent();
+                    intent.putStringArrayListExtra("images", images);
+                    intent.putExtra("current", position);
+                    intent.setClass(view.getContext(), ImageShowActivity.class);
+                    view.getContext().startActivity(intent);
+                }
+
+                public void onOutsidePhotoTap() {
+                }
+            });
+            return imageView;
+        }
+        else if (type.equals("whole")) {
+            PhotoView imageView = new PhotoView(context);
+            String image = images.get(position);
+            ServerReq.Utils.loadImage("/upload/" + images.get(position), imageView);
+//            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            container.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            return imageView;
+        }
+        return null;
     }
 }

@@ -1,15 +1,18 @@
 package com.example.mine;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -17,34 +20,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class PhotoViewPagerFragment extends Fragment {
+public class ImageShowActivity extends AppCompatActivity {
     private int imageNum;
-//    private int currentPage;
+    //    private int currentPage;
     private ImageView[] dots;
     private ArrayList<String> images;
     private int currentPage = 0;
 
-    public PhotoViewPagerFragment(ArrayList<String> images) {
-        this.images = images;
-        imageNum = images.size();
-        dots = new ImageView[imageNum];
-    }
+//    public PhotoViewPagerFragment(List<String> images) {
+//        this.images = images;
+//        imageNum = images.size();
+//        dots = new ImageView[imageNum];
+//    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_image_show);
 
-    @SuppressLint("ResourceAsColor")
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        ViewGroup dotsBox = view.findViewById(R.id.dots_box);
+        Intent intent = getIntent();
+        images = intent.getStringArrayListExtra("images");
+        currentPage = intent.getIntExtra("current", 0);
+        imageNum = images.size();
+        dots = new ImageView[imageNum];
+
+        ViewGroup dotsBox = findViewById(R.id.dots_box);
         for(int i = 0; i < imageNum; i++) {
-            ImageView dot = new ImageView(this.getContext());
+            ImageView dot = new ImageView(this.getBaseContext());
             dot.setLayoutParams(new ViewGroup.LayoutParams(15, 15));
             dots[i] = dot;
-            if(i == 0) {
+            if(i == currentPage) {
                 dot.setBackgroundResource(R.drawable.background_whiteblue);
             }
             else {
@@ -55,8 +61,9 @@ public class PhotoViewPagerFragment extends Fragment {
             layoutParams.leftMargin = 8;
             dotsBox.addView(dot, layoutParams);
         }
-        ViewPager viewPager = view.findViewById(R.id.view_pager);
-        viewPager.setAdapter(new PhotoViewPagerAdapter(this.getContext(), images));
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(new PhotoViewPagerAdapter(getBaseContext(), images, "whole"));
+        viewPager.setCurrentItem(currentPage);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -77,13 +84,6 @@ public class PhotoViewPagerFragment extends Fragment {
             }
         });
 
-
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_image_pager, container, false);
     }
 
 }

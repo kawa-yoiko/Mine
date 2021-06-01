@@ -39,7 +39,7 @@
                         android:id="@+id/comment_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="评论"
+                        android:text="热评"
                         android:textSize="18dp"
                         android:textStyle="bold"></TextView>
 
@@ -61,6 +61,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></FrameLayout>
 
+
+<!--        <FrameLayout-->
+<!--            android:id="@+id/comment_middle"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"></FrameLayout>-->
+<!--        <RelativeLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="10dp"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:layout_marginBottom="20dp">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/comment_text"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="评论"-->
+<!--                android:textSize="18dp"-->
+<!--                android:textStyle="bold"></TextView>-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/comment_num"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:layout_marginLeft="3dp"-->
+<!--                android:layout_toRightOf="@+id/comment_text"-->
+<!--                android:text="(24)"-->
+<!--                android:textSize="14dp"></TextView>-->
+<!--        </RelativeLayout>-->
     </RelativeLayout>
 
     <LinearLayout

@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -131,7 +132,7 @@ public class PostActivity extends AppCompatActivity {
                 break;
             case 1:
                 getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        new PhotoViewPagerFragment(Arrays.asList(post.getContent().split(" ")))).commit();
+                        new PhotoViewPagerFragment(new ArrayList<>(Arrays.asList(post.getContent().split(" "))))).commit();
                 break;
         }
 
