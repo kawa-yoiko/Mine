@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -21,63 +22,59 @@ import com.lzy.imagepicker.view.CropImageView;
 
 import java.util.ArrayList;
 
-public class SettingActivity extends AppCompatActivity {
+public class CollectionSettingActivity extends AppCompatActivity {
     private static int IMAGE_PICKER = 0;
-    private ImageView avatar_img;
+    private ImageView cover_img;
     private ImageItem imageItem;
-    private EditText nicknameEdit;
-    private EditText passwordEdit;
+    private EditText nameEdit;
+    private EditText tagEdit;
     private EditText introductionEdit;
-    private String nickname;
-    private String password;
+    private String name;
+    private String tag;
     private String introduction;
-    private boolean isAvatarChanged = false;
+    private boolean isCoverChanged = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.user_set);
+        setContentView(R.layout.collection_set);
 
         ImagePickerGenerator imagePickerGenerator = new ImagePickerGenerator(1);
         ImagePicker imagePicker = imagePickerGenerator.getImagePicker();
 
-        View setAvatar = findViewById(R.id.set_avatar);
-        setAvatar.setOnClickListener(new View.OnClickListener() {
+        View setCover = findViewById(R.id.set_cover);
+        setCover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, ImageGridActivity.class);
+                Intent intent = new Intent(CollectionSettingActivity.this, ImageGridActivity.class);
                 startActivityForResult(intent, IMAGE_PICKER);
-                isAvatarChanged = true;
+                isCoverChanged = true;
             }
         });
 
-        avatar_img = findViewById(R.id.avatar);
+        cover_img = findViewById(R.id.cover);
 
-        passwordEdit = findViewById(R.id.password);
-        nicknameEdit = findViewById(R.id.nickname);
+        tagEdit = findViewById(R.id.tag);
+        nameEdit = findViewById(R.id.name);
         introductionEdit = findViewById(R.id.introduction);
-        password = passwordEdit.getText().toString();
-        nickname = nicknameEdit.getText().toString();
+        tag = tagEdit.getText().toString();
+        name = nameEdit.getText().toString();
         introduction = introductionEdit.getText().toString();
 
-        passwordEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                }
-                else {
-                    passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    password = passwordEdit.getText().toString();
-                }
-            }
-        });
-        nicknameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        tagEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    nickname = nicknameEdit.getText().toString();
+                    tag = tagEdit.getText().toString();
+                }
+            }
+        });
+        nameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    name = nameEdit.getText().toString();
                 }
             }
         });
@@ -87,6 +84,18 @@ public class SettingActivity extends AppCompatActivity {
                 if (!hasFocus) {
                     introduction = introductionEdit.getText().toString();
                 }
+            }
+        });
+
+        Button ensureBtn = findViewById(R.id.ensure);
+        ensureBtn.setOnClickListener((View v) -> {
+            //TODO: send name, tag introduction and avator to server
+            // if need, apply constraint that: only send changed items to server
+            if(isCoverChanged) {
+
+            }
+            else {
+
             }
         });
 
@@ -101,21 +110,20 @@ public class SettingActivity extends AppCompatActivity {
                 imageItem = images.get(0);
                 String path = imageItem.path;
                 Bitmap bm = BitmapFactory.decodeFile(path);
-                avatar_img.setImageBitmap(bm);
+                cover_img.setImageBitmap(bm);
             }
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //TODO: send nickname, password introduction and avator to server
-        // if need, apply constraint that: only send changed items to server
-        if(isAvatarChanged) {
-
-        }
-        else {
-
-        }
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//
+//        if(isCoverChanged) {
+//
+//        }
+//        else {
+//
+//        }
+//    }
 }

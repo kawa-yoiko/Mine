@@ -25,4 +25,13 @@
     <color name="grey_yellow">#F7FFFAF7</color>
     <color name="grey_yellow2">#F7FAF9F5</color>
     <color name="blue">#004BE0</color>
+    <color name="whitepink">#FBBABA</color>
+    <color name="orange">#FFFAE6</color>
+    <color name="darkorange">#E9AF1D</color>
+    <color name="greyblue">#8196BE</color>
+    <color name="bluegreen">#78DDB9</color>
+    <color name="lakeblue">#5FB4E0</color>
+    <color name="lightorange">#FFC636</color>
+    <color name="purple">#B887C9</color>
+
 </resources>

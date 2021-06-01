@@ -20,13 +20,13 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp">
 
             <Button
                 android:id="@+id/back_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bt_background_grey"
+                android:background="@drawable/bt_background_grey_noradius"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:paddingHorizontal="15dp"
@@ -88,6 +88,7 @@
                 android:layout_centerVertical="true"
                 android:textStyle="bold"></TextView>
 
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,12 +127,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="25dp"
-                    android:id="@+id/book_icon"
-                    android:src="@drawable/flower"></ImageView>
+                    android:id="@+id/collection_icon"
+                    android:src="@drawable/collection"></ImageView>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/book_icon"
+                    android:layout_toRightOf="@+id/collection_icon"
                     android:layout_centerVertical="true"
                     android:textSize="16dp"
                     android:textStyle="bold"
@@ -155,7 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="25dp"
                     android:id="@+id/tag_icon"
-                    android:src="@drawable/flower"></ImageView>
+                    android:src="@drawable/tag"></ImageView>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

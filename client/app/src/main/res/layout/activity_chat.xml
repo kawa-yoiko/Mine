@@ -14,12 +14,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:id="@+id/btn_back"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:src="@drawable/flower">
+                    android:src="@drawable/arrowleft">
                 </ImageView>
                 <TextView
                     android:layout_width="wrap_content"
@@ -30,6 +30,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:layout_toRightOf="@+id/btn_back"
+                    android:paddingBottom="4dp"
                     android:text="kuriko"></TextView>
             </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>

@@ -166,15 +166,14 @@
             android:layout_marginHorizontal="6dp"
             android:background="@drawable/bt_background_grey"></EditText>
 
-        <Button
+        <ImageView
             android:id="@+id/comment_button"
-            android:layout_width="wrap_content"
+            android:layout_width="23dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:background="@drawable/background_white"
-            android:drawableLeft="@drawable/flower"
+            android:src="@drawable/send"
             android:minWidth="0dp"
-            android:minHeight="0dp"></Button>
+            android:minHeight="0dp"></ImageView>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

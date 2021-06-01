@@ -9,33 +9,56 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginLeft="50px"
             android:layout_marginRight="50px"
             >
-            <TextView
+<!--            <TextView-->
+<!--                android:id="@+id/collection"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="30dp"-->
+<!--                android:layout_marginRight="60dp"-->
+<!--                android:background="@color/yellow"-->
+<!--                android:padding="6dp"-->
+<!--                android:text="粥粥可爱"-->
+<!--                android:textSize="16dp"-->
+<!--                android:textStyle="bold"></TextView>-->
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="25sp"
-                android:layout_weight="5"
-                android:layout_marginRight="50px"
-                android:text="粥粥可爱"
-                android:id="@+id/collection"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/bound"></TextView>
+                android:layout_height="30dp"
+                android:layout_marginRight="60dp"
+                android:padding="6dp"
+                android:background="@drawable/bt_background_yellow">
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:id="@+id/book_icon"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/collection"></ImageView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="粥粥可爱"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_toRightOf="@+id/book_icon"
+                    android:id="@+id/collection"
+                    android:layout_centerVertical="true"
+                    ></TextView>
+            </RelativeLayout>
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_weight="3">
+                android:layout_gravity="center"
+                android:scrollbars="none">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/tag"
                     android:text="#猫猫 #狗粮 #摄影 #1234567891234"
-                    android:textSize="16sp"></TextView>
+                    android:textSize="16dp"></TextView>
             </HorizontalScrollView>
         </LinearLayout>
         <LinearLayout

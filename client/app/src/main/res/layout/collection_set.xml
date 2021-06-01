@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="30dp"
+    android:paddingTop="50dp"
     android:background="@color/grey_0"
     >
     <LinearLayout
@@ -17,19 +17,21 @@
         android:showDividers="middle"
         tools:ignore="MissingConstraints"
         android:background="@color/white"
+        android:id="@+id/set"
         >
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingVertical="10dp"
             android:paddingHorizontal="20dp"
+            android:id="@+id/set_cover"
             >
             <view
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 class="com.example.mine.WidthEqualsHeightImageView"
                 android:src="@drawable/luoxiaohei"
-                android:id="@+id/avatar"
+                android:id="@+id/cover"
                 android:scaleType="centerCrop"></view>
             <Button
                 android:layout_width="wrap_content"
@@ -68,6 +70,7 @@
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
+                android:id="@+id/name"
                 ></EditText>
         </RelativeLayout>
         <RelativeLayout
@@ -84,12 +87,13 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="#狗粮 #摄影"
+                android:text="狗粮, 摄影"
                 android:gravity="top"
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
                 android:minHeight="60dp"
+                android:id="@+id/tag"
                 ></EditText>
         </RelativeLayout>
         <View
@@ -117,7 +121,21 @@
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
                 android:minHeight="100dp"
+                android:id="@+id/introduction"
                 ></EditText>
         </RelativeLayout>
     </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bt_background_whiteyellow"
+        android:text="创建合集"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="70dp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/set"
+        android:id="@+id/ensure"
+        ></Button>
 </androidx.constraintlayout.widget.ConstraintLayout>

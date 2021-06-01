@@ -73,15 +73,16 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="20dp"
             android:background="@drawable/bt_background_whiteyellow"
-            android:drawableLeft="@drawable/plus1"
+            android:drawableLeft="@drawable/add"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingLeft="25dp"
-            android:paddingTop="10dp"
-            android:paddingRight="25dp"
-            android:paddingBottom="10dp"
+            android:paddingLeft="35dp"
+            android:paddingRight="35dp"
+            android:paddingVertical="10dp"
             android:text="发布作品"
             android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             tools:ignore="MissingConstraints" />
 
         <LinearLayout
@@ -92,41 +93,81 @@
             android:dividerPadding="20dp"
             android:showDividers="beginning|middle|end">
 
-            <Button
+            <RelativeLayout
                 android:id="@+id/settings_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
-                android:drawableLeft="@drawable/comment"
-                android:drawablePadding="20dp"
                 android:paddingHorizontal="30dp"
-                android:text="帐号设置"
-                android:textAlignment="textStart" />
-
-            <Button
+                android:paddingVertical="15dp"
+                >
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/settings"
+                    android:id="@+id/setting_icon"
+                    android:layout_marginRight="45dp"
+                    ></ImageView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="帐号设置"
+                    android:textColor="@color/black"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/setting_icon"
+                    ></TextView>
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/stars_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
-                android:drawableLeft="@drawable/star"
-                android:drawablePadding="20dp"
                 android:paddingHorizontal="30dp"
-                android:text="收藏夹"
-                android:textAlignment="textStart" />
-
-            <Button
+                android:paddingVertical="15dp"
+                >
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/star"
+                    android:id="@+id/star_icon"
+                    android:layout_marginRight="45dp"
+                    ></ImageView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="收藏夹"
+                    android:textColor="@color/black"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/star_icon"
+                    ></TextView>
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/about_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
-                android:drawableLeft="@drawable/flower"
-                android:drawablePadding="20dp"
                 android:paddingHorizontal="30dp"
-                android:text="关于"
-                android:textAlignment="textStart" />
+                android:paddingVertical="15dp"
+                >
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/about"
+                    android:id="@+id/about_icon"
+                    android:layout_marginRight="45dp"
+                    ></ImageView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="关于"
+                    android:textColor="@color/black"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/about_icon"
+                    ></TextView>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

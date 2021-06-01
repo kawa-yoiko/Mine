@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
@@ -32,12 +34,28 @@ public class MyFragment  extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+        ImageView settingIcon = view.findViewById(R.id.setting_icon);
+        ImageView aboutIcon = view.findViewById(R.id.about_icon);
+        ImageView starIcon = view.findViewById(R.id.star_icon);
+        settingIcon.setColorFilter(Color.parseColor("#AAAAAA"));
+        aboutIcon.setColorFilter(Color.parseColor("#8196BE"));
+        starIcon.setColorFilter(Color.parseColor("#F4DB35"));
+        
         Button post_button = view.findViewById(R.id.post_button);
         post_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 View popView = getLayoutInflater().inflate(R.layout.post_type_selector, null);
+                
+                ImageView textIcon = popView.findViewById(R.id.text_icon);
+                ImageView imageIcon = popView.findViewById(R.id.image_icon);
+                ImageView musicIcon = popView.findViewById(R.id.music_icon);
+                ImageView videoIcon = popView.findViewById(R.id.video_icon);
+                textIcon.setColorFilter(Color.parseColor("#78DDB9"));
+                imageIcon.setColorFilter(Color.parseColor("#5FB4E0"));
+                musicIcon.setColorFilter(Color.parseColor("#FFC636"));
+                videoIcon.setColorFilter(Color.parseColor("#B887C9"));
+                
                 View text_button = popView.findViewById(R.id.text);
                 View image_button = popView.findViewById(R.id.image);
                 View.OnClickListener typeSelectorListener = new View.OnClickListener() {
@@ -69,12 +87,12 @@ public class MyFragment  extends Fragment {
             }
         });
 
-        ((Button) view.findViewById(R.id.settings_button)).setOnClickListener((View v) -> {
+        ( view.findViewById(R.id.settings_button)).setOnClickListener((View v) -> {
             Intent intent = new Intent(getActivity(), SettingActivity.class);
             getActivity().startActivity(intent);
         });
 
-        ((Button) view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
+        ( view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
             Intent intent = new Intent(getActivity(), StarActivity.class);
             getActivity().startActivity(intent);
         });

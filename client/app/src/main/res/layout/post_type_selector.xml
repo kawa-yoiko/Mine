@@ -27,10 +27,10 @@
             android:id="@+id/text"
             >
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:id="@+id/text_icon"
-                android:src="@drawable/flower"></ImageView>
+                android:src="@drawable/text"></ImageView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,10 +47,10 @@
             android:id="@+id/image"
             >
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:id="@+id/image_icon"
-                android:src="@drawable/flower"></ImageView>
+                android:src="@drawable/image"></ImageView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,10 +67,10 @@
             android:id="@+id/music"
             >
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:id="@+id/music_icon"
-                android:src="@drawable/flower"></ImageView>
+                android:src="@drawable/music"></ImageView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,10 +87,10 @@
             android:id="@+id/video"
             >
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:id="@+id/video_icon"
-                android:src="@drawable/flower"></ImageView>
+                android:src="@drawable/video"></ImageView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

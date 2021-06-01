@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="30dp"
+    android:paddingTop="50dp"
     android:background="@color/grey_0"
     >
     <LinearLayout
@@ -70,6 +70,7 @@
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
+                android:id="@+id/nickname"
                 ></EditText>
         </RelativeLayout>
         <RelativeLayout
@@ -81,17 +82,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/gender_text"
+                android:id="@+id/password_text"
                 android:textSize="16dp"
                 android:layout_centerVertical="true"
-                android:text="性别"></TextView>
+                android:text="密码"></TextView>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="保密"
+                android:text="123456"
+                android:inputType="textPassword"
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
+                android:id="@+id/password"
                 ></EditText>
         </RelativeLayout>
         <RelativeLayout
@@ -116,6 +119,7 @@
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
                 android:minHeight="100dp"
+                android:id="@+id/introduction"
                 ></EditText>
         </RelativeLayout>
     </LinearLayout>

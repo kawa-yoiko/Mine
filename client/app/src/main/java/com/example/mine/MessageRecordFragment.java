@@ -36,15 +36,15 @@ public class MessageRecordFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerview);
 
-        Button bt = view.findViewById(R.id.test);
-        bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                records.remove(0);
-                MessageRecordAdapter adapterNew = new MessageRecordAdapter(records);
-                recyclerView.setAdapter(adapterNew);
-            }
-        });
+//        Button bt = view.findViewById(R.id.test);
+//        bt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                records.remove(0);
+//                MessageRecordAdapter adapterNew = new MessageRecordAdapter(records);
+//                recyclerView.setAdapter(adapterNew);
+//            }
+//        });
         MessageRecordAdapter adapter = new MessageRecordAdapter(records);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

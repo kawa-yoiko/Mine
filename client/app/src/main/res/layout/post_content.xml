@@ -82,17 +82,29 @@
             android:text="#猫猫 #狗粮 #摄影 #1234567891234"
             android:textSize="16sp"></TextView>
 
-        <TextView
-            android:id="@+id/collection"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginLeft="50px"
             android:layout_marginRight="50px"
-            android:background="@drawable/bt_background_yellow"
-            android:drawableLeft="@drawable/flower"
             android:padding="6dp"
-            android:text="粥粥可爱"
-            android:textSize="16sp"
-            android:textStyle="bold"></TextView>
+            android:background="@drawable/bt_background_yellow">
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:id="@+id/book_icon"
+                android:layout_centerVertical="true"
+                android:src="@drawable/collection"></ImageView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="粥粥可爱"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_toRightOf="@+id/book_icon"
+                android:id="@+id/collection"
+                android:layout_centerVertical="true"
+                ></TextView>
+        </RelativeLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

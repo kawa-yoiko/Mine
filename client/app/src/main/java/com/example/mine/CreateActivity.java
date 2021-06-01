@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -23,6 +24,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,6 +60,11 @@ public class CreateActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String createType = intent.getStringExtra("create_type");
 
+        ImageView collectionIcon = findViewById(R.id.collection_icon);
+        ImageView tagIcon = findViewById(R.id.tag_icon);
+        collectionIcon.setColorFilter(Color.parseColor("#BBBBBB"));
+        tagIcon.setColorFilter(Color.parseColor("#BBBBBB"));
+
         if(createType.equals("text")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_text, null);
         } else if(createType.equals("image")) {
@@ -68,7 +75,8 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView = createAreaView.findViewById(R.id.recyclerview);
             addImage = new WidthEqualsHeightImageView(getApplicationContext());
             addImage.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            addImage.setImageResource(R.drawable.plus);
+            addImage.setImageResource(R.mipmap.ic_add_white_48dp);
+            addImage.setColorFilter(Color.parseColor("#CCCCCC"));
             addImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -123,6 +131,9 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button createButton = popViewCollection.findViewById(R.id.create);
                 createButton.setOnClickListener((View v1) -> {
+                    Intent intentToCreate = new Intent();
+                    intentToCreate.setClass(v1.getContext(), CollectionSettingActivity.class);
+                    v1.getContext().startActivity(intentToCreate);
                 });
                 popupWindowCollection = new PopupWindow(popViewCollection, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);

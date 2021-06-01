@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,12 +50,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         switch (type) {
             case 0 :
                 icon.setImageResource(R.drawable.flower);
+                icon.setColorFilter(Color.parseColor("#FBBABA"));
                 break;
             case 1:
                 icon.setImageResource(R.drawable.comment);
+                icon.setColorFilter(Color.parseColor("#A2E0FF"));
                 break;
             case 2:
-                icon.setImageResource(R.drawable.star);
+                icon.setImageResource(R.drawable.mark);
+                icon.setColorFilter(Color.parseColor("#F1D20A"));
                 break;
 
         }

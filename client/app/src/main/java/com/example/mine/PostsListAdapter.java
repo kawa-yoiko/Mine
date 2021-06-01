@@ -1,6 +1,8 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +83,18 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         comment_num_text.setText(String.valueOf(post.getComment_num()));
         TextView star_num_text = item.findViewById(R.id.star_num);
         star_num_text.setText(String.valueOf(post.getStar_num()));
+
+        ImageView flowerIcon = item.findViewById(R.id.flower_icon);
+        ImageView commentIcon = item.findViewById(R.id.comment_icon);
+        ImageView starIcon = item.findViewById(R.id.star_icon);
+        ImageView bookIcon = item.findViewById(R.id.book_icon);
+        flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
+        commentIcon.setColorFilter(Color.parseColor("#A2E0FF"));
+        starIcon.setColorFilter(Color.parseColor("#F4DB35"));
+        bookIcon.setColorFilter(Color.parseColor("#FFFCE6"));
+//        ImageView test = item.findViewById(R.id.test);
+//        test.setColorFilter(R.color.whitebule);
+
         if (holder instanceof ImageHolder) {
             ImageView content_image = item.findViewById(R.id.content);
             ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);

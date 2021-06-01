@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment messageFragment = new MessageFragment();
 //        Fragment commentFragment = new CommentFragment();
         setCurrentFragment(postsListFragment);
+        titleView.setText("首页");
 //        View view = View.inflate(this.getBaseContext(), R.layout.search_box, null);
 //        View cv = getWindow().getDecorView();
 //        ViewGroup test = cv.findViewById(R.id.test);

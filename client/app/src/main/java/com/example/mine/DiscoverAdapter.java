@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,9 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
         tagText.setText(post.getTag());
         TextView fondNumText = item.findViewById(R.id.fond_num);
         fondNumText.setText(String.valueOf(post.getFlower_num()));
+
+        ImageView flowerIcon = item.findViewById(R.id.flower_icon);
+        flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
 
         TextView text = item.findViewById(R.id.text);
         ImageView image = item.findViewById(R.id.image);

@@ -4,6 +4,7 @@ package com.example.mine;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,6 +51,13 @@ public class PostActivity extends AppCompatActivity {
         TextView comment_num_text = findViewById(R.id.comment_num);
         comment_num_text.setText(String.valueOf(post.getComment_num()));
 
+        ImageView flowerIcon = findViewById(R.id.flower_icon);
+        ImageView commentButton = findViewById(R.id.comment_button);
+        ImageView starIcon = findViewById(R.id.star_icon);
+        flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
+        commentButton.setColorFilter(Color.parseColor("#A2E0FF"));
+        starIcon.setColorFilter(Color.parseColor("#F4DB35"));
+
         // Flower button
         ToggleReqButton toggleFlower = new ToggleReqButton(
                 findViewById(R.id.flower_button),
@@ -71,12 +79,12 @@ public class PostActivity extends AppCompatActivity {
         toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());
 
         EditText commentText = (EditText) findViewById(R.id.comment_edit);
-        Button commentButton = (Button) findViewById(R.id.comment_button);
+//        Button commentButton = (Button) findViewById(R.id.comment_button);
         commentButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
-                commentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.star, 0, 0, 0);
+                commentButton.setImageResource(R.drawable.star);
                 commentText.setEnabled(false);
                 ServerReq.postJson("/post/" + post.id + "/comment/new", List.of(
                         new Pair<>("reply_to", "-1"),
@@ -87,7 +95,7 @@ public class PostActivity extends AppCompatActivity {
                     } catch (Exception e) {
                     }
                     PostActivity.this.runOnUiThread(() -> {
-                        commentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.flower, 0, 0, 0);
+                        commentButton.setImageResource(R.drawable.flower);
                         commentText.setEnabled(true);
                     });
                     int commentId = -1;
@@ -120,6 +128,10 @@ public class PostActivity extends AppCompatActivity {
         TextView timestamp_text = postView.findViewById(R.id.timestamp);
         timestamp_text.setText(post.getTimestamp());
         TextView caption_text = postView.findViewById(R.id.caption);
+
+        ImageView bookIcon = postView.findViewById(R.id.book_icon);
+        bookIcon.setColorFilter(Color.parseColor("#FFFCE6"));
+
         caption_text.setText(post.getCaption());
         switch (post.getContentType()) {
             default:

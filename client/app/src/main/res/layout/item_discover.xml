@@ -34,7 +34,7 @@
             android:layout_marginBottom="6dp"
             android:maxHeight="48sp"
             android:text="题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目题目"
-            android:textSize="18sp"
+            android:textSize="17dp"
             android:textStyle="bold"></TextView>
 
         <TextView
@@ -44,7 +44,7 @@
             android:layout_marginBottom="6dp"
             android:maxHeight="160dp"
             android:text="内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容"
-            android:textSize="15sp" />
+            android:textSize="15dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
             <TextView
                 android:id="@+id/tag"
                 android:text="#五条悟"
-                android:textSize="18sp"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
