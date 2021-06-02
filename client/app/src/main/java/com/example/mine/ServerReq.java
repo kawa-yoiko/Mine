@@ -6,6 +6,8 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -111,6 +113,7 @@ public class ServerReq {
             if (response.code() >= 400 && response.code() <= 599)
                 Log.e("network", "Response code " + response);
             callback.accept(response.body().byteStream());
+            response.close();
         }
     }
 
@@ -126,9 +129,7 @@ public class ServerReq {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void get(String url, Consumer<String> callbackFn) {
-        getStream(url, (InputStream stream) -> {
-            callbackFn.accept(streamToString(stream));
-        });
+        getStream(url, (InputStream stream) -> callbackFn.accept(streamToString(stream)));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -277,15 +278,11 @@ public class ServerReq {
         }
 
         public static void loadImage(String url, ImageView imageView) {
-            Activity activity = getActivity(imageView);
-            if (activity == null) {
-                Log.e("network", "Hosting activity is null");
-                return;
-            }
+            Handler handler = new Handler(Looper.getMainLooper());
             imageView.setImageDrawable(null);
             ServerReq.getStream(url, (InputStream stream) -> {
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                activity.runOnUiThread(() -> imageView.setImageBitmap(bitmap));
+                handler.post(() -> imageView.setImageBitmap(bitmap));
             });
         }
     }
