@@ -2,6 +2,7 @@ package com.example.mine;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -24,6 +25,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -44,6 +46,7 @@ public class CreateActivity extends AppCompatActivity {
     ArrayList<ImageItem> imageItems = new ArrayList<>(0);
     WidthEqualsHeightImageView addImage;
     private static int IMAGE_PICKER = 0;
+    private static int VIDEO_PICKER = 2;
 
     private String tags = "";
     private User.CollectionBrief collection = null;
@@ -87,6 +90,14 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView.setAdapter(new ConcatAdapter(new ImagePickerAdapter(imageItems), new SingleViewAdapter(addImage)));
             recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
 //            recyclerView.setAdapter(new ImagePickerAdapter(imageItems));
+        } else if (createType.equals("video")) {
+            createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_video, null);
+            ((ImageButton) createAreaView.findViewById(R.id.btn_select)).setOnClickListener((View v) -> {
+                Intent videoIntent = new Intent();
+                videoIntent.setType("video/*");
+                videoIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(videoIntent, "Select Video"), VIDEO_PICKER);
+            });
         } else {
             createAreaView = null;
         }
@@ -222,11 +233,16 @@ public class CreateActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == ImagePicker.RESULT_CODE_ITEMS) {
-            if (data != null && requestCode == IMAGE_PICKER) {
+        if (requestCode == IMAGE_PICKER) {
+            if (resultCode == ImagePicker.RESULT_CODE_ITEMS && data != null) {
                 ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_RESULT_ITEMS);
                 imageItems.addAll(images);
                 recyclerView.setAdapter(new ConcatAdapter(new ImagePickerAdapter(imageItems), new SingleViewAdapter(addImage)));
+            }
+        } else if (requestCode == VIDEO_PICKER) {
+            if (resultCode == RESULT_OK) {
+                Uri selectedUri = data.getData();
+                Log.d("CreateAcvitity", selectedUri.toString());
             }
         }
     }

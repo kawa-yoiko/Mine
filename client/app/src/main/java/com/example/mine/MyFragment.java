@@ -58,9 +58,10 @@ public class MyFragment  extends Fragment {
                 
                 View text_button = popView.findViewById(R.id.text);
                 View image_button = popView.findViewById(R.id.image);
+                View video_button = popView.findViewById(R.id.video);
                 View.OnClickListener typeSelectorListener = new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
+                     public void onClick(View view) {
                         Intent intent = new Intent();
                         switch (view.getId()) {
                             case R.id.text:
@@ -68,6 +69,9 @@ public class MyFragment  extends Fragment {
                                 break;
                             case R.id.image:
                                 intent.putExtra("create_type", "image");
+                                break;
+                            case R.id.video:
+                                intent.putExtra("create_type", "video");
                                 break;
                             default:
                                 break;
@@ -78,6 +82,7 @@ public class MyFragment  extends Fragment {
                 };
                 text_button.setOnClickListener(typeSelectorListener);
                 image_button.setOnClickListener(typeSelectorListener);
+                video_button.setOnClickListener(typeSelectorListener);
 
                 popupWindow = new PopupWindow(popView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindow.setOutsideTouchable(false);
