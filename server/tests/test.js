@@ -575,6 +575,11 @@ if (process.env['GEN'] !== '1') (async () => {
     {_ignoreRedundant: true, contents: `${u2img1}`},
   ])
 
+  // Message
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq'},
+    {id: any, timestamp: any})
+
   console.log(`\n${pass}/${total} passed`);
 })();
 
