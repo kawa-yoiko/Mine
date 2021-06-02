@@ -579,6 +579,21 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/message/send',
     {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq'},
     {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq2'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token2, to_user: 'kayuyuko', contents: 'qwqwqwqwq3'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq4'},
+    {id: any, timestamp: any})
+  await check('GET', '/message/with/kayuyuko',
+    {token: token2, start: 0, count: 2},
+    [any, any])
+  await check('GET', '/message/with/kayuyuko',
+    {token: token2, start: 1, count: 10},
+    [any, any, any])
 
   console.log(`\n${pass}/${total} passed`);
 })();
