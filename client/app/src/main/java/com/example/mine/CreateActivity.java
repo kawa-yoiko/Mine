@@ -242,7 +242,7 @@ public class CreateActivity extends AppCompatActivity {
                 Log.d("CreateActivity", "video path: " + singleMediaPath);
                 ServerReq.uploadFile("/upload", new File(singleMediaPath), (Long len, Long sent) -> {
                     double progress = (double)sent / len;
-                    Log.d("CreateActivity", "video upload progress = " + progress);
+                    // Log.d("CreateActivity", "video upload progress = " + progress);
                     ((ProgressBar) cv.findViewById(R.id.progress)).setMax(1000);
                     ((ProgressBar) cv.findViewById(R.id.progress)).setProgress((int) Math.round(1000 * progress), true);
                 }, (JSONObject obj) -> {
@@ -283,7 +283,7 @@ public class CreateActivity extends AppCompatActivity {
                 Log.d("CreateAcvitity", singleMediaPath);
                 videoView.setVisibility(View.VISIBLE);
                 videoView.setVideoURI(selectedUri);
-                videoView.start();
+                // videoView.start();
             }
         }
     }

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -51,7 +52,7 @@ public class ServerReq {
 
     private static String getFullUrl(String url) {
         if (url.startsWith("/")) {
-            return "http://8.140.133.34:7678" + url;
+            return "http://8.140.133.34:7679" + url;
         } else {
             return url;
         }
@@ -255,11 +256,17 @@ public class ServerReq {
                 .url(getFullUrl(url))
                 .header("Authorization", token != null ? "Bearer " + token : "")
                 .post(new ProgressRequestBody(requestBody, (long contentLength, long bytesWritten) -> {
-                    Log.d("ServerReq", "content = " + contentLength + ", written = " + bytesWritten);
+                    // Log.d("ServerReq", "content = " + contentLength + ", written = " + bytesWritten);
                     progressFn.accept(contentLength, bytesWritten);
                 }))
                 .build();
-        Call call = client.newCall(request);
+        OkHttpClient extClient = client.newBuilder()
+                .retryOnConnectionFailure(true)
+                .callTimeout(0, TimeUnit.SECONDS)
+                .writeTimeout(3600, TimeUnit.SECONDS)
+                .readTimeout(3600, TimeUnit.SECONDS)
+                .build();
+        Call call = extClient.newCall(request);
         call.enqueue(new ReqCallback((InputStream stream) -> {
             callbackFn.accept(parseJson(streamToString(stream)));
         }));

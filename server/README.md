@@ -16,6 +16,11 @@ docker rm $(docker stop $(docker ps -a -q --filter ancestor=mineserver --format=
 docker image rm mineserver
 ```
 
+To start a test server on an alternative port:
+```sh
+docker run -it --entrypoint=sh --publish 7679:2317 mineserver
+```
+
 ## Local PostgreSQL setup (for development)
 ```sh
 initdb -D data.swp
