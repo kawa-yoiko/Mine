@@ -589,11 +589,22 @@ if (process.env['GEN'] !== '1') (async () => {
     {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq4'},
     {id: any, timestamp: any})
   await check('GET', '/message/with/kayuyuko',
-    {token: token2, start: 0, count: 2},
-    [any, any])
+    {token: token2, start: 0, count: 2}, [
+      {from_me: false, contents: 'qwqwqwqwq4', _ignoreRedundant: true},
+      {from_me: true, contents: 'qwqwqwqwq3', _ignoreRedundant: true},
+    ])
   await check('GET', '/message/with/kayuyuko',
-    {token: token2, start: 1, count: 10},
-    [any, any, any])
+    {token: token2, start: 1, count: 10}, [
+      {from_me: true, contents: 'qwqwqwqwq3', _ignoreRedundant: true},
+      {from_me: false, contents: 'qwqwqwqwq2', _ignoreRedundant: true},
+      {from_me: false, contents: 'qwqwqwqwq', _ignoreRedundant: true},
+    ])
+
+  await check('GET', '/message/latest', {token: token1}, [{
+      from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+      to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
+      _ignoreRedundant: true,
+  }])
 
   console.log(`\n${pass}/${total} passed`);
 })();

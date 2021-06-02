@@ -50,7 +50,17 @@ func getMessageWith(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, messages)
 }
 
+func getMessageLatest(w http.ResponseWriter, r *http.Request) {
+	u := mustAuth(r)
+	messages, err := models.ReadLatestMessages(u.Id)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, messages)
+}
+
 func init() {
 	registerHandler("/message/send", postMessageSend, "POST")
 	registerHandler("/message/with/{nickname}", getMessageWith, "GET")
+	registerHandler("/message/latest", getMessageLatest, "GET")
 }
