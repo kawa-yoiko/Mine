@@ -52,7 +52,7 @@ public class ServerReq {
 
     private static String getFullUrl(String url) {
         if (url.startsWith("/")) {
-            return "http://8.140.133.34:7679" + url;
+            return "http://8.140.133.34:7678" + url;
         } else {
             return url;
         }

@@ -5,7 +5,6 @@ import (
 
 	"errors"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"os"
@@ -87,20 +86,10 @@ func postUploadAvatar(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, u.Repr())
 }
 
-func getUpload(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-
-	f, err := os.Open(uploadDir + "/" + id)
-	if err != nil {
-		panic(models.CheckedError{404})
-	}
-	defer f.Close()
-
-	io.Copy(w, f)
-}
-
 func init() {
 	registerHandler("/upload", postUpload, "POST")
 	registerHandler("/upload/avatar", postUploadAvatar, "POST")
-	registerHandler("/upload/{id}", getUpload, "GET")
+
+	router.PathPrefix("/upload").Handler(
+		http.FileServer(http.Dir(uploadDir))).Methods("GET")
 }
