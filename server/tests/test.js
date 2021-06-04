@@ -603,8 +603,17 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('GET', '/message/latest', {token: token1}, [{
       from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
       to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
+      unread_count: 1,
       _ignoreRedundant: true,
   }])
+  await check('GET', '/message/latest', {token: token2}, [{
+      from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+      to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
+      unread_count: 3,
+      _ignoreRedundant: true,
+  }])
+
+  // Message reading
 
   console.log(`\n${pass}/${total} passed`);
 })();

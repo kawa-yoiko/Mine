@@ -25,7 +25,7 @@ func init() {
 	registerSchema("message_pair",
 		"to_user_id INTEGER NOT NULL",
 		"from_user_id INTEGER", // nullable
-		"last_read BIGINT NOT NULL",
+		"unread_count INTEGER NOT NULL",
 		"ADD CONSTRAINT to_user_ref FOREIGN KEY (to_user_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT from_user_ref FOREIGN KEY (from_user_id) REFERENCES mine_user (id)",
 		"ADD CONSTRAINT message_pair_uniq UNIQUE (to_user_id, from_user_id)",
@@ -62,9 +62,16 @@ func (m *Message) Create() error {
 		return err
 	}
 	_, err = db.Exec(`INSERT INTO
-		message_pair (to_user_id, from_user_id, last_read)
-		VALUES ($1, $2, 0), ($2, $1, $3) ON CONFLICT DO NOTHING`,
-		m.ToUser.Id, m.FromUser.Id, m.Timestamp)
+		message_pair (to_user_id, from_user_id, unread_count)
+		VALUES ($1, $2, 0), ($2, $1, 0) ON CONFLICT DO NOTHING`,
+		m.ToUser.Id, m.FromUser.Id)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(`UPDATE message_pair
+		SET unread_count = unread_count + 1
+		WHERE to_user_id = $1 AND from_user_id = $2`,
+		m.ToUser.Id, m.FromUser.Id)
 	return err
 }
 
@@ -99,8 +106,7 @@ func ReadMessagesBetweenUsers(fromUserId int32, toUserId int32, start int, count
 }
 
 func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
-	/*
-	ERROR:  subquery must return only one column
+	/* ERROR:  subquery must return only one column
 	rows, err := db.Query(`SELECT
 		(SELECT * FROM message
 		  WHERE message.to_user_id = $1
@@ -109,15 +115,18 @@ func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 		FROM message_pair
 		WHERE to_user_id = $1`, userId)
 	*/
-	rows, err := db.Query(`SELECT message.*,
+	rows, err := db.Query(`SELECT
+		  message_pair.unread_count,
+		  message.*,
 		  from_user.nickname, from_user.avatar,
 		  to_user.nickname, to_user.avatar
 		FROM message_pair
-		  INNER JOIN message USING (from_user_id)
+		  INNER JOIN message ON
+		    message.from_user_id = message_pair.from_user_id OR
+		    message.from_user_id = message_pair.to_user_id
 		  INNER JOIN mine_user from_user ON message.from_user_id = from_user.id
 		  INNER JOIN mine_user to_user ON message.to_user_id = to_user.id
 		WHERE message_pair.to_user_id = $1
-		  OR message_pair.from_user_id = $1
 		ORDER BY message.timestamp DESC, message.id DESC LIMIT 1`, userId)
 	if err != nil {
 		return nil, err
@@ -126,10 +135,14 @@ func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 	messages := []map[string]interface{}{}
 	for rows.Next() {
 		m := Message{}
-		if err := rows.Scan(m.fields()...); err != nil {
+		var unreadCount int
+		fields := append([]interface{}{&unreadCount}, m.fields()...)
+		if err := rows.Scan(fields...); err != nil {
 			return nil, err
 		}
-		messages = append(messages, m.Repr())
+		r := m.Repr()
+		r["unread_count"] = unreadCount
+		messages = append(messages, r)
 	}
 	return messages, rows.Err()
 }
