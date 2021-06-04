@@ -146,3 +146,10 @@ func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 	}
 	return messages, rows.Err()
 }
+
+func MarkMessagesAsRead(toUserId, fromUserId int32) error {
+	_, err := db.Exec(`UPDATE message_pair
+		SET unread_count = 0 WHERE to_user_id = $1 AND from_user_id = $2`,
+		toUserId, fromUserId)
+	return err
+}

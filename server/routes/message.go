@@ -59,8 +59,25 @@ func getMessageLatest(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, messages)
 }
 
+func postMessageRead(w http.ResponseWriter, r *http.Request) {
+	u := mustAuth(r)
+
+	nickname := mux.Vars(r)["nickname"]
+	uOther := models.User{Nickname: nickname}
+	if err := uOther.ReadByNickname(); err != nil {
+		panic(err)
+	}
+
+	if err := models.MarkMessagesAsRead(u.Id, uOther.Id); err != nil {
+		panic(err)
+	}
+
+	write(w, 200, jsonPayload{})
+}
+
 func init() {
 	registerHandler("/message/send", postMessageSend, "POST")
 	registerHandler("/message/with/{nickname}", getMessageWith, "GET")
 	registerHandler("/message/latest", getMessageLatest, "GET")
+	registerHandler("/message/read/{nickname}", postMessageRead, "POST")
 }
