@@ -32,6 +32,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import okhttp3.*;
+import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -246,11 +247,10 @@ public class ServerReq {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static void uploadFile(String url, File file, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+    private static void uploadFileWithBody(String url, RequestBody fileBody, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("fileqwqwqwq", "filequququq",
-                        RequestBody.create(file, MediaType.parse("application/octet-stream")))
+                .addFormDataPart("fileqwqwqwq", "filequququq", fileBody)
                 .build();
         Request request = new Request.Builder()
                 .url(getFullUrl(url))
@@ -270,6 +270,51 @@ public class ServerReq {
         call.enqueue(new ReqCallback((InputStream stream) -> {
             callbackFn.accept(parseJson(streamToString(stream)));
         }));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFile(String url, File file, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+        uploadFileWithBody(url,
+                RequestBody.create(file, MediaType.parse("application/octet-stream")),
+                progressFn,
+                callbackFn);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFileStream(String url, InputStream inputStream, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+        final MediaType mediaType = MediaType.parse("application/octet-stream");
+        RequestBody fileBody = new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return mediaType;
+            }
+
+            @Override
+            public long contentLength() {
+                try {
+                    long a = inputStream.available();
+                    Log.d("uploadFileStream", "a = " + a);
+                    return inputStream.available();
+                } catch (IOException e) {
+                    return 0;
+                }
+            }
+
+            @Override
+            public void writeTo(BufferedSink sink) throws IOException {
+                Source source = null;
+                try {
+                    source = Okio.source(inputStream);
+                    sink.writeAll(source);
+                } catch (Exception e) {
+                    Log.d("uploadFileStream", "exception: " + e.toString());
+                } finally {
+                    Log.d("uploadFileStream", "closing quietly");
+                    Util.closeQuietly(source);
+                }
+            }
+        };
+        uploadFileWithBody(url, fileBody, progressFn, callbackFn);
     }
 
     public static class Utils {

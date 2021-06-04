@@ -44,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,7 +55,7 @@ public class CreateActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ArrayList<ImageItem> imageItems = new ArrayList<>(0);
     WidthEqualsHeightImageView addImage;
-    String singleMediaPath;
+    Uri singleMediaUri;
     VideoView videoView;
     private static int IMAGE_PICKER = 0;
     private static int VIDEO_PICKER = 2;
@@ -239,8 +240,16 @@ public class CreateActivity extends AppCompatActivity {
                     });
                 }
             } else if (createType.equals("video")) {
-                Log.d("CreateActivity", "video path: " + singleMediaPath);
-                ServerReq.uploadFile("/upload", new File(singleMediaPath), (Long len, Long sent) -> {
+                Log.d("CreateActivity", "video path: " + singleMediaUri);
+                InputStream istr;
+                try {
+                    istr = getContentResolver().openInputStream(singleMediaUri);
+                } catch (Exception e) {
+                    Log.e("CreateActivity", e.toString());
+                    return;
+                }
+                // ServerReq.uploadFile("/upload", new File(ContentProviderUtils.getPath(getBaseContext(), singleMediaUri)), (Long len, Long sent) -> {
+                ServerReq.uploadFileStream("/upload", istr, (Long len, Long sent) -> {
                     double progress = (double)sent / len;
                     // Log.d("CreateActivity", "video upload progress = " + progress);
                     ((ProgressBar) cv.findViewById(R.id.progress)).setMax(1000);
@@ -254,7 +263,7 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     Log.d("CreateActivity", "upload id = " + id);
                     ServerReq.postJson("/post/new", List.of(
-                            new Pair<>("type", "2"),
+                            new Pair<>("type", "3"),
                             new Pair<>("caption", ((EditText) createAreaView.findViewById(R.id.caption_input)).getText().toString()),
                             new Pair<>("contents", id),
                             new Pair<>("collection", String.valueOf(collection.id)),
@@ -277,12 +286,10 @@ public class CreateActivity extends AppCompatActivity {
             }
         } else if (requestCode == VIDEO_PICKER) {
             if (resultCode == RESULT_OK) {
-                Uri selectedUri = data.getData();
-                Log.d("CreateAcvitity", selectedUri.toString());
-                singleMediaPath = ContentProviderUtils.getPath(this.getBaseContext(), selectedUri);
-                Log.d("CreateAcvitity", singleMediaPath);
+                singleMediaUri = data.getData();
+                Log.d("CreateAcvitity", singleMediaUri.toString());
                 videoView.setVisibility(View.VISIBLE);
-                videoView.setVideoURI(selectedUri);
+                videoView.setVideoURI(singleMediaUri);
                 // videoView.start();
             }
         }
