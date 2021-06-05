@@ -669,6 +669,8 @@ else (async () => {
   const Vd = 2000; // (variation)
   const B = 5;     // Number of subscriptions per user (minimum)
   const Bd = 15;   // (variation)
+  const E = 10;    // Number of messages between a pair of users (minimum)
+  const Ed = 190;  // (variation)
 
   const token = Array(N);
   for (let i = 0; i < N; i++) {
@@ -826,6 +828,16 @@ else (async () => {
         {token: token[u], is_subscribe: 1}, any));
     }
   await Promise.all(promisesSubscriptions);
+
+  // Messages
+  for (let u = 0; u < N; u++)
+    for (let v = 0; v < N; v++) if (u !== v && rand() % 3 === 0) {
+      for (let e = E + rand() % Ed; e > 0; e--) {
+        await check('POST', '/message/send',
+          {token: token[u], to_user: `uu${v}`, contents: bullshit.sentence()},
+          any);
+      }
+    }
 
   console.log(token);
 
