@@ -624,6 +624,11 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('GET', '/message/latest', {token: token1}, [{unread_count: 1, _ignoreRedundant: true}])
   await check('GET', '/message/latest', {token: token2}, [{unread_count: 1, _ignoreRedundant: true}])
 
+  // System messages
+  await check('GET', '/message/with/n',
+    {token: token2, start: 1, count: 10},
+    any);
+
   console.log(`\n${pass}/${total} passed`);
 })();
 

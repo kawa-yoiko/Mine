@@ -55,22 +55,26 @@ func (m *Message) Create() error {
 	m.Timestamp = time.Now().Unix()
 	err := db.QueryRow(`INSERT INTO
 		message (timestamp, to_user_id, from_user_id, contents)
-		VALUES ($1, $2, $3, $4) RETURNING id`,
+		VALUES ($1, $2, NULLIF($3, -1), $4) RETURNING id`,
 		m.Timestamp, m.ToUser.Id, m.FromUser.Id, m.Contents,
 	).Scan(&m.Id)
 	if err != nil {
 		return err
 	}
+	extraPair := ", ($2, $1, 0)"
+	if m.FromUser.Id == -1 {
+		extraPair = ""
+	}
 	_, err = db.Exec(`INSERT INTO
 		message_pair (to_user_id, from_user_id, unread_count)
-		VALUES ($1, $2, 0), ($2, $1, 0) ON CONFLICT DO NOTHING`,
+		VALUES ($1, NULLIF($2, -1), 0)`+extraPair+` ON CONFLICT DO NOTHING`,
 		m.ToUser.Id, m.FromUser.Id)
 	if err != nil {
 		return err
 	}
 	_, err = db.Exec(`UPDATE message_pair
 		SET unread_count = unread_count + 1
-		WHERE to_user_id = $1 AND from_user_id = $2`,
+		WHERE to_user_id = $1 AND COALESCE(from_user_id, -1) = $2`,
 		m.ToUser.Id, m.FromUser.Id)
 	return err
 }
@@ -83,13 +87,15 @@ func (m *Message) fields() []interface{} {
 	}
 }
 
-func ReadMessagesBetweenUsers(fromUserId int32, toUserId int32, start int, count int) ([]map[string]interface{}, error) {
-	rows, err := db.Query(`SELECT * FROM message
-		WHERE (from_user_id = $1 AND to_user_id = $2) OR
-		      (from_user_id = $2 AND to_user_id = $1)
+func ReadMessagesBetweenUsers(selfUserId int32, otherUserId int32, start int, count int) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT
+		id, timestamp, to_user_id, COALESCE(from_user_id, -1), contents
+		FROM message
+		WHERE (COALESCE(from_user_id, -1) = $1 AND to_user_id = $2) OR
+		      (COALESCE(from_user_id, -1) = $2 AND to_user_id = $1)
 		ORDER BY timestamp DESC, id DESC
 		LIMIT $3 OFFSET $4`,
-		fromUserId, toUserId, count, start)
+		selfUserId, otherUserId, count, start)
 	if err != nil {
 		return nil, err
 	}
@@ -100,11 +106,12 @@ func ReadMessagesBetweenUsers(fromUserId int32, toUserId int32, start int, count
 		if err := rows.Scan(m.fields()[:5]...); err != nil {
 			return nil, err
 		}
-		messages = append(messages, m.ReprBrief(m.FromUser.Id == fromUserId))
+		messages = append(messages, m.ReprBrief(m.FromUser.Id == selfUserId))
 	}
 	return messages, rows.Err()
 }
 
+// Does not return system messages
 func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 	/* ERROR:  subquery must return only one column
 	rows, err := db.Query(`SELECT
@@ -124,7 +131,7 @@ func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 		  INNER JOIN message ON
 		    message.from_user_id = message_pair.from_user_id OR
 		    message.from_user_id = message_pair.to_user_id
-		  INNER JOIN mine_user from_user ON message.from_user_id = from_user.id
+		  LEFT JOIN mine_user from_user ON message.from_user_id = from_user.id
 		  INNER JOIN mine_user to_user ON message.to_user_id = to_user.id
 		WHERE message_pair.to_user_id = $1
 		ORDER BY message.timestamp DESC, message.id DESC LIMIT 1`, userId)
