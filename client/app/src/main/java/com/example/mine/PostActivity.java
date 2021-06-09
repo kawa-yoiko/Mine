@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.os.Looper;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -21,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -146,6 +149,9 @@ public class PostActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.content,
                         new PhotoViewPagerFragment(new ArrayList<>(Arrays.asList(post.getContent().split(" "))))).commit();
                 break;
+            case 3:
+                getSupportFragmentManager().beginTransaction().replace(R.id.content,
+                        new VideoPlayerFragment(Uri.parse(ServerReq.getUploadFullUrl(post.getContent())))).commit();
         }
 
         collection_text.setOnClickListener(new View.OnClickListener() {

@@ -59,6 +59,10 @@ public class ServerReq {
         }
     }
 
+    public static String getUploadFullUrl(String id) {
+        return "http://8.140.133.34:7678/upload/" + id;
+    }
+
     private static String streamToString(InputStream stream) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
