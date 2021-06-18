@@ -602,6 +602,11 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 0, count: 10}, [any, any]);
   await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 0, count: 1}, [any]);
   await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 1, count: 1}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', start: 0, count: 10}, [any, any, any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', start: 2, count: 2}, [any]);
+  await check('GET', `/search_collections`, {token: token1, tag: 'a', start: 0, count: 10}, [any]);
+  await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 0, count: 10}, [any]);
+  await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 1, count: 10}, []);
 
   // Message
   await check('POST', '/message/send',

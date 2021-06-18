@@ -51,11 +51,25 @@ func getSearchPosts(w http.ResponseWriter, r *http.Request) {
 	start, _ := strconv.Atoi(query(r, "start"))
 	count, _ := strconv.Atoi(query(r, "count"))
 
-	posts, err := models.SearchByTag(u.Id, tag, start, count)
+	posts, err := models.SearchPostsByTag(u.Id, tag, start, count)
 	if err != nil {
 		panic(err)
 	}
 	write(w, 200, posts)
+}
+
+func getSearchCollections(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+
+	tag := query(r, "tag")
+	start, _ := strconv.Atoi(query(r, "start"))
+	count, _ := strconv.Atoi(query(r, "count"))
+
+	collections, err := models.SearchCollectionsByTag(u.Id, tag, start, count)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, collections)
 }
 
 func init() {
@@ -63,4 +77,5 @@ func init() {
 	registerHandler("/discover_timeline", getDiscoverTimeline, "GET")
 	registerHandler("/star_timeline", getStarTimeline, "GET")
 	registerHandler("/search_posts", getSearchPosts, "GET")
+	registerHandler("/search_collections", getSearchCollections, "GET")
 }

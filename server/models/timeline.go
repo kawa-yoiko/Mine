@@ -81,7 +81,7 @@ func StarTimeline(userId int32, start int, count int) ([]map[string]interface{},
 	return posts, nil
 }
 
-func SearchByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
+func SearchPostsByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
 	rows, err := db.Query(
 		postSelectClauseWithBaseRel(
 			userId,
@@ -95,4 +95,19 @@ func SearchByTag(userId int32, tag string, start int, count int) ([]map[string]i
 		return nil, err
 	}
 	return postsReprBriefFromRows(rows)
+}
+
+func SearchCollectionsByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT` + collectionSelectFields() + `
+		FROM collection_tag INNER JOIN collection
+		  ON collection_tag.collection_id = collection.id
+		  WHERE collection_tag.tag = $1
+		  ORDER BY collection.id DESC
+		  LIMIT $3 OFFSET $2`,
+		tag, start, count,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return collectionsReprBriefFromRows(rows)
 }

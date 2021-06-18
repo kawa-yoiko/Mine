@@ -1,5 +1,9 @@
 package models
 
+import (
+	"database/sql"
+)
+
 type Collection struct {
 	Id          int32
 	Author      User
@@ -121,13 +125,7 @@ func (c *Collection) Read() error {
 	return nil
 }
 
-func readCollections(userId int32) ([]map[string]interface{}, error) {
-	rows, err := db.Query(`SELECT id, title, description,
-		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id)
-		FROM collection WHERE author_id = $1`, userId)
-	if err != nil {
-		return nil, err
-	}
+func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, error) {
 	defer rows.Close()
 	collections := []map[string]interface{}{}
 	for rows.Next() {
@@ -138,10 +136,24 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 		}
 		collections = append(collections, c.ReprBrief())
 	}
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 	return collections, nil
+}
+
+func collectionSelectFields() string {
+	return ` id, title, description,
+		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id) `
+}
+
+func readCollections(userId int32) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT` + collectionSelectFields() +
+		`FROM collection WHERE author_id = $1`, userId)
+	if err != nil {
+		return nil, err
+	}
+	return collectionsReprBriefFromRows(rows)
 }
 
 func (c *Collection) Subscribe(u User, add bool) error {
