@@ -374,6 +374,29 @@ if (process.env['GEN'] !== '1') (async () => {
     {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
   ])
 
+  // Hot comments
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    // Currently empty
+  ])
+  await check('POST', `/post/${pid1}/comment/new`, {
+    token: token2,
+    reply_to: -1,
+    contents: 'Maybe comment',
+  }, {id: any})
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    // Still empty since no upvote
+  ])
+  await check('POST', `/post/${pid1}/comment/${cid1}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1});
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    {_ignoreRedundant: true, id: cid1},
+  ])
+
   // Upvote
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
@@ -408,7 +431,7 @@ if (process.env['GEN'] !== '1') (async () => {
     collection: {id: lid1, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
-    comment_count: 4,
+    comment_count: 5,
     star_count: 2,
     my_star: true,
     my_upvote: true,
