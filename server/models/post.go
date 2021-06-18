@@ -177,7 +177,7 @@ func (p *Post) Create() error {
 }
 
 // TODO: Optimize comment counting
-func postSelectClause(userId int32) string {
+func postSelectClauseWithBaseRel(userId int32, baseRel string) string {
 	u := strconv.FormatInt(int64(userId), 10)
 	return `SELECT
 		post.*, mine_user.nickname, mine_user.avatar, collection.title,
@@ -187,9 +187,13 @@ func postSelectClause(userId int32) string {
 		(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id),
 		(SELECT COUNT (*) <> 0 FROM post_upvote WHERE post_upvote.post_id = post.id AND post_upvote.user_id = ` + u + `),
 		(SELECT COUNT (*) <> 0 FROM post_star WHERE post_star.post_id = post.id AND post_star.user_id = ` + u + `)
-		FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
+		FROM ` + baseRel + ` INNER JOIN mine_user ON post.author_id = mine_user.id
 		  INNER JOIN collection ON post.collection_id = collection.id
 	`
+}
+
+func postSelectClause(userId int32) string {
+	return postSelectClauseWithBaseRel(userId, "post")
 }
 
 func (p *Post) fields() []interface{} {

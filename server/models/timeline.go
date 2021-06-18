@@ -80,3 +80,19 @@ func StarTimeline(userId int32, start int, count int) ([]map[string]interface{},
 	}
 	return posts, nil
 }
+
+func SearchByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
+	rows, err := db.Query(
+		postSelectClauseWithBaseRel(
+			userId,
+			"post_tag INNER JOIN post ON post_tag.post_id = post.id",
+		)+`WHERE post_tag.tag = $1
+		  ORDER BY post.timestamp DESC
+		  LIMIT $3 OFFSET $2`,
+		tag, start, count,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return postsReprBriefFromRows(rows)
+}

@@ -44,8 +44,23 @@ func getStarTimeline(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, posts)
 }
 
+func getSearchPosts(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+
+	tag := query(r, "tag")
+	start, _ := strconv.Atoi(query(r, "start"))
+	count, _ := strconv.Atoi(query(r, "count"))
+
+	posts, err := models.SearchByTag(u.Id, tag, start, count)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, posts)
+}
+
 func init() {
 	registerHandler("/subscription_timeline", getSubscriptionTimeline, "GET")
 	registerHandler("/discover_timeline", getDiscoverTimeline, "GET")
 	registerHandler("/star_timeline", getStarTimeline, "GET")
+	registerHandler("/search_posts", getSearchPosts, "GET")
 }
