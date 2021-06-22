@@ -55,8 +55,8 @@ public class CreateActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ArrayList<ImageItem> imageItems = new ArrayList<>(0);
     WidthEqualsHeightImageView addImage;
+    ImageButton addMediaButton;
     Uri singleMediaUri;
-    VideoView videoView;
     private static int IMAGE_PICKER = 0;
     private static int VIDEO_PICKER = 2;
 
@@ -104,8 +104,8 @@ public class CreateActivity extends AppCompatActivity {
 //            recyclerView.setAdapter(new ImagePickerAdapter(imageItems));
         } else if (createType.equals("video")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_video, null);
-            this.videoView = (VideoView)createAreaView.findViewById(R.id.video_view);
-            ((ImageButton) createAreaView.findViewById(R.id.btn_select)).setOnClickListener((View v) -> {
+            addMediaButton = (ImageButton) createAreaView.findViewById(R.id.btn_select);
+            addMediaButton.setOnClickListener((View v) -> {
                 Intent videoIntent = new Intent();
                 videoIntent.setType("video/*");
                 videoIntent.setAction(Intent.ACTION_GET_CONTENT);
@@ -288,9 +288,9 @@ public class CreateActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 singleMediaUri = data.getData();
                 Log.d("CreateAcvitity", singleMediaUri.toString());
-                videoView.setVisibility(View.VISIBLE);
-                videoView.setVideoURI(singleMediaUri);
-                // videoView.start();
+                addMediaButton.setVisibility(View.GONE);
+                getSupportFragmentManager().beginTransaction().replace(R.id.video_view,
+                        new VideoPlayerFragment(singleMediaUri)).commit();
             }
         }
     }
