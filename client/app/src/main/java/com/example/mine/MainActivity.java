@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 //        Window window = this.getWindow();
 //        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        ServerReq.login("uu2", "aaaaaa2", (Boolean success) -> {
+        ServerReq.login("uu4", "aaaaaa4", (Boolean success) -> {
             android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
             this.runOnUiThread(this::setUpAllViews);
         });

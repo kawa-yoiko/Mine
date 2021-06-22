@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
@@ -13,6 +15,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -36,6 +39,7 @@ public class SettingActivity extends AppCompatActivity {
     private ImageItem imageItem;
     private EditText nicknameEdit;
     private EditText passwordEdit;
+    private EditText passwordConfirmEdit;
     private EditText introductionEdit;
     private String nickname;
     private String password;
@@ -53,18 +57,20 @@ public class SettingActivity extends AppCompatActivity {
         ImagePicker imagePicker = imagePickerGenerator.getImagePicker();
 
         View setAvatar = findViewById(R.id.set_avatar);
-        setAvatar.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener setAvatarListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SettingActivity.this, ImageGridActivity.class);
                 startActivityForResult(intent, IMAGE_PICKER);
                 isAvatarChanged = true;
             }
-        });
+        };
+        setAvatar.setOnClickListener(setAvatarListener);
 
         avatar_img = findViewById(R.id.avatar);
 
         passwordEdit = findViewById(R.id.password);
+        passwordConfirmEdit = findViewById(R.id.password_confirm);
         nicknameEdit = findViewById(R.id.nickname);
         introductionEdit = findViewById(R.id.introduction);
         password = passwordEdit.getText().toString();
@@ -87,22 +93,6 @@ public class SettingActivity extends AppCompatActivity {
                 }
             }
         });
-        nicknameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    nickname = nicknameEdit.getText().toString();
-                }
-            }
-        });
-        introductionEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    introduction = introductionEdit.getText().toString();
-                }
-            }
-        });
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener((View v) -> {
@@ -111,19 +101,38 @@ public class SettingActivity extends AppCompatActivity {
             passwordEdit.setEnabled(false);
             introductionEdit.setEnabled(false);
             saveButton.setEnabled(false);
-            ServerReq.uploadFile("/upload/avatar", new File(imageItem.path), (Long len, Long sent) -> {
-            }, (JSONObject obj) -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            Runnable setTextualProfile = () ->
                 ServerReq.postJson("/whoami/edit", List.of(
-                        new Pair<>("signature", introduction)
-                ), (JSONObject objUser) -> {
+                        new Pair<>("nickname", nicknameEdit.getText().toString()),
+                        new Pair<>("signature", introductionEdit.getText().toString())
+                ), (JSONObject objWhoAmI) -> handler.post(() -> {
                     try {
-                        ServerReq.updateMyInfo(objUser);
+                        int errorCode = objWhoAmI.getInt("error");
+                        if (errorCode != 0) {
+                            setAvatar.setOnClickListener(setAvatarListener);
+                            nicknameEdit.setEnabled(true);
+                            passwordEdit.setEnabled(true);
+                            passwordConfirmEdit.setEnabled(true);
+                            introductionEdit.setEnabled(true);
+                            saveButton.setEnabled(true);
+                            Toast.makeText(this,
+                                    (errorCode == 1 ? "用户名过长或过短" :
+                                            errorCode == 2 ? "用户名已被占用" : "未知错误"),
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        ServerReq.updateMyInfo(objWhoAmI.getJSONObject("user"));
                     } catch (Exception e) {
                         Log.e("SettingActivity", e.toString());
                     }
                     finish();
-                });
-            });
+                }));
+            if (imageItem != null)
+                ServerReq.uploadFile("/upload/avatar", new File(imageItem.path),
+                        (Long len, Long sent) -> {},
+                        (JSONObject obj) -> setTextualProfile.run());
+            else setTextualProfile.run();
         });
     }
 
