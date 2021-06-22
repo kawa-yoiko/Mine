@@ -106,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         case R.id.my:
                             setCurrentFragment(myFragment);
-                            toolbar.setVisibility(View.INVISIBLE);
+                            toolbar.setVisibility(View.VISIBLE);
+                            titleView.setText("我的");
                             return true;
                     }
                     return false;
