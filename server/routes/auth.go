@@ -7,6 +7,7 @@ import (
 
 	"database/sql"
 	"errors"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 )
@@ -120,6 +121,15 @@ func getWhoAmI(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, u.Repr())
 }
 
+func getWhoIs(w http.ResponseWriter, r *http.Request) {
+	nickname := mux.Vars(r)["nickname"]
+	u := models.User{Nickname: nickname}
+	if err := u.ReadByNickname(); err != nil {
+		panic(err)
+	}
+	write(w, 200, u.Repr())
+}
+
 func postWhoAmIEdit(w http.ResponseWriter, r *http.Request) {
 	u := mustAuth(r)
 
@@ -140,5 +150,6 @@ func init() {
 	registerHandler("/signup", postSignup, "POST")
 	registerHandler("/login", postLogin, "POST")
 	registerHandler("/whoami", getWhoAmI, "GET")
+	registerHandler("/whois/{nickname}", getWhoIs, "GET")
 	registerHandler("/whoami/edit", postWhoAmIEdit, "POST")
 }

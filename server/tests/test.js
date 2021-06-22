@@ -203,44 +203,46 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
   let u1 = await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
     token: any,
-    user: {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]}
+    user: {nickname: 'kayuyuko', avatar: '', signature: '', posts: [], collections: [any]}
   }, 200)
   let token1 = u1.token
   await check('GET', '/whoami', {token: '123123'}, undefined, 401)
   await check('GET', '/whoami', {token: token1},
-    {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
+    {nickname: 'kayuyuko', avatar: '', signature: '', posts: [], collections: [any]})
   let u2 = await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
     token: any,
-    user: {nickname: 'kurikoneko', avatar: '', signature: '', collections: [any]}
+    user: {nickname: 'kurikoneko', avatar: '', signature: '', posts: [], collections: [any]}
   }, 200)
   let token2 = u2.token
 
   // User modification
   await check('POST', '/whoami/edit',
     {token: token2, nickname: 'kurikoneko1', signature: bio2},
-    {error: 0, user: {nickname: 'kurikoneko1', avatar: '', signature: bio2, collections: [any]}})
+    {error: 0, user: {nickname: 'kurikoneko1', avatar: '', signature: bio2, posts: [], collections: [any]}})
   await check('GET', '/whoami', {token: token2},
-    {nickname: 'kurikoneko1', avatar: '', signature: bio2, collections: [any]})
+    {nickname: 'kurikoneko1', avatar: '', signature: bio2, posts: [], collections: [any]})
   await check('POST', '/whoami/edit',
     {token: token2, nickname: 'kurikoneko', signature: bio2},
-    {error: 0, user: {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]}})
+    {error: 0, user: {nickname: 'kurikoneko', avatar: '', signature: bio2, posts: [], collections: [any]}})
   await check('POST', '/whoami/edit',
     {token: token1, nickname: 'kayuyuko', signature: bio1},
-    {error: 0, user: {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]}})
+    {error: 0, user: {nickname: 'kayuyuko', avatar: '', signature: bio1, posts: [], collections: [any]}})
   await check('POST', '/whoami/edit',
     {token: token1, nickname: 'k', signature: bio1},
     {error: 1}, 400)
   await check('POST', '/whoami/edit',
     {token: token1, nickname: 'kurikoneko', signature: bio1},
     {error: 2}, 400)
+  await check('GET', '/whois/kurikoneko', {},
+    {nickname: 'kurikoneko', avatar: '', signature: bio2, posts: [], collections: [any]})
 
   // Avatar
   let avt1 = (await check('PUT', '/upload/avatar',
     {token: token1, file: 'avt1.png'},
-    {nickname: 'kayuyuko', avatar: any, signature: bio1, collections: [any]})).avatar
+    {nickname: 'kayuyuko', avatar: any, signature: bio1, posts: [], collections: [any]})).avatar
   let avt2 = (await check('PUT', '/upload/avatar',
     {token: token2, file: 'avt2.png'},
-    {nickname: 'kurikoneko', avatar: any, signature: bio2, collections: [any]})).avatar
+    {nickname: 'kurikoneko', avatar: any, signature: bio2, posts: [], collections: [any]})).avatar
 
   let u2img1 = (await check('PUT', '/upload',
     {token: token2, file: 'post1.png'},

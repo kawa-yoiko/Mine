@@ -39,6 +39,7 @@ func (u *User) Repr() map[string]interface{} {
 		"nickname":    u.Nickname,
 		"avatar":      u.Avatar,
 		"signature":   u.Signature,
+		"posts":       []string{},
 		"collections": collections,
 	}
 }
