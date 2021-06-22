@@ -3,14 +3,19 @@ package com.example.mine;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -19,7 +24,11 @@ import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.view.CropImageView;
 
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SettingActivity extends AppCompatActivity {
     private static int IMAGE_PICKER = 0;
@@ -33,6 +42,7 @@ public class SettingActivity extends AppCompatActivity {
     private String introduction;
     private boolean isAvatarChanged = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,14 +71,18 @@ public class SettingActivity extends AppCompatActivity {
         nickname = nicknameEdit.getText().toString();
         introduction = introductionEdit.getText().toString();
 
+        ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(), avatar_img);
+        nicknameEdit.setText(ServerReq.getMyNickname());
+        introductionEdit.setText(ServerReq.getMyBio());
+
         passwordEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    // passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 }
                 else {
-                    passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    // passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     password = passwordEdit.getText().toString();
                 }
             }
@@ -90,6 +104,27 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
+        Button saveButton = findViewById(R.id.save_button);
+        saveButton.setOnClickListener((View v) -> {
+            setAvatar.setOnClickListener(null);
+            nicknameEdit.setEnabled(false);
+            passwordEdit.setEnabled(false);
+            introductionEdit.setEnabled(false);
+            saveButton.setEnabled(false);
+            ServerReq.uploadFile("/upload/avatar", new File(imageItem.path), (Long len, Long sent) -> {
+            }, (JSONObject obj) -> {
+                ServerReq.postJson("/whoami/edit", List.of(
+                        new Pair<>("signature", introduction)
+                ), (JSONObject objUser) -> {
+                    try {
+                        ServerReq.updateMyInfo(objUser);
+                    } catch (Exception e) {
+                        Log.e("SettingActivity", e.toString());
+                    }
+                    finish();
+                });
+            });
+        });
     }
 
     @Override

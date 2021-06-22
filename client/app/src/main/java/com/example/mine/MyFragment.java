@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ import okhttp3.*;
 
 public class MyFragment  extends Fragment {
     private PopupWindow popupWindow;
+    private static final int REQUEST_ACCOUNT_SETTINGS = 1;
     public MyFragment() {}
 
     @Override
@@ -99,7 +101,7 @@ public class MyFragment  extends Fragment {
 
         ( view.findViewById(R.id.settings_button)).setOnClickListener((View v) -> {
             Intent intent = new Intent(getActivity(), SettingActivity.class);
-            getActivity().startActivity(intent);
+            this.startActivityForResult(intent, REQUEST_ACCOUNT_SETTINGS);
         });
 
         ( view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
@@ -115,6 +117,8 @@ public class MyFragment  extends Fragment {
                 getActivity().startActivity(intent);
             }
         });
+
+        updateUserInfoDisplay();
     }
 
     @Override
@@ -122,5 +126,20 @@ public class MyFragment  extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my, container, false);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ACCOUNT_SETTINGS) {
+            this.updateUserInfoDisplay();
+        }
+    }
+
+    private void updateUserInfoDisplay() {
+        ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(),
+                getView().findViewById(R.id.avatar));
+        ((TextView) getView().findViewById(R.id.nickname)).setText(ServerReq.getMyNickname());
+        ((TextView) getView().findViewById(R.id.signature)).setText(ServerReq.getMyBio());
     }
 }

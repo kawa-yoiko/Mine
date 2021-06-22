@@ -9,6 +9,7 @@
     android:background="@color/grey_0"
     >
     <LinearLayout
+        android:id="@+id/edit_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -63,15 +64,15 @@
                 android:textSize="16dp"
                 android:layout_centerVertical="true"
                 android:text="用户名"></TextView>
+
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="kuriko"
-                android:layout_marginLeft="70dp"
-                android:textSize="16dp"
-                android:background="#00FFFFFF"
                 android:id="@+id/nickname"
-                ></EditText>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:background="#00FFFFFF"
+                android:text="kuriko"
+                android:textSize="16dp"></EditText>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -86,16 +87,34 @@
                 android:textSize="16dp"
                 android:layout_centerVertical="true"
                 android:text="密码"></TextView>
+
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="123456"
-                android:inputType="textPassword"
-                android:layout_marginLeft="70dp"
-                android:textSize="16dp"
-                android:background="#00FFFFFF"
                 android:id="@+id/password"
-                ></EditText>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:background="#00FFFFFF"
+                android:inputType="textPassword"
+                android:hint="若不修改则留空"
+                android:text=""
+                android:textSize="16dp"></EditText>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="15dp"
+            android:paddingHorizontal="20dp"
+            >
+            <EditText
+                android:id="@+id/password_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:background="#00FFFFFF"
+                android:inputType="textPassword"
+                android:hint="重复输入一次"
+                android:text=""
+                android:textSize="16dp"></EditText>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -110,17 +129,35 @@
                 android:textSize="16dp"
 
                 android:text="简介"></TextView>
+
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="我爱吃栗子红红火火"
-                android:gravity="top"
-                android:layout_marginLeft="70dp"
-                android:textSize="16dp"
-                android:background="#00FFFFFF"
-                android:minHeight="100dp"
                 android:id="@+id/introduction"
-                ></EditText>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:background="#00FFFFFF"
+                android:gravity="top"
+                android:minHeight="100dp"
+                android:text="我爱吃栗子红红火火"
+                android:textSize="16dp"></EditText>
         </RelativeLayout>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/save_button"
+        app:layout_constraintTop_toBottomOf="@id/edit_container"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="25dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/bt_background_yellow"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingVertical="8dp"
+        android:text="保存"
+        android:textColor="#FDFDFD"
+        android:textSize="16dp"></Button>
 </androidx.constraintlayout.widget.ConstraintLayout>
