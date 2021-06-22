@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"strconv"
+	"time"
 )
 
 func postsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, error) {
@@ -81,15 +83,36 @@ func StarTimeline(userId int32, start int, count int) ([]map[string]interface{},
 	return posts, nil
 }
 
-func SearchPostsByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
+func SearchPostsByTag(userId int32, tag string, start int, count int, ty string) ([]map[string]interface{}, error) {
+	queryArgs := []interface{}{tag, start, count}
+	queryFilter := ""
+	queryOrder := ""
+	switch ty {
+	case "new":
+		queryOrder = "post.timestamp DESC"
+	case "day":
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryOrder = "post_upvote_count DESC"
+	case "month":
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryOrder = "post_upvote_count DESC"
+	case "season":
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryOrder = "post_upvote_count DESC"
+	case "all":
+		queryOrder = "post_upvote_count DESC"
+	default:
+		return nil, CheckedError{400}
+	}
+
 	rows, err := db.Query(
 		postSelectClauseWithBaseRel(
 			userId,
 			"post_tag INNER JOIN post ON post_tag.post_id = post.id",
-		)+`WHERE post_tag.tag = $1
-		  ORDER BY post.timestamp DESC
-		  LIMIT $3 OFFSET $2`,
-		tag, start, count,
+		)+" WHERE post_tag.tag = $1 "+queryFilter+
+			" ORDER BY "+queryOrder+
+			" LIMIT $3 OFFSET $2",
+		queryArgs...,
 	)
 	if err != nil {
 		return nil, err
@@ -98,7 +121,7 @@ func SearchPostsByTag(userId int32, tag string, start int, count int) ([]map[str
 }
 
 func SearchCollectionsByTag(userId int32, tag string, start int, count int) ([]map[string]interface{}, error) {
-	rows, err := db.Query(`SELECT` + collectionSelectFields() + `
+	rows, err := db.Query(`SELECT`+collectionSelectFields()+`
 		FROM collection_tag INNER JOIN collection
 		  ON collection_tag.collection_id = collection.id
 		  WHERE collection_tag.tag = $1

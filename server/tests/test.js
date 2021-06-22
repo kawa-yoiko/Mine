@@ -599,11 +599,24 @@ if (process.env['GEN'] !== '1') (async () => {
   ])
 
   // Search by tag
-  await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 0, count: 10}, [any, any]);
-  await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 0, count: 1}, [any]);
-  await check('GET', `/search_posts`, {token: token1, tag: 'd', start: 1, count: 1}, [any]);
-  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', start: 0, count: 10}, [any, any, any]);
-  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', start: 2, count: 2}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 10}, [any, any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 1}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 1, count: 1}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'new', start: 0, count: 10}, [any, any, any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'new', start: 2, count: 2}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'day', start: 0, count: 10}, [
+    {_ignoreRedundant: true, upvote_count: 1},
+    {_ignoreRedundant: true, upvote_count: 0},
+    {_ignoreRedundant: true, upvote_count: 0},
+  ]);
+  await check('POST', `/post/${pids[2]}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pids[2]}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 2})
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'day', start: 0, count: 10}, [
+    {_ignoreRedundant: true, upvote_count: 2},
+    {_ignoreRedundant: true, upvote_count: 1},
+    {_ignoreRedundant: true, upvote_count: 0},
+  ]);
+
   await check('GET', `/search_collections`, {token: token1, tag: 'a', start: 0, count: 10}, [any]);
   await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 0, count: 10}, [any]);
   await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 1, count: 10}, []);

@@ -182,7 +182,7 @@ func postSelectClauseWithBaseRel(userId int32, baseRel string) string {
 	return `SELECT
 		post.*, mine_user.nickname, mine_user.avatar, collection.title,
 		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id),
-		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
+		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id) AS post_upvote_count,
 		(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
 		(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id),
 		(SELECT COUNT (*) <> 0 FROM post_upvote WHERE post_upvote.post_id = post.id AND post_upvote.user_id = ` + u + `),

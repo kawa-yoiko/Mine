@@ -50,8 +50,9 @@ func getSearchPosts(w http.ResponseWriter, r *http.Request) {
 	tag := query(r, "tag")
 	start, _ := strconv.Atoi(query(r, "start"))
 	count, _ := strconv.Atoi(query(r, "count"))
+	ty := query(r, "type")
 
-	posts, err := models.SearchPostsByTag(u.Id, tag, start, count)
+	posts, err := models.SearchPostsByTag(u.Id, tag, start, count, ty)
 	if err != nil {
 		panic(err)
 	}

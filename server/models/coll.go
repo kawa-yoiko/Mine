@@ -148,7 +148,7 @@ func collectionSelectFields() string {
 }
 
 func readCollections(userId int32) ([]map[string]interface{}, error) {
-	rows, err := db.Query(`SELECT` + collectionSelectFields() +
+	rows, err := db.Query(`SELECT`+collectionSelectFields()+
 		`FROM collection WHERE author_id = $1`, userId)
 	if err != nil {
 		return nil, err
