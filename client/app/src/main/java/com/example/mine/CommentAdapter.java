@@ -67,7 +67,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 item.findViewById(R.id.flower_button),
                 item.findViewById(R.id.flower_icon),
                 item.findViewById(R.id.flower_num),
-                R.drawable.flower_monochrome, R.drawable.flower, R.drawable.flower_semi,
+                R.drawable.flower_monochrome, R.drawable.flower3, R.drawable.flower_semi,
                 "/post/" + this.postId + "/comment/" + comment.id + "/upvote",
                 "upvote");
         toggleFlower.setState(comment.myUpvote ? 1 : 0, comment.getFlowerNum());

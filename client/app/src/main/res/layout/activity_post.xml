@@ -29,6 +29,39 @@
                     android:layout_height="wrap_content"></FrameLayout>
 
                 <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp">
+
+                    <ImageView
+                        android:id="@+id/hot_comment_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="10dp"
+                        app:srcCompat="@drawable/star1"></ImageView>
+
+                    <TextView
+                        android:id="@+id/hot_comment_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/hot_comment_icon"
+                        android:layout_marginLeft="6dp"
+                        android:text="热评"
+                        android:textSize="18dp"
+                        android:textStyle="bold"></TextView>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/hot_comment_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/hot_comment_text"
+                        android:layout_marginTop="12dp"
+                        >
+                    </androidx.recyclerview.widget.RecyclerView>
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -39,7 +72,7 @@
                         android:id="@+id/comment_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="热评"
+                        android:text="全部评论"
                         android:textSize="18dp"
                         android:textStyle="bold"></TextView>
 
@@ -48,7 +81,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="3dp"
+                        android:layout_marginLeft="6dp"
                         android:layout_toRightOf="@+id/comment_text"
                         android:text="(23)"
                         android:textSize="14dp"></TextView>

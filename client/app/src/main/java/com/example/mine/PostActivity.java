@@ -28,18 +28,23 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PostActivity extends AppCompatActivity {
     private ViewGroup fView;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +54,31 @@ public class PostActivity extends AppCompatActivity {
         View postView = getPostView(post);
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
+
         CommentFragment commentFragment = new CommentFragment(post.id, findViewById(R.id.post_content_heading));
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
         TextView comment_num_text = findViewById(R.id.comment_num);
-        comment_num_text.setText(String.valueOf(post.getComment_num()));
+        comment_num_text.setText("(" + post.getComment_num() + ")");
+
+        // Hot comments section
+        LinkedList<Comment> hotComments = new LinkedList<>();
+        CommentAdapter hotCommentsAdapter = new CommentAdapter(post.id, hotComments);
+        RecyclerView hotCommentsView = findViewById(R.id.hot_comment_list);
+        hotCommentsView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+        hotCommentsView.setAdapter(hotCommentsAdapter);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        ServerReq.getJsonArray("/post/" + post.id + "/comments/hot", (JSONArray arr) -> {
+            try {
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    hotComments.add(new Comment(obj));
+                }
+                hotCommentsAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                Log.e("PostActivity", e.toString());
+            }
+        });
 
         ImageView flowerIcon = findViewById(R.id.flower_icon);
         ImageView commentButton = findViewById(R.id.comment_button);
@@ -66,7 +92,7 @@ public class PostActivity extends AppCompatActivity {
                 findViewById(R.id.flower_button),
                 findViewById(R.id.flower_icon),
                 findViewById(R.id.flower_num),
-                R.drawable.flower_monochrome, R.drawable.flower, R.drawable.flower_semi,
+                R.drawable.flower, R.drawable.flower, R.drawable.flower_semi,
                 "/post/" + post.id + "/upvote",
                 "upvote");
         toggleFlower.setState(post.myUpvote ? 1 : 0, post.getFlower_num());
@@ -76,7 +102,7 @@ public class PostActivity extends AppCompatActivity {
                 findViewById(R.id.star_button),
                 findViewById(R.id.star_icon),
                 findViewById(R.id.star_num),
-                R.drawable.star_monochrome, R.drawable.star, R.drawable.star_semi,
+                R.drawable.star_monochrome, R.drawable.star, R.drawable.star,
                 "/post/" + post.id + "/star",
                 "star");
         toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());
