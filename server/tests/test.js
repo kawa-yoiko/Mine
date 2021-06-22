@@ -296,6 +296,15 @@ if (process.env['GEN'] !== '1') (async () => {
     tags: 'tag1,tag2',
   }, undefined, 403)
 
+  await check('GET', '/whois/kayuyuko', {}, {
+    nickname: 'kayuyuko', avatar: any, signature: bio1,
+    posts: [{id: any, timestamp: any, type: 0, caption: any, contents: any}], collections: [any]
+  })
+  await check('GET', '/whois/kurikoneko', {}, {
+    nickname: 'kurikoneko', avatar: any, signature: bio2,
+    posts: [{id: any, timestamp: any, type: 1, contents: any}], collections: [any]
+  })
+
   // Comments
   let cid1 = (await check('POST', `/post/${pid1}/comment/new`, {
     token: token2,
@@ -463,7 +472,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: pid1, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
+      {id: pid1, timestamp: any, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
     ],
     tags: [],
     subscription_count: 0,
@@ -473,12 +482,12 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[1], timestamp: any, type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[3], timestamp: any, type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 0,
@@ -511,10 +520,10 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 0,
@@ -524,8 +533,8 @@ if (process.env['GEN'] !== '1') (async () => {
     title: 'Collection',
     description: 'A collection',
     posts: [
-      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[1], timestamp: any, type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[3], timestamp: any, type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
     ],
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
@@ -555,10 +564,10 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 1,

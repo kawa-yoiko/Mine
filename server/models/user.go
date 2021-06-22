@@ -31,6 +31,10 @@ func init() {
 }
 
 func (u *User) Repr() map[string]interface{} {
+	posts, err := readPostsOutline(u.Id)
+	if err != nil {
+		panic(err)
+	}
 	collections, err := readCollections(u.Id)
 	if err != nil {
 		panic(err)
@@ -39,7 +43,7 @@ func (u *User) Repr() map[string]interface{} {
 		"nickname":    u.Nickname,
 		"avatar":      u.Avatar,
 		"signature":   u.Signature,
-		"posts":       []string{},
+		"posts":       posts,
 		"collections": collections,
 	}
 }

@@ -133,9 +133,10 @@ func (p *Post) ReprBrief() map[string]interface{} {
 
 func (p *Post) ReprOutline() map[string]interface{} {
 	ret := map[string]interface{}{
-		"id":       p.Id,
-		"type":     p.Type,
-		"contents": p.truncatedContents(100),
+		"id":        p.Id,
+		"timestamp": p.Timestamp,
+		"type":      p.Type,
+		"contents":  p.truncatedContents(100),
 	}
 	if p.Type == 0 {
 		ret["caption"] = p.Caption
@@ -222,6 +223,25 @@ func (p *Post) Read(userId int32) error {
 	}
 
 	return nil
+}
+
+func readPostsOutline(userId int32) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT id, timestamp, type, caption, contents FROM post
+		WHERE author_id = $1`, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	posts := []map[string]interface{}{}
+	for rows.Next() {
+		p := Post{}
+		err := rows.Scan(&p.Id, &p.Timestamp, &p.Type, &p.Caption, &p.Contents)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p.ReprOutline())
+	}
+	return posts, rows.Err()
 }
 
 func (p *Post) Upvote(u User, add bool) error {
