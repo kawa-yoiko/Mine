@@ -11,6 +11,7 @@ public class MessageRecord {
     private String messageNum;
     private String date;
     private String avatar;
+    private int messageId;
 
     public MessageRecord(String username, String content, String messageNum, String date, String avatar) {
         this.username = username;
@@ -18,6 +19,7 @@ public class MessageRecord {
         this.messageNum = messageNum;
         this.date = date;
         this.avatar = avatar;
+        this.messageId = -1;
     }
 
     public MessageRecord(JSONObject obj) {
@@ -32,6 +34,7 @@ public class MessageRecord {
             this.content = obj.getString("contents");
             this.messageNum = String.valueOf(obj.getInt("unread_count"));
             this.date = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
+            this.messageId = obj.getInt("id");
         } catch (Exception e) {
             Log.e("MessageRecord", e.toString());
         }
@@ -55,5 +58,9 @@ public class MessageRecord {
 
     public String getUsername() {
         return username;
+    }
+
+    public int getMessageId() {
+        return messageId;
     }
 }

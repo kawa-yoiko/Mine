@@ -53,11 +53,12 @@ public class ChatActivity extends AppCompatActivity {
                 for (int i = 0; i < arr.length(); i++)
                     chats.add(new Chat(arr.getJSONObject(i)));
                 adapter.notifyDataSetChanged();
-                recyclerView.smoothScrollToPosition(0);
+                recyclerView.scrollToPosition(0);
             } catch (Exception e) {
                 Log.e("ChatActivity", e.toString());
             }
         }));
+        ServerReq.post("/message/read/" + otherNickname, List.of(), (String s) -> {});
 
         EditText commentEdit = findViewById(R.id.comment_edit);
         Button commentButton = findViewById(R.id.comment_button);

@@ -9,22 +9,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
 
 public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdapter.MessageRecordViewHolder> {
     private LinkedList<MessageRecord> data;
+    private final Fragment fragment;
 
     public static class MessageRecordViewHolder extends RecyclerView.ViewHolder {
+        public String avatar = "";
         public MessageRecordViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }
 
-    public MessageRecordAdapter(LinkedList<MessageRecord> data)
-    {
+    public MessageRecordAdapter(LinkedList<MessageRecord> data, Fragment fragment) {
         this.data = data;
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -51,7 +54,11 @@ public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdap
             messageNumText.setText(messageNum);
         }
         ImageView avatarImage = item.findViewById(R.id.avatar);
-        ServerReq.Utils.loadImage("/upload/" + messageRecord.getAvatar(), avatarImage);
+        String avatar = messageRecord.getAvatar();
+        if (!holder.avatar.equals(avatar)) {
+            ServerReq.Utils.loadImage("/upload/" + avatar, avatarImage);
+            holder.avatar = avatar;
+        }
         TextView dateText = item.findViewById(R.id.date);
         dateText.setText(messageRecord.getDate());
 
@@ -62,7 +69,7 @@ public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdap
                 intent.setClass(v.getContext(), ChatActivity.class);
                 intent.putExtra("username", messageRecord.getUsername());
                 intent.putExtra("other_avatar", messageRecord.getAvatar());
-                v.getContext().startActivity(intent);
+                fragment.startActivityForResult(intent, 0);
             }
         });
     }
