@@ -46,6 +46,7 @@ public class ServerReq {
     static OkHttpClient client;
 
     static String token;
+    static String myNickname, myAvatar;
 
     static {
         client = new OkHttpClient();
@@ -191,6 +192,8 @@ public class ServerReq {
             } else {
                 try {
                     token = obj.getString("token");
+                    myNickname = nickname;
+                    myAvatar = obj.getJSONObject("user").getString("avatar");
                     callbackFn.accept(true);
                 } catch (JSONException e) {
                     callbackFn.accept(false);
@@ -198,6 +201,9 @@ public class ServerReq {
             }
         });
     }
+
+    public static String getMyNickname() { return myNickname; }
+    public static String getMyAvatar() { return myAvatar; }
 
     // https://github.com/square/okhttp/blob/master/samples/guide/src/main/java/okhttp3/recipes/Progress.java
     private static class ProgressRequestBody extends RequestBody {

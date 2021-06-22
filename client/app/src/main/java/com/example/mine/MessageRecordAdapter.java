@@ -51,7 +51,7 @@ public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdap
             messageNumText.setText(messageNum);
         }
         ImageView avatarImage = item.findViewById(R.id.avatar);
-        avatarImage.setImageResource(messageRecord.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" + messageRecord.getAvatar(), avatarImage);
         TextView dateText = item.findViewById(R.id.date);
         dateText.setText(messageRecord.getDate());
 
@@ -61,6 +61,7 @@ public class MessageRecordAdapter extends RecyclerView.Adapter<MessageRecordAdap
                 Intent intent = new Intent();
                 intent.setClass(v.getContext(), ChatActivity.class);
                 intent.putExtra("username", messageRecord.getUsername());
+                intent.putExtra("other_avatar", messageRecord.getAvatar());
                 v.getContext().startActivity(intent);
             }
         });

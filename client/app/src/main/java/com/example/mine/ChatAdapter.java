@@ -16,6 +16,7 @@ import com.example.mine.R;
 import java.util.LinkedList;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private String otherAvatar;
     private LinkedList<Chat> data;
     private int LEFT = 0;
     private int RIGHT = 1;
@@ -31,8 +32,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
         }
     }
-    public ChatAdapter(LinkedList<Chat> data)
-    {
+    public ChatAdapter(String otherAvatar, LinkedList<Chat> data) {
+        this.otherAvatar = otherAvatar;
         this.data = data;
     }
 
@@ -69,7 +70,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView dateText = item.findViewById(R.id.date);
         dateText.setText(chat.getDate());
         ImageView avatarImage = item.findViewById(R.id.avatar);
-        avatarImage.setImageResource(chat.getAvatar());
+        ServerReq.Utils.loadImage("/upload/" +
+                (chat.getIsUserOwn() == 1 ? ServerReq.getMyAvatar() : this.otherAvatar), avatarImage);
     }
 
     @Override

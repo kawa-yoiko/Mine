@@ -1,6 +1,10 @@
 package com.example.mine;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +12,12 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONArray;
 
 import java.util.LinkedList;
 
@@ -24,15 +31,11 @@ public class MessageRecordFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LinkedList<MessageRecord> records = new LinkedList<>();
-
-        records.add(new MessageRecord("kuriko", "粥粥", "1", "1h前", R.drawable.luoxiaohei));
-        records.add(new MessageRecord("kuriko", "ldzldzldzldzldz", "0", "2h前", R.drawable.luoxiaohei));
-        records.add(new MessageRecord("栗子", "中午去哪吃", "1", "3h前", R.drawable.luoxiaohei));
-        records.add(new MessageRecord("kuriko", "不想起床", "2", "3h前", R.drawable.luoxiaohei));
 
         recyclerView = view.findViewById(R.id.recyclerview);
 
@@ -48,6 +51,18 @@ public class MessageRecordFragment extends Fragment {
         MessageRecordAdapter adapter = new MessageRecordAdapter(records);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        ServerReq.getJsonArray("/message/latest", (JSONArray arr) -> handler.post(() -> {
+            try {
+                for (int i = 0; i < arr.length(); i++) {
+                    records.add(new MessageRecord(arr.getJSONObject(i)));
+                }
+                adapter.notifyItemRangeInserted(0, arr.length());
+            } catch (Exception e) {
+                Log.e("MessageRecordFragment", e.toString());
+            }
+        }));
     }
 
     @Override
