@@ -898,10 +898,18 @@ else (async () => {
 
   // Messages
   for (let u = 0; u < N; u++)
-    for (let v = 0; v < N; v++) if (u !== v && rand() % 3 === 0) {
+    for (let v = 0; v < N; v++) if (u !== v && rand() % 3 !== 0) {
       for (let e = E + rand() % Ed; e > 0; e--) {
+        let fromToken, to_user;
+        if (rand() % 2 === 0) {
+          fromToken = token[u];
+          to_user = `uu${v}`;
+        } else {
+          fromToken = token[v];
+          to_user = `uu${u}`;
+        }
         await check('POST', '/message/send',
-          {token: token[u], to_user: `uu${v}`, contents: bullshit.sentence()},
+          {token: fromToken, to_user, contents: bullshit.sentence()},
           any);
       }
     }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 
 import androidx.annotation.Nullable;
@@ -46,6 +47,10 @@ public class ChatActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("ChatActivity", e.toString());
             }
+        });
+
+        findViewById(R.id.comment_button).setOnClickListener((View v) -> {
+            
         });
     }
 }
