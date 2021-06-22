@@ -217,13 +217,22 @@ if (process.env['GEN'] !== '1') (async () => {
 
   // User modification
   await check('POST', '/whoami/edit',
-    {token: token2, signature: bio2},
-    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+    {token: token2, nickname: 'kurikoneko1', signature: bio2},
+    {error: 0, user: {nickname: 'kurikoneko1', avatar: '', signature: bio2, collections: [any]}})
   await check('GET', '/whoami', {token: token2},
-    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+    {nickname: 'kurikoneko1', avatar: '', signature: bio2, collections: [any]})
   await check('POST', '/whoami/edit',
-    {token: token1, signature: bio1},
-    {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]})
+    {token: token2, nickname: 'kurikoneko', signature: bio2},
+    {error: 0, user: {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]}})
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'kayuyuko', signature: bio1},
+    {error: 0, user: {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]}})
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'k', signature: bio1},
+    {error: 1}, 400)
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'kurikoneko', signature: bio1},
+    {error: 2}, 400)
 
   // Avatar
   let avt1 = (await check('PUT', '/upload/avatar',

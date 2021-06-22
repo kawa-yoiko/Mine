@@ -123,12 +123,17 @@ func getWhoAmI(w http.ResponseWriter, r *http.Request) {
 func postWhoAmIEdit(w http.ResponseWriter, r *http.Request) {
 	u := mustAuth(r)
 
+	u.Nickname = r.PostFormValue("nickname")
 	u.Signature = r.PostFormValue("signature")
 	if err := u.Update(); err != nil {
+		if err, ok := err.(models.UserCreateError); ok {
+			write(w, 400, jsonPayload{"error": err.Code})
+			return
+		}
 		panic(err)
 	}
 
-	write(w, 200, u.Repr())
+	write(w, 200, jsonPayload{"error": 0, "user": u.Repr()})
 }
 
 func init() {
