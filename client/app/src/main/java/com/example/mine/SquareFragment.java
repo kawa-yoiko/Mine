@@ -41,6 +41,13 @@ public class SquareFragment extends Fragment {
             this.image = image;
         }
     }
+    public static class IconItem extends PostItem {
+        public int icon;
+        public IconItem(int id, int icon) {
+            this.id = id;
+            this.icon = icon;
+        }
+    }
 
     private RecyclerView recyclerView;
     private View headingView;
@@ -103,7 +110,9 @@ public class SquareFragment extends Fragment {
             } else if (post.type == 1) {
                 dateAndImages.add(new ImageItem(post.id, post.contents));
             } else if (post.type == 2) {
-                dateAndImages.add(new ImageItem(post.id, ""));
+                dateAndImages.add(new IconItem(post.id, R.drawable.music));
+            } else if (post.type == 3) {
+                dateAndImages.add(new IconItem(post.id, R.drawable.video));
             }
         }
     }

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int TEXT = 2;
     private LinkedList<SquareFragment.Item> data;
     private int itemsBefore = 0;
+    private RecyclerView recyclerView;
 
     public static class DateHolder extends RecyclerView.ViewHolder {
         TextView textView;
@@ -58,7 +60,8 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        if (data.get(position) instanceof SquareFragment.ImageItem) {
+        if (data.get(position) instanceof SquareFragment.ImageItem ||
+                data.get(position) instanceof SquareFragment.IconItem) {
             return PICTURE;
         } else if (data.get(position) instanceof SquareFragment.TextItem) {
             return TEXT;
@@ -94,10 +97,18 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ((DateHolder)holder).textView.setText(date);
         }
         else if (holder instanceof ImageHolder) {
-            String image = ((SquareFragment.ImageItem) item).image;
-            ServerReq.Utils.loadImage(
-                    "/upload/" + image,
-                    ((ImageHolder)holder).imageView);
+            if (item instanceof SquareFragment.ImageItem) {
+                String image = ((SquareFragment.ImageItem) item).image;
+                ServerReq.Utils.loadImage(
+                        "/upload/" + image,
+                        ((ImageHolder) holder).imageView);
+            } else {
+                ((ImageHolder) holder).imageView.setImageResource(
+                        ((SquareFragment.IconItem) item).icon
+                );
+                ((ImageHolder) holder).imageView.setColorFilter(
+                        ResourcesCompat.getColor(recyclerView.getResources(), R.color.themeyellow, null));
+            }
         }
         else if (holder instanceof TextHolder) {
             String caption = ((SquareFragment.TextItem) item).caption;
@@ -121,6 +132,7 @@ public class SquareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
         RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
         if(manager instanceof GridLayoutManager) {
             final GridLayoutManager gridManager = ((GridLayoutManager) manager);
