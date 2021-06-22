@@ -99,7 +99,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentH
                     if (expanded) {
                         LinkedList<Comment> subcomments = new LinkedList<>();
                         CommentChildAdapter commentChildAdapter = new CommentChildAdapter(
-                                CommentAdapter.this.postId, subcomments);
+                                CommentAdapter.this.postId, subcomments, replyCallback);
                         recyclerView.setAdapter(commentChildAdapter);
                         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
                         loadingIndicator.setVisibility(View.VISIBLE);
@@ -125,6 +125,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentH
                     }
                 }
             });
+            recyclerView.setAdapter(null);
         } else {
             moreButton.setVisibility(View.GONE);
         }

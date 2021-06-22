@@ -48,9 +48,16 @@ import java.util.List;
 public class PostActivity extends AppCompatActivity {
     private ViewGroup fView;
 
+    private Post post;
+    private int commentCount;
+    private TextView commentCountText;
+
     private Comment replyComment = null;
     private View bottomToolbar;
     private EditText commentText;
+
+    private LinkedList<Comment> hotComments;
+    private CommentAdapter hotCommentsAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -58,7 +65,7 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_post);
-        Post post = (Post) getIntent().getSerializableExtra("post");
+        post = (Post) getIntent().getSerializableExtra("post");
         View postView = getPostView(post);
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
@@ -66,28 +73,17 @@ public class PostActivity extends AppCompatActivity {
         CommentFragment commentFragment = new CommentFragment(post.id,
                 findViewById(R.id.post_content_heading), this::setReplyComment);
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
-        TextView comment_num_text = findViewById(R.id.comment_num);
-        comment_num_text.setText("(" + post.getComment_num() + ")");
+        commentCount = post.getComment_num();
+        commentCountText = (TextView) PostActivity.this.findViewById(R.id.comment_num);
+        commentCountText.setText("(" + commentCount + ")");
 
         // Hot comments section
-        LinkedList<Comment> hotComments = new LinkedList<>();
-        CommentAdapter hotCommentsAdapter = new CommentAdapter(post.id, hotComments, this::setReplyComment);
+        hotComments = new LinkedList<>();
+        hotCommentsAdapter = new CommentAdapter(post.id, hotComments, this::setReplyComment);
         RecyclerView hotCommentsView = findViewById(R.id.hot_comment_list);
         hotCommentsView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         hotCommentsView.setAdapter(hotCommentsAdapter);
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        ServerReq.getJsonArray("/post/" + post.id + "/comments/hot", (JSONArray arr) -> {
-            try {
-                for (int i = 0; i < arr.length(); i++) {
-                    JSONObject obj = arr.getJSONObject(i);
-                    hotComments.add(new Comment(obj));
-                }
-                hotCommentsAdapter.notifyDataSetChanged();
-            } catch (Exception e) {
-                Log.e("PostActivity", e.toString());
-            }
-        });
+        refreshHotComments();
 
         ImageView flowerIcon = findViewById(R.id.flower_icon);
         ImageView commentButton = findViewById(R.id.comment_button);
@@ -148,7 +144,10 @@ public class PostActivity extends AppCompatActivity {
                         commentText.setHint("");
                         replyComment = null;
                         commentText.setText("");
+                        refreshHotComments();
                         commentFragment.refresh();
+                        commentCount += 1;
+                        commentCountText.setText("(" + commentCount + ")");
                     });
                 });
             }
@@ -233,5 +232,22 @@ public class PostActivity extends AppCompatActivity {
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void refreshHotComments() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        ServerReq.getJsonArray("/post/" + post.id + "/comments/hot", (JSONArray arr) -> handler.post(() -> {
+            try {
+                hotComments.clear();
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    hotComments.add(new Comment(obj));
+                }
+                hotCommentsAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                Log.e("PostActivity", e.toString());
+            }
+        }));
     }
 }

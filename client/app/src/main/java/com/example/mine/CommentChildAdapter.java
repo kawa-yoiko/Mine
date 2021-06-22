@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,14 +8,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
 public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final int postId;
-    private LinkedList<Comment> data;
+    private final LinkedList<Comment> data;
+    private final Consumer<Comment> replyCallback;
 
     public static class CommentChildHolder extends RecyclerView.ViewHolder {
         public CommentChildHolder(@NonNull View itemView) {
@@ -23,9 +27,10 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public CommentChildAdapter(int postId, LinkedList<Comment> data) {
+    public CommentChildAdapter(int postId, LinkedList<Comment> data, Consumer<Comment> replyCallback) {
         this.postId = postId;
         this.data = data;
+        this.replyCallback = replyCallback;
     }
 
 
@@ -37,10 +42,13 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Comment comment = data.get(position);
-        View item =holder.itemView;
+        View item = holder.itemView;
+        item.setOnClickListener((View v) -> this.replyCallback.accept(comment));
+
         ImageView avatarView = item.findViewById(R.id.avatar);
         ServerReq.Utils.loadImage("/upload/" + comment.getAvatar(), avatarView);
         TextView nicknameView = item.findViewById(R.id.nickname);

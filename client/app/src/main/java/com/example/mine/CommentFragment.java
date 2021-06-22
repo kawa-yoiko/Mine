@@ -87,6 +87,7 @@ public class CommentFragment extends Fragment {
 
     public void refresh() {
         this.onViewCreated(getView(), null);
+        recyclerView.smoothScrollToPosition(2);
     }
 
     @Override
