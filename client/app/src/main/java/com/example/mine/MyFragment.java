@@ -109,11 +109,14 @@ public class MyFragment  extends Fragment {
             getActivity().startActivity(intent);
         });
 
-        View gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
+        ImageView gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
+        gotoHomePageBtn.setColorFilter(Color.parseColor("#555555"));
         gotoHomePageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), HomepageActivity.class);
+                Intent intent = new Intent(getActivity(), LoadingActivity.class);
+                intent.putExtra("type", LoadingActivity.DestType.homepage);
+                intent.putExtra("nickname", ServerReq.getMyNickname());
                 getActivity().startActivity(intent);
             }
         });

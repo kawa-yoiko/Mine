@@ -44,6 +44,7 @@ public class SquareFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private View headingView;
+    List<Collection.PostBrief> posts;
     private LinkedList<Item> dateAndImages;
     private SquareAdapter adapter;
 
@@ -60,14 +61,9 @@ public class SquareFragment extends Fragment {
     }
     public SquareFragment(View headingView, List<Collection.PostBrief> posts) {
         this.headingView = headingView;
+        this.posts = posts;
         this.dateAndImages = new LinkedList<>();
-        for (Collection.PostBrief post : posts) {
-            if (post.type == 0) {
-                dateAndImages.add(new TextItem(post.id, post.caption, post.contents));
-            } else if (post.type == 1) {
-                dateAndImages.add(new ImageItem(post.id, post.contents));
-            }
-        }
+        rebuildItems();
     }
 
     @Override
@@ -96,6 +92,25 @@ public class SquareFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.square_fragment, container, false);
+    }
+
+    private void rebuildItems() {
+        dateAndImages.clear();
+        dateAndImages.add(new DateItem("2021 年 5 月"));
+        for (Collection.PostBrief post : posts) {
+            if (post.type == 0) {
+                dateAndImages.add(new TextItem(post.id, post.caption, post.contents));
+            } else if (post.type == 1) {
+                dateAndImages.add(new ImageItem(post.id, post.contents));
+            } else if (post.type == 2) {
+                dateAndImages.add(new ImageItem(post.id, ""));
+            }
+        }
+    }
+
+    public void notifyDatasetChanged() {
+        rebuildItems();
+        adapter.notifyDataSetChanged();
     }
 
     public void reverse() {

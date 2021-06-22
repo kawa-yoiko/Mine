@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class CollectionListView {
-    public static View inflate(Context context, BiConsumer<User.CollectionBrief, Boolean> callback) {
+    public static View inflate(Context context, String nickname, BiConsumer<User.CollectionBrief, Boolean> callback) {
         FrameLayout container = new FrameLayout(context);
         View.inflate(context, R.layout.loading_indicator, container);
 
@@ -31,7 +31,7 @@ public class CollectionListView {
         recyclerView.setAdapter(new Adapter(collections, callback));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        ServerReq.getJson("/whoami", (JSONObject obj) -> {
+        ServerReq.getJson(nickname != null ? ("/whois/" + nickname) : "/whoami", (JSONObject obj) -> {
             User user = new User(obj);
             collections.addAll(user.collections);
             container.removeAllViews();

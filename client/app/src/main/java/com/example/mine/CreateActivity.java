@@ -141,7 +141,7 @@ public class CreateActivity extends AppCompatActivity {
         View popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
         FrameLayout collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
         collectionContainer.removeAllViews();
-        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), (User.CollectionBrief sel, Boolean init) -> {
+        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), null, (User.CollectionBrief sel, Boolean init) -> {
             if (init && collection != null) return;
             Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
             collection = sel;
