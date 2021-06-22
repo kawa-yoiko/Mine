@@ -23,17 +23,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
 public class CommentFragment extends Fragment {
     private RecyclerView recyclerView;
-    private View headingView;
-    private int postId;
+    private final int postId;
+    private final View headingView;
+    private final Consumer<Comment> replyCallback;
 
     private LinkedList<Comment> comments;
 
-    public CommentFragment(int postId, View headingView) {
+    public CommentFragment(int postId, View headingView, Consumer<Comment> replyCallback) {
         this.postId = postId;
         this.headingView = headingView;
+        this.replyCallback = replyCallback;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class CommentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recyclerview);
         comments = new LinkedList<>();
-        CommentAdapter commentAdapter = new CommentAdapter(this.postId, comments);
+        CommentAdapter commentAdapter = new CommentAdapter(this.postId, comments, replyCallback);
         SingleViewAdapter headingAdapter = new SingleViewAdapter(headingView);
         SingleViewAdapter loadingAdapter = new SingleViewAdapter(
                 getLayoutInflater().inflate(R.layout.loading_indicator, (ViewGroup) view, false));
@@ -57,6 +60,7 @@ public class CommentFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void load(int start) {
+                if (start < 2) return;
                 Log.d("Comment", "Load " + start);
                 InfScrollListener listener = this;
                 ServerReq.getJsonArray("/post/" + CommentFragment.this.postId +

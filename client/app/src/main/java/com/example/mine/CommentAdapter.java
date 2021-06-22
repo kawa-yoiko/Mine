@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,10 +22,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
-public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentHolder> {
     private final int postId;
-    private LinkedList<Comment> data;
+    private final LinkedList<Comment> data;
+    private final Consumer<Comment> replyCallback;
 
     public static class CommentHolder extends RecyclerView.ViewHolder {
         public CommentHolder(@NonNull View itemView) {
@@ -33,26 +36,30 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
 
-    public CommentAdapter(int postId, LinkedList<Comment> data)
+    public CommentAdapter(int postId, LinkedList<Comment> data, @Nullable Consumer<Comment> replyCallback)
     {
         this.postId = postId;
         this.data = data;
+        this.replyCallback = replyCallback;
     }
 
 
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false);
         return new CommentHolder(mItemView);
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CommentHolder holder, int position) {
         Comment comment = data.get(position);
-        View item =holder.itemView;
+        View item = holder.itemView;
+        item.setOnClickListener((View v) -> this.replyCallback.accept(comment));
+
         ImageView avatarView = item.findViewById(R.id.avatar);
         ServerReq.Utils.loadImage("/upload/" + comment.getAvatar(), avatarView);
         TextView nicknameView = item.findViewById(R.id.nickname);

@@ -1,10 +1,12 @@
 package com.example.mine;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,9 +16,11 @@ import android.os.PersistableBundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -44,6 +48,10 @@ import java.util.List;
 public class PostActivity extends AppCompatActivity {
     private ViewGroup fView;
 
+    private Comment replyComment = null;
+    private View bottomToolbar;
+    private EditText commentText;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,14 +63,15 @@ public class PostActivity extends AppCompatActivity {
         fView = findViewById(R.id.post_content);
         fView.addView(postView);
 
-        CommentFragment commentFragment = new CommentFragment(post.id, findViewById(R.id.post_content_heading));
+        CommentFragment commentFragment = new CommentFragment(post.id,
+                findViewById(R.id.post_content_heading), this::setReplyComment);
         getSupportFragmentManager().beginTransaction().replace(R.id.post_comment, commentFragment).commit();
         TextView comment_num_text = findViewById(R.id.comment_num);
         comment_num_text.setText("(" + post.getComment_num() + ")");
 
         // Hot comments section
         LinkedList<Comment> hotComments = new LinkedList<>();
-        CommentAdapter hotCommentsAdapter = new CommentAdapter(post.id, hotComments);
+        CommentAdapter hotCommentsAdapter = new CommentAdapter(post.id, hotComments, this::setReplyComment);
         RecyclerView hotCommentsView = findViewById(R.id.hot_comment_list);
         hotCommentsView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         hotCommentsView.setAdapter(hotCommentsAdapter);
@@ -107,7 +116,7 @@ public class PostActivity extends AppCompatActivity {
                 "star");
         toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());
 
-        EditText commentText = (EditText) findViewById(R.id.comment_edit);
+        commentText = (EditText) findViewById(R.id.comment_edit);
 //        Button commentButton = (Button) findViewById(R.id.comment_button);
         commentButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -115,8 +124,9 @@ public class PostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 commentButton.setImageResource(R.drawable.star);
                 commentText.setEnabled(false);
+                Log.d("PA", "posting");
                 ServerReq.postJson("/post/" + post.id + "/comment/new", List.of(
-                        new Pair<>("reply_to", "-1"),
+                        new Pair<>("reply_to", String.valueOf(replyComment == null ? -1 : replyComment.id)),
                         new Pair<>("contents", commentText.getText().toString())
                 ), (JSONObject obj) -> {
                     try {
@@ -124,7 +134,7 @@ public class PostActivity extends AppCompatActivity {
                     } catch (Exception e) {
                     }
                     PostActivity.this.runOnUiThread(() -> {
-                        commentButton.setImageResource(R.drawable.flower);
+                        commentButton.setImageResource(R.drawable.send);
                         commentText.setEnabled(true);
                     });
                     int commentId = -1;
@@ -135,12 +145,16 @@ public class PostActivity extends AppCompatActivity {
                     if (commentId == -1)
                         return;
                     PostActivity.this.runOnUiThread(() -> {
+                        commentText.setHint("");
+                        replyComment = null;
                         commentText.setText("");
                         commentFragment.refresh();
                     });
                 });
             }
         });
+
+        bottomToolbar = findViewById(R.id.post_bottom_toolbar);
     }
 
     private View getPostView(Post post) {
@@ -193,5 +207,31 @@ public class PostActivity extends AppCompatActivity {
         });
 
         return postView;
+    }
+
+    private void setReplyComment(Comment comment) {
+        replyComment = comment;
+        commentText.setHint("回复 " + comment.getNickname());
+        commentText.requestFocus();
+    }
+
+    // ref: https://stackoverflow.com/a/36411427
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                Rect outRect = new Rect();
+                bottomToolbar.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    commentText.setHint("");
+                    replyComment = null;
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 }
