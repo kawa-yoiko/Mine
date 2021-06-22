@@ -58,6 +58,7 @@ public class PostActivity extends AppCompatActivity {
 
     private LinkedList<Comment> hotComments;
     private CommentAdapter hotCommentsAdapter;
+    private View hotCommentContainer;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -83,6 +84,7 @@ public class PostActivity extends AppCompatActivity {
         RecyclerView hotCommentsView = findViewById(R.id.hot_comment_list);
         hotCommentsView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         hotCommentsView.setAdapter(hotCommentsAdapter);
+        hotCommentContainer = findViewById(R.id.hot_comment_container);
         refreshHotComments();
 
         ImageView flowerIcon = findViewById(R.id.flower_icon);
@@ -246,6 +248,7 @@ public class PostActivity extends AppCompatActivity {
                     hotComments.add(new Comment(obj));
                 }
                 hotCommentsAdapter.notifyDataSetChanged();
+                hotCommentContainer.setVisibility(arr.length() > 0 ? View.VISIBLE : View.GONE);
             } catch (Exception e) {
                 Log.e("PostActivity", e.toString());
             }
