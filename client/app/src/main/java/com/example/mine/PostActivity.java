@@ -188,6 +188,7 @@ public class PostActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.content,
                         new PhotoViewPagerFragment(new ArrayList<>(Arrays.asList(post.getContent().split(" "))))).commit();
                 break;
+            case 2:
             case 3:
                 getSupportFragmentManager().beginTransaction().replace(R.id.content,
                         new VideoPlayerFragment(Uri.parse(ServerReq.getUploadFullUrl(post.getContent())))).commit();

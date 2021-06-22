@@ -61,7 +61,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         else if (viewType == TEXT) {
             View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post_text, parent, false);
             return new TextHolder(mItemView);
-        } else if (viewType == VIDEO) {
+        } else if (viewType == AUDIO || viewType == VIDEO) {
             View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
             return new ImageHolder(mItemView);
         }
@@ -107,6 +107,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             ImageView content_image = item.findViewById(R.id.content);
             if (post.getContentType() == 0) {
                 ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
+            } else if (post.getContentType() == 2) {
+                content_image.setImageResource(R.drawable.music);
+                content_image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
             } else {
                 content_image.setImageResource(R.drawable.video);
                 content_image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));

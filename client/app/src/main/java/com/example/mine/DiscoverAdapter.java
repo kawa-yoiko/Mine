@@ -63,6 +63,10 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
             text.setVisibility(View.GONE);
             image.setVisibility(View.VISIBLE);
             ServerReq.Utils.loadImage("/upload/" + post.getContent(), image);
+        } else if (post.getContentType() == 2) {
+            image.setImageResource(R.drawable.music);
+            image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
+            text.setVisibility(View.GONE);
         } else if (post.getContentType() == 3) {
             image.setImageResource(R.drawable.video);
             image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));

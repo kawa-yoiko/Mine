@@ -102,14 +102,14 @@ public class CreateActivity extends AppCompatActivity {
             recyclerView.setAdapter(new ConcatAdapter(new ImagePickerAdapter(imageItems), new SingleViewAdapter(addImage)));
             recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
 //            recyclerView.setAdapter(new ImagePickerAdapter(imageItems));
-        } else if (createType.equals("video")) {
+        } else if (createType.equals("video") || createType.equals("audio")) {
             createAreaView = View.inflate(this.getBaseContext(), R.layout.create_area_video, null);
             addMediaButton = (ImageButton) createAreaView.findViewById(R.id.btn_select);
             addMediaButton.setOnClickListener((View v) -> {
                 Intent videoIntent = new Intent();
-                videoIntent.setType("video/*");
+                videoIntent.setType(createType + "/*");
                 videoIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(videoIntent, "Select Video"), VIDEO_PICKER);
+                startActivityForResult(Intent.createChooser(videoIntent, "Select Media"), VIDEO_PICKER);
             });
         } else {
             createAreaView = null;
@@ -239,8 +239,8 @@ public class CreateActivity extends AppCompatActivity {
                         }
                     });
                 }
-            } else if (createType.equals("video")) {
-                Log.d("CreateActivity", "video path: " + singleMediaUri);
+            } else if (createType.equals("video") || createType.equals("audio")) {
+                Log.d("CreateActivity", "media path: " + singleMediaUri);
                 InputStream istr;
                 try {
                     istr = getContentResolver().openInputStream(singleMediaUri);
@@ -263,7 +263,7 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     Log.d("CreateActivity", "upload id = " + id);
                     ServerReq.postJson("/post/new", List.of(
-                            new Pair<>("type", "3"),
+                            new Pair<>("type", createType.equals("video") ? "3" : "2"),
                             new Pair<>("caption", ((EditText) createAreaView.findViewById(R.id.caption_input)).getText().toString()),
                             new Pair<>("contents", id),
                             new Pair<>("collection", String.valueOf(collection.id)),

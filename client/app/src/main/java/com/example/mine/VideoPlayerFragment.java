@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 public class VideoPlayerFragment extends Fragment {
     private final Uri uri;
+    private SimpleExoPlayer player;
 
     public VideoPlayerFragment(@NonNull Uri uri) {
         this.uri = uri;
@@ -28,7 +29,7 @@ public class VideoPlayerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        SimpleExoPlayer player = new SimpleExoPlayer.Builder(view.getContext()).build();
+        player = new SimpleExoPlayer.Builder(view.getContext()).build();
 
         StyledPlayerView playerView = view.findViewById(R.id.player_view);
         playerView.setPlayer(player);
@@ -58,5 +59,11 @@ public class VideoPlayerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_video_player, container, false);
+    }
+
+    @Override
+    public void onDestroy() {
+        player.stop();
+        super.onDestroy();
     }
 }
