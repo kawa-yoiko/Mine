@@ -637,6 +637,9 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/message/send',
     {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq4'},
     {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: '栗小猫', contents: 'qwqwqwqwq5'},
+    {id: any, timestamp: any})
   await check('GET', '/message/with/kayuyuko',
     {token: token2, start: 0, count: 2}, [
       {from_me: false, contents: 'qwqwqwqwq4', _ignoreRedundant: true},
@@ -651,6 +654,11 @@ if (process.env['GEN'] !== '1') (async () => {
 
   await check('GET', '/message/latest', {token: token1}, [{
     from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+    to_user: {nickname: '栗小猫', _ignoreRedundant: true},
+    unread_count: 0,
+    _ignoreRedundant: true,
+  }, {
+    from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
     to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
     unread_count: 1,
     _ignoreRedundant: true,
@@ -664,13 +672,13 @@ if (process.env['GEN'] !== '1') (async () => {
 
   // Message reading
   await check('POST', '/message/read/kayuyuko', {token: token2}, {})
-  await check('GET', '/message/latest', {token: token1}, [{unread_count: 1, _ignoreRedundant: true}])
+  await check('GET', '/message/latest', {token: token1}, [any, {unread_count: 1, _ignoreRedundant: true}])
   await check('GET', '/message/latest', {token: token2}, [{unread_count: 0, _ignoreRedundant: true}])
 
   await check('POST', '/message/send',
-    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq5'},
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq6'},
     {id: any, timestamp: any})
-  await check('GET', '/message/latest', {token: token1}, [{unread_count: 1, _ignoreRedundant: true}])
+  await check('GET', '/message/latest', {token: token1}, [{unread_count: 1, _ignoreRedundant: true}, any])
   await check('GET', '/message/latest', {token: token2}, [{unread_count: 1, _ignoreRedundant: true}])
 
   // System messages

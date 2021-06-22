@@ -122,19 +122,24 @@ func ReadLatestMessages(userId int32) ([]map[string]interface{}, error) {
 		FROM message_pair
 		WHERE to_user_id = $1`, userId)
 	*/
-	rows, err := db.Query(`SELECT
+	rows, err := db.Query(`SELECT * FROM (
+		SELECT DISTINCT ON (message_pair.from_user_id)
 		  message_pair.unread_count,
 		  message.*,
 		  from_user.nickname, from_user.avatar,
 		  to_user.nickname, to_user.avatar
 		FROM message_pair
 		  INNER JOIN message ON
-		    message.from_user_id = message_pair.from_user_id OR
-		    message.from_user_id = message_pair.to_user_id
+		    (message.from_user_id = message_pair.from_user_id AND
+		     message.to_user_id = message_pair.to_user_id) OR
+		    (message.from_user_id = message_pair.to_user_id AND
+		     message.to_user_id = message_pair.from_user_id)
 		  LEFT JOIN mine_user from_user ON message.from_user_id = from_user.id
 		  INNER JOIN mine_user to_user ON message.to_user_id = to_user.id
 		WHERE message_pair.to_user_id = $1
-		ORDER BY message.timestamp DESC, message.id DESC LIMIT 1`, userId)
+		ORDER BY message_pair.from_user_id, message.timestamp DESC, message.id DESC
+	) AS _
+		ORDER BY timestamp DESC, id DESC`, userId)
 	if err != nil {
 		return nil, err
 	}
