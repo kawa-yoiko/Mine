@@ -23,10 +23,15 @@ public class MessageRecord {
     public MessageRecord(JSONObject obj) {
         try {
             this.username = obj.getJSONObject("from_user").getString("nickname");
+            if (!this.username.equals(ServerReq.getMyNickname())) {
+                this.avatar = obj.getJSONObject("from_user").getString("avatar");
+            } else {
+                this.username = obj.getJSONObject("to_user").getString("nickname");
+                this.avatar = obj.getJSONObject("to_user").getString("avatar");
+            }
             this.content = obj.getString("contents");
             this.messageNum = String.valueOf(obj.getInt("unread_count"));
             this.date = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
-            this.avatar = obj.getJSONObject("from_user").getString("avatar");
         } catch (Exception e) {
             Log.e("MessageRecord", e.toString());
         }
