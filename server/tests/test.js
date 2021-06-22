@@ -711,6 +711,7 @@ else (async () => {
   const C = 3;     // Number of collections per user (minimum)
   const Cd = 5;    // (variation)
   const M = 10;    // Average number of posts per collection
+  const A = 50;    // Number of tags
   const P = 50;    // Number of post upvotes per user (minimum)
   const Pd = 150;  // (variation)
   const S = 50;    // Number of stars per user (minimum)
@@ -785,13 +786,27 @@ else (async () => {
     return a;
   };
 
+  // Tags
+  const tagsAll = [];
+  for (let i = 0; i < A; i++) {
+    const s = bullshit.sentence(1).replace(/[，。；？·]/g, '');
+    const n = rand() % (s.length - 2);
+    tagsAll.push(s.substr(n, 2 + rand() % 3));
+  }
+
   // Create posts
   const postsAll = [];
   for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
+    const tags = [];
+    for (let a = 1 + rand() % 3, i = 0; i < a; i++) {
+      let u = rand() % (tagsAll.length - i) + i;
+      let t = tagsAll[u]; tagsAll[u] = tagsAll[i]; tagsAll[i] = t;
+      tags.push(tagsAll[i]);
+    }
     const args = {
       token: token[u],
       collection: colls[u][rand() % colls[u].length],
-      tags: 'tag3,tag4',
+      tags: tags.join(','),
     };
     if (rand() % 3 !== 0) {
       const contentImages = Array.from(Array(1 + rand() % 9),
