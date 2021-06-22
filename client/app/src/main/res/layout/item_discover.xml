@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -49,48 +50,66 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="100px"
-            >
+            android:layout_marginBottom="8dp">
+
             <TextView
                 android:id="@+id/tag"
-                android:text="#五条悟"
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_weight="5"
+                android:text="#五条悟"
                 android:textColor="#999999"
-                >
-            </TextView>
+                android:textSize="16dp"
+                android:textStyle="bold"></TextView>
+
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
                 <ImageView
-                    android:layout_gravity="start"
+                    android:id="@+id/flower_icon"
                     android:layout_width="17dp"
                     android:layout_height="17dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/flower"
-                    android:layout_marginRight="8px"
-                    android:layout_marginLeft="5px"
                     android:layout_centerVertical="true"
-                    android:id="@+id/flower_icon"
-                    >
-                </ImageView>
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="5px"
+                    android:layout_marginRight="8px"
+                    android:layout_weight="1"
+                    android:src="@drawable/flower"></ImageView>
+
                 <TextView
                     android:id="@+id/fond_num"
-                    android:text="1023 "
-                    android:textSize="14dp"
-                    android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/flower_icon"
                     android:layout_centerVertical="true"
+                    android:layout_gravity="start"
+                    android:layout_toRightOf="@+id/flower_icon"
                     android:layout_weight="1"
-                    >
-                </TextView>
+                    android:text="1023 "
+                    android:textSize="14dp"></TextView>
             </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:srcCompat="@drawable/luoxiaohei" />
+
+            <TextView
+                android:id="@+id/nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:text="kuriko" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

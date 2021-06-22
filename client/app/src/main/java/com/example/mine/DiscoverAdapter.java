@@ -49,6 +49,10 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
         ImageView flowerIcon = item.findViewById(R.id.flower_icon);
         flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
 
+        ServerReq.Utils.loadImage("/upload/" + post.getAvatar(),
+                (ImageView) item.findViewById(R.id.avatar));
+        ((TextView) item.findViewById(R.id.nickname)).setText(post.getNickname());
+
         TextView text = item.findViewById(R.id.text);
         ImageView image = item.findViewById(R.id.image);
         if (post.getContentType() == 0) {
