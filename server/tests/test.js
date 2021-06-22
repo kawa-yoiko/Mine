@@ -184,8 +184,6 @@ const check = async (method, url, params, expect, expect_status) => {
 if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/reset')
 
-/*
-  console.log('======== Sign up ========');
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa..moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '哈哈哈哈哈哈'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '888'}, {error: 1}, 400)
@@ -195,7 +193,6 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/signup', {nickname: 'kayuyuko2', email: 'kyyk2@kawa.moe', password: '888888'}, {error: 0}, 200)
   await check('POST', '/signup', {nickname: '小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
-*/
 
   const bio1 = '我爱吃栗子';
   const bio2 = '我爱吃寿司';

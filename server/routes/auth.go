@@ -41,6 +41,10 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 		Tags:        []string{},
 	}
 	if err := c.Create(); err != nil {
+		if err, ok := err.(models.UserCreateError); ok {
+			write(w, 400, jsonPayload{"error": err.Code})
+			return
+		}
 		panic(err)
 	}
 

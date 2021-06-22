@@ -90,9 +90,9 @@ func (u *User) Create() error {
 	).Scan(&u.Id)
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23505" { // unique_violation
-			if err.Constraint == "nickname_unique" {
+			if err.Constraint == "user_nickname_uniq" {
 				return UserCreateError{UserCreateErrorNicknameExists}
-			} else if err.Constraint == "email_unique" {
+			} else if err.Constraint == "user_email_uniq" {
 				return UserCreateError{UserCreateErrorEmailExists}
 			}
 		}
