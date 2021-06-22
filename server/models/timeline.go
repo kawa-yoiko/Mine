@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -91,13 +92,13 @@ func SearchPostsByTag(userId int32, tag string, start int, count int, ty string)
 	case "new":
 		queryOrder = "post.timestamp DESC"
 	case "day":
-		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix()-86400*1000*1, 10)
 		queryOrder = "post_upvote_count DESC"
 	case "month":
-		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix()-86400*1000*1, 10)
 		queryOrder = "post_upvote_count DESC"
 	case "season":
-		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix() - 86400 * 1000 * 1, 10)
+		queryFilter = " AND post.timestamp >= " + strconv.FormatInt(time.Now().Unix()-86400*1000*1, 10)
 		queryOrder = "post_upvote_count DESC"
 	case "all":
 		queryOrder = "post_upvote_count DESC"
@@ -133,4 +134,25 @@ func SearchCollectionsByTag(userId int32, tag string, start int, count int) ([]m
 		return nil, err
 	}
 	return collectionsReprBriefFromRows(rows)
+}
+
+func SearchTags(tag string) ([]string, error) {
+	tag = strings.ReplaceAll(tag, "%", "\\%")
+	tag = strings.ReplaceAll(tag, "_", "\\_")
+	rows, err := db.Query(
+		`SELECT DISTINCT (tag) FROM post_tag WHERE tag LIKE $1 LIMIT 10`,
+		"%"+tag+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	tags := []string{}
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, rows.Err()
 }

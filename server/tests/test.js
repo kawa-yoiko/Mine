@@ -598,6 +598,12 @@ if (process.env['GEN'] !== '1') (async () => {
     {_ignoreRedundant: true, contents: `${u2img1}`},
   ])
 
+  // Search tags
+  await check('GET', `/search_tags`, {tag: 'tag'},
+    [any, any, any, any, any, any, any, any])
+  await check('GET', `/search_tags`, {tag: ''}, undefined, 400)
+  await check('GET', `/search_tags`, {tag: '%_'}, [])
+
   // Search by tag
   await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 10}, [any, any]);
   await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 1}, [any]);
