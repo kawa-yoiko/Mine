@@ -208,6 +208,13 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
+        postView.findViewById(R.id.author_container).setOnClickListener((View v) -> {
+            Intent intent = new Intent(this, LoadingActivity.class);
+            intent.putExtra("type", LoadingActivity.DestType.homepage);
+            intent.putExtra("nickname", post.getNickname());
+            this.startActivity(intent);
+        });
+
         return postView;
     }
 
