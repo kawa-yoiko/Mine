@@ -88,7 +88,8 @@ public class MessageRecordFragment extends Fragment {
                     boolean itemChanged = false;
                     for (MessageRecord rec : records) {
                         if (rec.getUsername().equals(newRec.getUsername())) {
-                            itemChanged = (rec.getMessageId() != newRec.getMessageId());
+                            itemChanged = (rec.getMessageId() != newRec.getMessageId() ||
+                                    !rec.getMessageNum().equals(newRec.getMessageNum()));
                             break;
                         }
                         originalIndex++;
