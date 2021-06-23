@@ -59,6 +59,7 @@ func (c *Collection) Repr() map[string]interface{} {
 func (c *Collection) ReprBrief() map[string]interface{} {
 	return map[string]interface{}{
 		"id":         c.Id,
+		"cover":      c.Cover,
 		"title":      c.Title,
 		"post_count": c.PostCount,
 	}

@@ -37,9 +37,8 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	println(len(ids))
 	for _, id := range ids {
-		if err := models.SendSystemMessage(id, "collection_update " + c.Cover + " " + c.Title); err != nil {
+		if err := models.SendSystemMessage(id, "collection_update "+c.Cover+" "+c.Title); err != nil {
 			panic(err)
 		}
 	}
@@ -79,7 +78,7 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 		if err := p.ReadAuthorId(); err != nil {
 			panic(err)
 		}
-		if err := models.SendSystemMessage(p.Author.Id, "post_comment " + u.Nickname); err != nil {
+		if err := models.SendSystemMessage(p.Author.Id, "post_comment "+u.Nickname); err != nil {
 			panic(err)
 		}
 	} else {
@@ -87,7 +86,7 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 		if err := cReplied.ReadAuthorId(); err != nil {
 			panic(err)
 		}
-		if err := models.SendSystemMessage(cReplied.Author.Id, "comment_reply " + u.Nickname); err != nil {
+		if err := models.SendSystemMessage(cReplied.Author.Id, "comment_reply "+u.Nickname); err != nil {
 			panic(err)
 		}
 	}
@@ -140,7 +139,7 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 	if err := p.ReadAuthorId(); err != nil {
 		panic(err)
 	}
-	if err := models.SendSystemMessage(p.Author.Id, "post_upvote " + u.Nickname); err != nil {
+	if err := models.SendSystemMessage(p.Author.Id, "post_upvote "+u.Nickname); err != nil {
 		panic(err)
 	}
 
