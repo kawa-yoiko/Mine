@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
@@ -62,14 +61,14 @@ public class CommentChildAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         replyNicknameView.setText(comment.getReplyNickname());
 
         ImageView flowerIcon = item.findViewById(R.id.flower_icon);
-        flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
 
         // Flower button
         ToggleReqButton toggleFlower = new ToggleReqButton(
                 item.findViewById(R.id.flower_button),
                 item.findViewById(R.id.flower_icon),
                 item.findViewById(R.id.flower_num),
-                R.drawable.flower_monochrome, R.drawable.flower, R.drawable.flower_monochrome,
+                R.drawable.flower_monochrome, R.drawable.flower,
+                Color.parseColor("#FBBABA"),
                 "/post/" + this.postId + "/comment/" + comment.id + "/upvote",
                 "upvote");
         toggleFlower.setState(comment.myUpvote ? 1 : 0, comment.getFlowerNum());

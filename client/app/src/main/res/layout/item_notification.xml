@@ -48,20 +48,22 @@
             <com.example.mine.WidthEqualsHeightImageView
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/luoxiaohei"
+                android:src="@drawable/luoxiaohei2"
                 android:scaleType="centerCrop"
                 android:id="@+id/image"
                 >
             </com.example.mine.WidthEqualsHeightImageView>
         </androidx.cardview.widget.CardView>
-    </RelativeLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5h前"
             android:id="@+id/date"
-            android:layout_marginLeft="40dp"
+            android:layout_toRightOf="@id/type_icon"
+            android:layout_below="@id/content"
+            android:layout_marginTop="6dp"
             ></TextView>
+    </RelativeLayout>
     </LinearLayout>
     <View
         android:layout_width="match_parent"

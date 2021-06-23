@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.lzy.imagepicker.ImagePicker;
@@ -71,7 +72,14 @@ public class SettingActivity extends AppCompatActivity {
         nicknameEdit = findViewById(R.id.nickname);
         introductionEdit = findViewById(R.id.introduction);
 
-        ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(), avatar_img);
+        if (ServerReq.getMyAvatar().isEmpty()) {
+            avatar_img.setColorFilter(ResourcesCompat.getColor(getResources(), R.color.themeyellow, null));
+            avatar_img.setImageResource(R.drawable.image);
+        } else {
+            avatar_img.setColorFilter(null);
+            ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(), avatar_img);
+        }
+
         nicknameEdit.setText(ServerReq.getMyNickname());
         introductionEdit.setText(ServerReq.getMyBio());
 

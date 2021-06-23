@@ -28,10 +28,13 @@ public class NotificationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         LinkedList<Notification> records = new LinkedList<>();
 
-        records.add(new Notification(1, "粥粥点赞了你的文章",  "1h前", R.drawable.luoxiaohei));
-        records.add(new Notification(1, "ldz点赞了你的文章",  "2h前", R.drawable.luoxiaohei));
-        records.add(new Notification(2, "食堂合集更新了", "3天前", R.drawable.luoxiaohei));
-        records.add(new Notification(0, "粥粥回复了你的文章", "5.20",  R.drawable.luoxiaohei));
+        for (int i = 0; i < 20; i++) {
+            records.add(new Notification(1, "uu1 点赞了你的文章", "1 小时前", R.drawable.luoxiaohei));
+            records.add(new Notification(1, "uu2 点赞了你的文章", "1 小时前", R.drawable.luoxiaohei2));
+            records.add(new Notification(2, "合集「uu3 的位分类合集」更新了", "1 小时前", R.drawable.luoxiaohei2));
+            records.add(new Notification(0, "uu4 回复了你的文章", "1 小时前", R.drawable.luoxiaohei));
+            records.add(new Notification(0, "uu5 回复了你的评论", "1 小时前", R.drawable.luoxiaohei2));
+        }
 
 
         NotificationAdapter adapter = new NotificationAdapter(records);
