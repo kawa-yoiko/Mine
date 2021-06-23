@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             if(str.equals("true")) {
                 // already login
                 isLogin = 1;
+                this.setUpAllViews();
             }
         }
         if(isLogin == 0) {
@@ -57,11 +58,6 @@ public class MainActivity extends AppCompatActivity {
 //
 //        Window window = this.getWindow();
 //        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-        ServerReq.login("uu4", "aaaaaa4", (Boolean success) -> {
-            android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
-            this.runOnUiThread(this::setUpAllViews);
-        });
     }
 
     private void setUpAllViews() {

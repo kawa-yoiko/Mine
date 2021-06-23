@@ -1,7 +1,10 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -9,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -50,21 +54,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         btLogin.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 //TODO: send login request to server; is password right?
-                int isPasswordRight = 1;
-                if (isPasswordRight == 0) {
-                    Toast toast = Toast.makeText(getBaseContext(), "密码错误！", Toast.LENGTH_LONG);
-                    toast.show();
-                }
-                else {
-                    Toast toast = Toast.makeText(getBaseContext(), "登录成功！", Toast.LENGTH_LONG);
-                    toast.show();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("isLogin", "true");
-                    LoginActivity.this.startActivity(intent);
-                }
+
+                Handler handler = new Handler(Looper.getMainLooper());
+                ServerReq.login(
+                    usernameTextView.getText().toString(),
+                    passwordTextView.getText().toString(),
+                    (Boolean success) -> handler.post(() -> {
+                        android.util.Log.d("MainActivity", success ? ServerReq.token : "T-T");
+                        if (!success) {
+                            Toast toast = Toast.makeText(getBaseContext(), "密码错误！", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else {
+                            Toast toast = Toast.makeText(getBaseContext(), "登录成功！", Toast.LENGTH_LONG);
+                            toast.show();
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("isLogin", "true");
+                            LoginActivity.this.startActivity(intent);
+                        }
+                    }));
             }
         });
 
