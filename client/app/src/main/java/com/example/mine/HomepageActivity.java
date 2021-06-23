@@ -87,6 +87,14 @@ public class HomepageActivity extends AppCompatActivity{
 
         ImageView btnMessage = findViewById(R.id.message_button);
         btnMessage.setColorFilter(Color.parseColor("#F1D20A"));
+
+        btnMessage.setOnClickListener((View v) -> {
+            Intent intent = new Intent();
+            intent.setClass(v.getContext(), ChatActivity.class);
+            intent.putExtra("username", user.nickname);
+            intent.putExtra("other_avatar", user.avatar);
+            startActivity(intent);
+        });
     }
 
 
