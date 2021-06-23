@@ -268,6 +268,8 @@ public class CreateActivity extends AppCompatActivity {
                 });
             }
         });
+
+        ((Button) findViewById(R.id.back_button)).setOnClickListener((View v) -> this.finish());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
