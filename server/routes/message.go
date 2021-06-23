@@ -28,16 +28,6 @@ func postMessageSend(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	// XXX: For debug use: send a system message
-	m = models.Message{
-		ToUser:   uOther,
-		FromUser: models.User{Id: -1},
-		Contents: "System message",
-	}
-	if err := m.Create(); err != nil {
-		panic(err)
-	}
-
 	write(w, 200, jsonPayload{"id": m.Id, "timestamp": m.Timestamp})
 }
 

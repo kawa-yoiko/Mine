@@ -225,6 +225,13 @@ func (p *Post) Read(userId int32) error {
 	return nil
 }
 
+func (p *Post) ReadAuthorId() error {
+	err := db.QueryRow(
+		`SELECT author_id FROM post WHERE id = $1`, p.Id,
+	).Scan(&p.Author.Id)
+	return err
+}
+
 func readPostsOutline(userId int32) ([]map[string]interface{}, error) {
 	rows, err := db.Query(`SELECT id, timestamp, type, caption, contents FROM post
 		WHERE author_id = $1`, userId)
@@ -304,6 +311,13 @@ func (c *Comment) Read(userId int32) error {
 	err := db.QueryRow(commentSelectClause(userId)+
 		"WHERE comment.id = $1", c.Id,
 	).Scan(c.fields()...)
+	return err
+}
+
+func (c *Comment) ReadAuthorId() error {
+	err := db.QueryRow(
+		`SELECT author_id FROM comment WHERE id = $1`, c.Id,
+	).Scan(&c.Author.Id)
 	return err
 }
 

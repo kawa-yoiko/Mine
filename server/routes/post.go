@@ -32,6 +32,18 @@ func postPostNew(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	// Notify all subscribers
+	ids, err := c.ReadAllSubscribersIds()
+	if err != nil {
+		panic(err)
+	}
+	println(len(ids))
+	for _, id := range ids {
+		if err := models.SendSystemMessage(id, "collection_update " + c.Cover + " " + c.Title); err != nil {
+			panic(err)
+		}
+	}
+
 	write(w, 200, jsonPayload{"id": p.Id})
 }
 
@@ -61,6 +73,25 @@ func postPostCommentNew(w http.ResponseWriter, r *http.Request) {
 	if err := c.Create(); err != nil {
 		panic(err)
 	}
+
+	if replyTo == -1 {
+		p := models.Post{Id: int32(id)}
+		if err := p.ReadAuthorId(); err != nil {
+			panic(err)
+		}
+		if err := models.SendSystemMessage(p.Author.Id, "post_comment " + u.Nickname); err != nil {
+			panic(err)
+		}
+	} else {
+		cReplied := models.Comment{Id: int32(replyTo)}
+		if err := cReplied.ReadAuthorId(); err != nil {
+			panic(err)
+		}
+		if err := models.SendSystemMessage(cReplied.Author.Id, "comment_reply " + u.Nickname); err != nil {
+			panic(err)
+		}
+	}
+
 	write(w, 200, jsonPayload{"id": c.Id})
 }
 
@@ -105,6 +136,14 @@ func postPostUpvote(w http.ResponseWriter, r *http.Request) {
 	if err := p.Upvote(u, isUpvote != 0); err != nil {
 		panic(err)
 	}
+
+	if err := p.ReadAuthorId(); err != nil {
+		panic(err)
+	}
+	if err := models.SendSystemMessage(p.Author.Id, "post_upvote " + u.Nickname); err != nil {
+		panic(err)
+	}
+
 	write(w, 200, jsonPayload{"upvote_count": p.UpvoteCount})
 }
 

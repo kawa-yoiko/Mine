@@ -165,3 +165,12 @@ func MarkMessagesAsRead(toUserId, fromUserId int32) error {
 		toUserId, fromUserId)
 	return err
 }
+
+func SendSystemMessage(userId int32, contents string) error {
+	m := Message{
+		ToUser:   User{Id: userId},
+		FromUser: User{Id: -1},
+		Contents: contents,
+	}
+	return m.Create()
+}

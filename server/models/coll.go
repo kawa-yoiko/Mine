@@ -177,3 +177,23 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 func (c *Collection) Subscribe(u User, add bool) error {
 	return processEntityUserRel("collection_subscription", "collection", false, c.Id, u, add, &c.SubCount)
 }
+
+func (c *Collection) ReadAllSubscribersIds() ([]int32, error) {
+	rows, err := db.Query(
+		`SELECT user_id FROM collection_subscription WHERE collection_id = $1`,
+		c.Id,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	ids := []int32{}
+	for rows.Next() {
+		var id int32
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
+}

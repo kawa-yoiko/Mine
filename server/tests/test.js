@@ -819,6 +819,15 @@ else (async () => {
     return a;
   };
 
+  // Subscriptions
+  const promisesSubscriptions = [];
+  for (let u = 0; u < N; u++)
+    for (let b = B + rand() % Bd; b > 0; b--) {
+      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
+        {token: token[u], is_subscribe: 1}, any));
+    }
+  await Promise.all(promisesSubscriptions);
+
   // Tags
   const tagsAll = [];
   for (let i = 0; i < A; i++) {
@@ -919,15 +928,6 @@ else (async () => {
       }, any));
     }
   await Promise.all(promisesStars);
-
-  // Subscriptions
-  const promisesSubscriptions = [];
-  for (let u = 0; u < N; u++)
-    for (let b = B + rand() % Bd; b > 0; b--) {
-      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
-        {token: token[u], is_subscribe: 1}, any));
-    }
-  await Promise.all(promisesSubscriptions);
 
   // Messages
   for (let u = 0; u < N; u++)
