@@ -10,25 +10,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteX="39dp"
+        tools:layout_editor_absoluteY="50dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
 
-            <view
-                android:id="@+id/avatar"
-                class="com.example.mine.WidthEqualsHeightImageView"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/avatar_layout"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginLeft="20dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/luoxiaohei2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <view
+                    android:id="@+id/avatar"
+                    class="com.example.mine.WidthEqualsHeightImageView"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/luoxiaohei2" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/nickname"
@@ -39,7 +45,7 @@
                 android:text="kayuyuko"
                 android:textSize="24sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/avatar"
+                app:layout_constraintLeft_toRightOf="@id/avatar_layout"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.5" />
 
@@ -50,7 +56,7 @@
                 android:layout_marginLeft="20sp"
                 android:layout_marginTop="6sp"
                 android:text="我爱吃栗子"
-                app:layout_constraintLeft_toRightOf="@id/avatar"
+                app:layout_constraintLeft_toRightOf="@id/avatar_layout"
                 app:layout_constraintTop_toBottomOf="@id/nickname" />
 
             <ImageView
@@ -58,12 +64,11 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginRight="20dp"
+                android:src="@drawable/arrow1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5"
-                android:src="@drawable/arrow1"
-                />
+                app:layout_constraintVertical_bias="0.5" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
@@ -76,21 +81,21 @@
             android:drawableLeft="@drawable/add"
             android:minWidth="0dp"
             android:minHeight="0dp"
+            android:paddingVertical="10dp"
             android:paddingLeft="35dp"
             android:paddingRight="35dp"
-            android:paddingVertical="10dp"
             android:text="发布作品"
+            android:textColor="@color/white"
             android:textSize="16dp"
             android:textStyle="bold"
-            android:textColor="@color/white"
             tools:ignore="MissingConstraints" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:divider="@drawable/divider_grey"
             android:dividerPadding="20dp"
+            android:orientation="vertical"
             android:showDividers="beginning|middle|end">
 
             <RelativeLayout
@@ -100,24 +105,24 @@
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
                 android:paddingHorizontal="30dp"
-                android:paddingVertical="15dp"
-                >
+                android:paddingVertical="15dp">
+
                 <ImageView
+                    android:id="@+id/setting_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/settings"
-                    android:id="@+id/setting_icon"
                     android:layout_marginRight="45dp"
-                    ></ImageView>
+                    android:src="@drawable/settings"></ImageView>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="帐号设置"
-                    android:textColor="@color/black"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/setting_icon"
-                    ></TextView>
+                    android:text="帐号设置"
+                    android:textColor="@color/black"></TextView>
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/stars_button"
                 android:layout_width="match_parent"
@@ -125,24 +130,24 @@
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
                 android:paddingHorizontal="30dp"
-                android:paddingVertical="15dp"
-                >
+                android:paddingVertical="15dp">
+
                 <ImageView
+                    android:id="@+id/star_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/star"
-                    android:id="@+id/star_icon"
                     android:layout_marginRight="45dp"
-                    ></ImageView>
+                    android:src="@drawable/star"></ImageView>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="收藏夹"
-                    android:textColor="@color/black"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/star_icon"
-                    ></TextView>
+                    android:text="收藏夹"
+                    android:textColor="@color/black"></TextView>
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/about_button"
                 android:layout_width="match_parent"
@@ -150,23 +155,22 @@
                 android:layout_gravity="start"
                 android:background="#00FFFFFF"
                 android:paddingHorizontal="30dp"
-                android:paddingVertical="15dp"
-                >
+                android:paddingVertical="15dp">
+
                 <ImageView
+                    android:id="@+id/about_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/about"
-                    android:id="@+id/about_icon"
                     android:layout_marginRight="45dp"
-                    ></ImageView>
+                    android:src="@drawable/about"></ImageView>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="关于"
-                    android:textColor="@color/black"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/about_icon"
-                    ></TextView>
+                    android:text="关于"
+                    android:textColor="@color/black"></TextView>
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
