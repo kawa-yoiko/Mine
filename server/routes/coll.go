@@ -26,9 +26,11 @@ func postCollectionNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCollection(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	c := models.Collection{Id: int32(id)}
-	if err := c.Read(); err != nil {
+	if err := c.Read(u.Id); err != nil {
 		panic(err)
 	}
 
@@ -41,7 +43,7 @@ func referredCollection(u models.User, idStr string) models.Collection {
 		panic(models.CheckedError{400})
 	}
 	c := models.Collection{Id: int32(id)}
-	if err := c.Read(); err != nil {
+	if err := c.Read(u.Id); err != nil {
 		panic(err)
 	}
 	if c.Author.Id != u.Id {

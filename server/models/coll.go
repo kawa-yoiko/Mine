@@ -13,6 +13,7 @@ type Collection struct {
 	Tags        []string
 	Posts       []Post
 	SubCount    int32
+	MySub       bool
 
 	PostCount int32
 }
@@ -53,6 +54,7 @@ func (c *Collection) Repr() map[string]interface{} {
 		"posts":              posts,
 		"tags":               c.Tags,
 		"subscription_count": c.SubCount,
+		"my_subscription":    c.MySub,
 	}
 }
 
@@ -79,7 +81,7 @@ func (c *Collection) Create() error {
 	return err
 }
 
-func (c *Collection) Read() error {
+func (c *Collection) Read(userId int32) error {
 	err := db.QueryRow(`SELECT
 		collection.*, mine_user.nickname, mine_user.avatar
 		FROM collection INNER JOIN mine_user ON collection.author_id = mine_user.id
@@ -126,6 +128,17 @@ func (c *Collection) Read() error {
 	if err != nil {
 		return err
 	}
+
+	var count int
+	err = db.QueryRow(
+		"SELECT COUNT (*) FROM collection_subscription WHERE collection_id = $1 AND user_id = $2",
+		c.Id, userId,
+	).Scan(&count)
+	if err != nil {
+		return err
+	}
+	c.MySub = (count != 0)
+
 	return nil
 }
 

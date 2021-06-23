@@ -477,6 +477,7 @@ if (process.env['GEN'] !== '1') (async () => {
     ],
     tags: [],
     subscription_count: 0,
+	my_subscription: false,
   })
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
@@ -493,6 +494,7 @@ if (process.env['GEN'] !== '1') (async () => {
     ],
     tags: [],
     subscription_count: 0,
+	my_subscription: false,
   })
   let lid3 = (await check('POST', '/collection/new', {
     token: token2,
@@ -508,6 +510,7 @@ if (process.env['GEN'] !== '1') (async () => {
     posts: [],
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
+	my_subscription: false,
   })
   await check('PUT', `/upload/collection_cover/${lid3}`, {token: token1, file: 'avt1.png'}, undefined, 403)
   await check('PUT', `/upload/collection_cover/${lid3}`, {token: token2, file: 'avt1.png'}, any)
@@ -533,6 +536,7 @@ if (process.env['GEN'] !== '1') (async () => {
     ],
     tags: [],
     subscription_count: 0,
+	my_subscription: false,
   })
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
@@ -545,6 +549,7 @@ if (process.env['GEN'] !== '1') (async () => {
     ],
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
+	my_subscription: false,
   })
 
   await check('POST', `/post/${pids[0]}/set_collection`, {
@@ -566,7 +571,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 0}, {subscription_count: 1})
   await check('POST', `/collection/${lid2}/subscribe`, {token: token2, is_subscribe: 1}, {subscription_count: 2})
   await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 0}, {subscription_count: 1})
-  await check('GET', `/collection/${lid2}`, undefined, {
+  await check('GET', `/collection/${lid2}`, {token: token2}, {
     author: {nickname: 'kurikoneko', avatar: avt2},
     cover: any,
     title: any,
@@ -579,6 +584,7 @@ if (process.env['GEN'] !== '1') (async () => {
     ],
     tags: [],
     subscription_count: 1,
+	my_subscription: true,
   })
   await check('GET', `/subscription_timeline`, {token: token2, start: 0, count: 10}, [{
     _ignoreRedundant: true,
