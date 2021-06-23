@@ -1,9 +1,16 @@
 package com.example.mine;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -11,10 +18,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
+import java.util.List;
 import java.util.Locale;
 
 public class CollectionActivity extends AppCompatActivity {
     SquareFragment squareFragment;
+    private Button subscribeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,5 +72,33 @@ public class CollectionActivity extends AppCompatActivity {
                         squareFragment.reverse();
                     }
                 });
+        
+        subscribeButton = (Button) findViewById(R.id.subscribe_button);
+        subscribeButton.setOnClickListener(new View.OnClickListener() {
+            boolean subscribed = collection.mySubscription;
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                subscribeButton.setEnabled(false);
+                Handler handler = new Handler(Looper.getMainLooper());
+                ServerReq.postJson("/collection/" + collection.id + "/subscribe",
+                        List.of(new Pair<>("is_subscribe", subscribed ? "0" : "1")),
+                        (JSONObject obj) -> handler.post(() -> {
+                            subscribed = !subscribed;
+                            updateSubscriptionStatus(subscribed);
+                            subscribeButton.setEnabled(true);
+                        }));
+            }
+        });
+
+        updateSubscriptionStatus(collection.mySubscription);
+    }
+
+    private void updateSubscriptionStatus(boolean subscribed) {
+        subscribeButton.setText(subscribed ? "已订阅" : "订阅");
+        Drawable drawable = ContextCompat.getDrawable(getBaseContext(),
+                subscribed ? R.drawable.exo_ic_check : R.drawable.mark);
+        drawable.setBounds(0, 0, 42, 42);
+        subscribeButton.setCompoundDrawables(drawable, null, null, null);
     }
 }

@@ -71,7 +71,9 @@ public class LoadingActivity extends AppCompatActivity {
                 requestNetworkAndSetUpIntent("/collection/" + id,
                         CollectionActivity.class,
                         (JSONObject obj, Intent intent) -> {
-                            intent.putExtra("collection", new Collection(obj));
+                            Collection collection = new Collection(obj);
+                            collection.id = id;
+                            intent.putExtra("collection", collection);
                         });
                 break;
             case homepage:

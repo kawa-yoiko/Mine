@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Collection implements Serializable {
+    public int id;
     public String authorName;
     public String authorAvatar;
     public String cover;
@@ -15,6 +16,7 @@ public class Collection implements Serializable {
     public String description;
     public ArrayList<PostBrief> posts;
     public String tags;
+    public boolean mySubscription;
 
     public static class PostBrief implements Serializable {
         public int id;
@@ -55,6 +57,7 @@ public class Collection implements Serializable {
                 builder.append(tags.getString(i));
             }
             this.tags = builder.toString();
+            this.mySubscription = obj.getBoolean("my_subscription");
         } catch (JSONException e) {
             android.util.Log.e("Collection", "Invalid JSON object " + e.toString());
         }
