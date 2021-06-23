@@ -48,7 +48,7 @@ public class StarActivity extends AppCompatActivity {
             // XXX: For demonstration purpose
             int i = 0;
             for (Collection.PostBrief post : posts) {
-                if (++i == (posts.size() / 6) * 3 + 2) {
+                if (++i == 5) {
                     items.add(new SquareFragment.DateItem("2021 年 5 月"));
                 }
                 if (post.type == 0) {
