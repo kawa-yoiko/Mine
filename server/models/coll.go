@@ -7,6 +7,7 @@ import (
 type Collection struct {
 	Id          int32
 	Author      User
+	Cover       string
 	Title       string
 	Description string
 	Tags        []string
@@ -20,6 +21,7 @@ func init() {
 	registerSchema("collection",
 		"id SERIAL PRIMARY KEY",
 		"author_id INTEGER NOT NULL",
+		"cover TEXT NOT NULL",
 		"title TEXT NOT NULL",
 		"description TEXT NOT NULL",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
@@ -45,6 +47,7 @@ func (c *Collection) Repr() map[string]interface{} {
 	}
 	return map[string]interface{}{
 		"author":             c.Author.ReprBrief(),
+		"cover":              c.Cover,
 		"title":              c.Title,
 		"description":        c.Description,
 		"posts":              posts,
@@ -63,9 +66,9 @@ func (c *Collection) ReprBrief() map[string]interface{} {
 
 func (c *Collection) Create() error {
 	err := db.QueryRow(`INSERT INTO
-		collection (author_id, title, description)
-		VALUES ($1, $2, $3) RETURNING id`,
-		c.Author.Id, c.Title, c.Description,
+		collection (author_id, cover, title, description)
+		VALUES ($1, $2, $3, $4) RETURNING id`,
+		c.Author.Id, c.Cover, c.Title, c.Description,
 	).Scan(&c.Id)
 	if err != nil {
 		return err
@@ -81,7 +84,7 @@ func (c *Collection) Read() error {
 		FROM collection INNER JOIN mine_user ON collection.author_id = mine_user.id
 		WHERE collection.id = $1`, c.Id,
 	).Scan(
-		&c.Id, &c.Author.Id, &c.Title, &c.Description,
+		&c.Id, &c.Author.Id, &c.Cover, &c.Title, &c.Description,
 		&c.Author.Nickname, &c.Author.Avatar,
 	)
 	if err != nil {

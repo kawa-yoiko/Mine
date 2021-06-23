@@ -469,6 +469,7 @@ if (process.env['GEN'] !== '1') (async () => {
   // Collections
   await check('GET', `/collection/${lid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: avt1},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -479,6 +480,7 @@ if (process.env['GEN'] !== '1') (async () => {
   })
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -500,6 +502,7 @@ if (process.env['GEN'] !== '1') (async () => {
   }, {id: any})).id
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: 'Collection',
     description: 'A collection',
     posts: [],
@@ -517,6 +520,7 @@ if (process.env['GEN'] !== '1') (async () => {
   }, {})
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -530,6 +534,7 @@ if (process.env['GEN'] !== '1') (async () => {
   })
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: 'Collection',
     description: 'A collection',
     posts: [
@@ -561,6 +566,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 0}, {subscription_count: 1})
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [

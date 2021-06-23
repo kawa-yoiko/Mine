@@ -86,9 +86,13 @@ func postUploadAvatar(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, u.Repr())
 }
 
+func postUploadCollectionCover(w http.ResponseWriter, r *http.Request) {
+}
+
 func init() {
 	registerHandler("/upload", postUpload, "POST")
 	registerHandler("/upload/avatar", postUploadAvatar, "POST")
+	registerHandler("/upload/collection_cover", postUploadCollectionCover, "POST")
 
 	router.PathPrefix("/upload").Handler(
 		http.FileServer(http.Dir(uploadDir))).Methods("GET")
