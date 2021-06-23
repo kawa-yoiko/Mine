@@ -149,7 +149,7 @@ func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, err
 	collections := []map[string]interface{}{}
 	for rows.Next() {
 		c := Collection{}
-		err := rows.Scan(&c.Id, &c.Title, &c.Description, &c.PostCount)
+		err := rows.Scan(&c.Id, &c.Cover, &c.Title, &c.Description, &c.PostCount)
 		if err != nil {
 			return nil, err
 		}
@@ -162,7 +162,7 @@ func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, err
 }
 
 func collectionSelectFields() string {
-	return ` id, title, description,
+	return ` id, cover, title, description,
 		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id) `
 }
 
