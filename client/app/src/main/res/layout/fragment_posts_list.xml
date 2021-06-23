@@ -11,4 +11,15 @@
         android:layout_height="match_parent"
         android:paddingBottom="60dp"
         />
+
+    <TextView
+        android:id="@+id/empty_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="还没有订阅合集哦，去「发现」页面逛逛吧~"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp"
+        android:visibility="invisible"
+        />
 </FrameLayout>

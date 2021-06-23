@@ -76,7 +76,12 @@ public class PostsListFragment extends Fragment {
                                 postsListAdapter.notifyDataSetChanged();
                             else
                                 postsListAdapter.notifyItemRangeInserted(posts.size() - n, n);
-                            if (complete) loadingAdapter.clear();
+                            if (complete) {
+                                loadingAdapter.clear();
+                                if (posts.size() == 0) {
+                                    view.findViewById(R.id.empty_hint).setVisibility(View.VISIBLE);
+                                }
+                            }
                         });
                         listener.finishLoad(complete);
                     } catch (Exception e) {
