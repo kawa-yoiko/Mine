@@ -15,6 +15,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/author_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50px"
@@ -28,8 +29,7 @@
                 class="com.example.mine.WidthEqualsHeightImageView"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/flower"
-                />
+                android:src="@drawable/flower" />
 
             <TextView
                 android:id="@+id/nickname"

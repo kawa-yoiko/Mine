@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ import okhttp3.*;
 
 public class MyFragment  extends Fragment {
     private PopupWindow popupWindow;
+    private static final int REQUEST_ACCOUNT_SETTINGS = 1;
     public MyFragment() {}
 
     @Override
@@ -58,9 +60,11 @@ public class MyFragment  extends Fragment {
                 
                 View text_button = popView.findViewById(R.id.text);
                 View image_button = popView.findViewById(R.id.image);
+                View music_button = popView.findViewById(R.id.music);
+                View video_button = popView.findViewById(R.id.video);
                 View.OnClickListener typeSelectorListener = new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
+                     public void onClick(View view) {
                         Intent intent = new Intent();
                         switch (view.getId()) {
                             case R.id.text:
@@ -68,6 +72,12 @@ public class MyFragment  extends Fragment {
                                 break;
                             case R.id.image:
                                 intent.putExtra("create_type", "image");
+                                break;
+                            case R.id.music:
+                                intent.putExtra("create_type", "audio");
+                                break;
+                            case R.id.video:
+                                intent.putExtra("create_type", "video");
                                 break;
                             default:
                                 break;
@@ -78,6 +88,8 @@ public class MyFragment  extends Fragment {
                 };
                 text_button.setOnClickListener(typeSelectorListener);
                 image_button.setOnClickListener(typeSelectorListener);
+                music_button.setOnClickListener(typeSelectorListener);
+                video_button.setOnClickListener(typeSelectorListener);
 
                 popupWindow = new PopupWindow(popView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindow.setOutsideTouchable(false);
@@ -89,7 +101,7 @@ public class MyFragment  extends Fragment {
 
         ( view.findViewById(R.id.settings_button)).setOnClickListener((View v) -> {
             Intent intent = new Intent(getActivity(), SettingActivity.class);
-            getActivity().startActivity(intent);
+            this.startActivityForResult(intent, REQUEST_ACCOUNT_SETTINGS);
         });
 
         ( view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
@@ -97,14 +109,19 @@ public class MyFragment  extends Fragment {
             getActivity().startActivity(intent);
         });
 
-        View gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
+        ImageView gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
+        gotoHomePageBtn.setColorFilter(Color.parseColor("#555555"));
         gotoHomePageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), HomepageActivity.class);
+                Intent intent = new Intent(getActivity(), LoadingActivity.class);
+                intent.putExtra("type", LoadingActivity.DestType.homepage);
+                intent.putExtra("nickname", ServerReq.getMyNickname());
                 getActivity().startActivity(intent);
             }
         });
+
+        updateUserInfoDisplay();
     }
 
     @Override
@@ -112,5 +129,20 @@ public class MyFragment  extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my, container, false);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ACCOUNT_SETTINGS) {
+            this.updateUserInfoDisplay();
+        }
+    }
+
+    private void updateUserInfoDisplay() {
+        ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(),
+                getView().findViewById(R.id.avatar));
+        ((TextView) getView().findViewById(R.id.nickname)).setText(ServerReq.getMyNickname());
+        ((TextView) getView().findViewById(R.id.signature)).setText(ServerReq.getMyBio());
     }
 }

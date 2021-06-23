@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private LinkedList<Post> data;
     private static final int IMAGE = 0;
     private static final int TEXT = 1;
+    private static final int AUDIO = 2;
+    private static final int VIDEO = 3;
 
     public static class ImageHolder extends RecyclerView.ViewHolder {
         public ImageHolder(@NonNull View itemView) {
@@ -43,6 +46,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             default:
             case 0: return TEXT;
             case 1: return IMAGE;
+            case 2: return AUDIO;
+            case 3: return VIDEO;
         }
     }
 
@@ -56,6 +61,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         else if (viewType == TEXT) {
             View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post_text, parent, false);
             return new TextHolder(mItemView);
+        } else if (viewType == AUDIO || viewType == VIDEO) {
+            View mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
+            return new ImageHolder(mItemView);
         }
         return null;
     }
@@ -97,7 +105,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (holder instanceof ImageHolder) {
             ImageView content_image = item.findViewById(R.id.content);
-            ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
+            if (post.getContentType() == 0) {
+                ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
+            } else if (post.getContentType() == 2) {
+                content_image.setImageResource(R.drawable.music);
+                content_image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
+            } else {
+                content_image.setImageResource(R.drawable.video);
+                content_image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
+            }
         }
         else if (holder instanceof TextHolder) {
             TextView content_text = item.findViewById(R.id.content);

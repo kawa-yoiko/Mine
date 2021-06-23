@@ -7,6 +7,7 @@ import (
 
 	"database/sql"
 	"errors"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 )
@@ -41,6 +42,10 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 		Tags:        []string{},
 	}
 	if err := c.Create(); err != nil {
+		if err, ok := err.(models.UserCreateError); ok {
+			write(w, 400, jsonPayload{"error": err.Code})
+			return
+		}
 		panic(err)
 	}
 
@@ -116,20 +121,35 @@ func getWhoAmI(w http.ResponseWriter, r *http.Request) {
 	write(w, 200, u.Repr())
 }
 
+func getWhoIs(w http.ResponseWriter, r *http.Request) {
+	nickname := mux.Vars(r)["nickname"]
+	u := models.User{Nickname: nickname}
+	if err := u.ReadByNickname(); err != nil {
+		panic(err)
+	}
+	write(w, 200, u.Repr())
+}
+
 func postWhoAmIEdit(w http.ResponseWriter, r *http.Request) {
 	u := mustAuth(r)
 
+	u.Nickname = r.PostFormValue("nickname")
 	u.Signature = r.PostFormValue("signature")
 	if err := u.Update(); err != nil {
+		if err, ok := err.(models.UserCreateError); ok {
+			write(w, 400, jsonPayload{"error": err.Code})
+			return
+		}
 		panic(err)
 	}
 
-	write(w, 200, u.Repr())
+	write(w, 200, jsonPayload{"error": 0, "user": u.Repr()})
 }
 
 func init() {
 	registerHandler("/signup", postSignup, "POST")
 	registerHandler("/login", postLogin, "POST")
 	registerHandler("/whoami", getWhoAmI, "GET")
+	registerHandler("/whois/{nickname}", getWhoIs, "GET")
 	registerHandler("/whoami/edit", postWhoAmIEdit, "POST")
 }

@@ -44,7 +44,7 @@ public class StarActivity extends AppCompatActivity {
                 }
             }
             // TODO: Reduce duplication
-            items.add(new SquareFragment.DateItem("2021 年 5 月"));
+            items.add(new SquareFragment.DateItem("2021 年 6 月"));
             for (Collection.PostBrief post : posts) {
                 if (post.type == 0) {
                     items.add(new SquareFragment.TextItem(post.id, post.caption, post.contents));

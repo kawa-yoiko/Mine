@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -48,6 +49,10 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
         ImageView flowerIcon = item.findViewById(R.id.flower_icon);
         flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
 
+        ServerReq.Utils.loadImage("/upload/" + post.getAvatar(),
+                (ImageView) item.findViewById(R.id.avatar));
+        ((TextView) item.findViewById(R.id.nickname)).setText(post.getNickname());
+
         TextView text = item.findViewById(R.id.text);
         ImageView image = item.findViewById(R.id.image);
         if (post.getContentType() == 0) {
@@ -58,6 +63,14 @@ public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.Discov
             text.setVisibility(View.GONE);
             image.setVisibility(View.VISIBLE);
             ServerReq.Utils.loadImage("/upload/" + post.getContent(), image);
+        } else if (post.getContentType() == 2) {
+            image.setImageResource(R.drawable.music);
+            image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
+            text.setVisibility(View.GONE);
+        } else if (post.getContentType() == 3) {
+            image.setImageResource(R.drawable.video);
+            image.setColorFilter(ResourcesCompat.getColor(item.getResources(), R.color.themeyellow, null));
+            text.setVisibility(View.GONE);
         }
 //        ImageView avatarIcon = item.findViewById(R.id.avatar_icon);
 //        avatarIcon.setImageResource(contact.getAvatarIcon());

@@ -17,6 +17,7 @@ public class LoadingActivity extends AppCompatActivity {
     public enum DestType {
         post,
         collection,
+        homepage,
     }
 
     // XXX: Straightforward but works
@@ -72,6 +73,14 @@ public class LoadingActivity extends AppCompatActivity {
                         (JSONObject obj, Intent intent) -> {
                             intent.putExtra("collection", new Collection(obj));
                         });
+                break;
+            case homepage:
+                requestNetworkAndSetUpIntent("/whois/" + inIntent.getStringExtra("nickname"),
+                        HomepageActivity.class,
+                        (JSONObject obj, Intent intent) -> {
+                            intent.putExtra("user", new User(obj));
+                        });
+                break;
         }
     }
 }

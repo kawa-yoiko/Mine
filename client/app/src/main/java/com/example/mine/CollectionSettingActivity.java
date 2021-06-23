@@ -3,8 +3,11 @@ package com.example.mine;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -12,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -20,7 +24,10 @@ import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.view.CropImageView;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class CollectionSettingActivity extends AppCompatActivity {
     private static int IMAGE_PICKER = 0;
@@ -34,6 +41,7 @@ public class CollectionSettingActivity extends AppCompatActivity {
     private String introduction;
     private boolean isCoverChanged = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,45 +66,20 @@ public class CollectionSettingActivity extends AppCompatActivity {
         tagEdit = findViewById(R.id.tag);
         nameEdit = findViewById(R.id.name);
         introductionEdit = findViewById(R.id.introduction);
-        tag = tagEdit.getText().toString();
-        name = nameEdit.getText().toString();
-        introduction = introductionEdit.getText().toString();
 
-        tagEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    tag = tagEdit.getText().toString();
-                }
-            }
-        });
-        nameEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    name = nameEdit.getText().toString();
-                }
-            }
-        });
-        introductionEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    introduction = introductionEdit.getText().toString();
-                }
-            }
-        });
+        cover_img.setColorFilter(Color.parseColor("#555555"));
 
         Button ensureBtn = findViewById(R.id.ensure);
         ensureBtn.setOnClickListener((View v) -> {
-            //TODO: send name, tag introduction and avator to server
+            // send name, tag introduction and avator to server
             // if need, apply constraint that: only send changed items to server
-            if(isCoverChanged) {
-
-            }
-            else {
-
-            }
+            ServerReq.postJson("/collection/new", List.of(
+                    new Pair<>("title", nameEdit.getText().toString()),
+                    new Pair<>("description", introductionEdit.getText().toString()),
+                    new Pair<>("tags", tagEdit.getText().toString())
+            ), (JSONObject obj) -> {
+                finish();
+            });
         });
 
     }
@@ -111,6 +94,7 @@ public class CollectionSettingActivity extends AppCompatActivity {
                 String path = imageItem.path;
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 cover_img.setImageBitmap(bm);
+                cover_img.setColorFilter(Color.WHITE);
             }
         }
     }

@@ -184,8 +184,6 @@ const check = async (method, url, params, expect, expect_status) => {
 if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/reset')
 
-/*
-  console.log('======== Sign up ========');
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa..moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '哈哈哈哈哈哈'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: 'kayuyuko1', email: 'kyyk1@kawa.moe', password: '888'}, {error: 1}, 400)
@@ -195,7 +193,6 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/signup', {nickname: 'kayuyuko2', email: 'kyyk2@kawa.moe', password: '888888'}, {error: 0}, 200)
   await check('POST', '/signup', {nickname: '小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 1}, 400)
   await check('POST', '/signup', {nickname: '栗小猫', email: 'kurikoneko@kawa.moe', password: '888888'}, {error: 0}, 200)
-*/
 
   const bio1 = '我爱吃栗子';
   const bio2 = '我爱吃寿司';
@@ -206,35 +203,46 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', '/login', {nickname: 'kayuyuko', password: '888888'}, undefined, 400)
   let u1 = await check('POST', '/login', {nickname: 'kayuyuko', password: 'P4$$w0rd'}, {
     token: any,
-    user: {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]}
+    user: {nickname: 'kayuyuko', avatar: '', signature: '', posts: [], collections: [any]}
   }, 200)
   let token1 = u1.token
   await check('GET', '/whoami', {token: '123123'}, undefined, 401)
   await check('GET', '/whoami', {token: token1},
-    {nickname: 'kayuyuko', avatar: '', signature: '', collections: [any]})
+    {nickname: 'kayuyuko', avatar: '', signature: '', posts: [], collections: [any]})
   let u2 = await check('POST', '/login', {nickname: 'kurikoneko', password: 'letme1n'}, {
     token: any,
-    user: {nickname: 'kurikoneko', avatar: '', signature: '', collections: [any]}
+    user: {nickname: 'kurikoneko', avatar: '', signature: '', posts: [], collections: [any]}
   }, 200)
   let token2 = u2.token
 
   // User modification
   await check('POST', '/whoami/edit',
-    {token: token2, signature: bio2},
-    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+    {token: token2, nickname: 'kurikoneko1', signature: bio2},
+    {error: 0, user: {nickname: 'kurikoneko1', avatar: '', signature: bio2, posts: [], collections: [any]}})
   await check('GET', '/whoami', {token: token2},
-    {nickname: 'kurikoneko', avatar: '', signature: bio2, collections: [any]})
+    {nickname: 'kurikoneko1', avatar: '', signature: bio2, posts: [], collections: [any]})
   await check('POST', '/whoami/edit',
-    {token: token1, signature: bio1},
-    {nickname: 'kayuyuko', avatar: '', signature: bio1, collections: [any]})
+    {token: token2, nickname: 'kurikoneko', signature: bio2},
+    {error: 0, user: {nickname: 'kurikoneko', avatar: '', signature: bio2, posts: [], collections: [any]}})
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'kayuyuko', signature: bio1},
+    {error: 0, user: {nickname: 'kayuyuko', avatar: '', signature: bio1, posts: [], collections: [any]}})
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'k', signature: bio1},
+    {error: 1}, 400)
+  await check('POST', '/whoami/edit',
+    {token: token1, nickname: 'kurikoneko', signature: bio1},
+    {error: 2}, 400)
+  await check('GET', '/whois/kurikoneko', {},
+    {nickname: 'kurikoneko', avatar: '', signature: bio2, posts: [], collections: [any]})
 
   // Avatar
   let avt1 = (await check('PUT', '/upload/avatar',
     {token: token1, file: 'avt1.png'},
-    {nickname: 'kayuyuko', avatar: any, signature: bio1, collections: [any]})).avatar
+    {nickname: 'kayuyuko', avatar: any, signature: bio1, posts: [], collections: [any]})).avatar
   let avt2 = (await check('PUT', '/upload/avatar',
     {token: token2, file: 'avt2.png'},
-    {nickname: 'kurikoneko', avatar: any, signature: bio2, collections: [any]})).avatar
+    {nickname: 'kurikoneko', avatar: any, signature: bio2, posts: [], collections: [any]})).avatar
 
   let u2img1 = (await check('PUT', '/upload',
     {token: token2, file: 'post1.png'},
@@ -287,6 +295,15 @@ if (process.env['GEN'] !== '1') (async () => {
     collection: lid2, // Others' collection
     tags: 'tag1,tag2',
   }, undefined, 403)
+
+  await check('GET', '/whois/kayuyuko', {}, {
+    nickname: 'kayuyuko', avatar: any, signature: bio1,
+    posts: [{id: any, timestamp: any, type: 0, caption: any, contents: any}], collections: [any]
+  })
+  await check('GET', '/whois/kurikoneko', {}, {
+    nickname: 'kurikoneko', avatar: any, signature: bio2,
+    posts: [{id: any, timestamp: any, type: 1, contents: any}], collections: [any]
+  })
 
   // Comments
   let cid1 = (await check('POST', `/post/${pid1}/comment/new`, {
@@ -374,6 +391,29 @@ if (process.env['GEN'] !== '1') (async () => {
     {_ignoreRedundant: true, upvote_count: 2, my_upvote: true},
   ])
 
+  // Hot comments
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    // Currently empty
+  ])
+  await check('POST', `/post/${pid1}/comment/new`, {
+    token: token2,
+    reply_to: -1,
+    contents: 'Maybe comment',
+  }, {id: any})
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    // Still empty since no upvote
+  ])
+  await check('POST', `/post/${pid1}/comment/${cid1}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 1});
+  await check('GET', `/post/${pid1}/comments/hot`, {
+    token: token2,
+  }, [
+    {_ignoreRedundant: true, id: cid1},
+  ])
+
   // Upvote
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
   await check('POST', `/post/${pid1}/upvote`, {token: token1, is_upvote: 0}, {upvote_count: 0})
@@ -408,7 +448,7 @@ if (process.env['GEN'] !== '1') (async () => {
     collection: {id: lid1, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
-    comment_count: 4,
+    comment_count: 5,
     star_count: 2,
     my_star: true,
     my_upvote: true,
@@ -432,7 +472,7 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: pid1, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
+      {id: pid1, timestamp: any, type: 0, caption: 'Caption', contents: 'Lorem ipsum'}
     ],
     tags: [],
     subscription_count: 0,
@@ -442,12 +482,12 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[1], timestamp: any, type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[3], timestamp: any, type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 0,
@@ -480,10 +520,10 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 0,
@@ -493,8 +533,8 @@ if (process.env['GEN'] !== '1') (async () => {
     title: 'Collection',
     description: 'A collection',
     posts: [
-      {id: pids[1], type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
-      {id: pids[3], type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
+      {id: pids[1], timestamp: any, type: 0, caption: 'Caption 1', contents: 'Lorem ipsum 1'},
+      {id: pids[3], timestamp: any, type: 0, caption: 'Caption 3', contents: 'Lorem ipsum 3'},
     ],
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
@@ -524,10 +564,10 @@ if (process.env['GEN'] !== '1') (async () => {
     title: any,
     description: any,
     posts: [
-      {id: any, type: 1, contents: any},
-      {id: pids[0], type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
-      {id: pids[2], type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
-      {id: pids[4], type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
+      {id: any, timestamp: any, type: 1, contents: any},
+      {id: pids[0], timestamp: any, type: 0, caption: 'Caption 0', contents: 'Lorem ipsum 0'},
+      {id: pids[2], timestamp: any, type: 0, caption: 'Caption 2', contents: 'Lorem ipsum 2'},
+      {id: pids[4], timestamp: any, type: 0, caption: 'Caption 4', contents: 'Lorem ipsum 4'},
     ],
     tags: [],
     subscription_count: 1,
@@ -575,6 +615,97 @@ if (process.env['GEN'] !== '1') (async () => {
     {_ignoreRedundant: true, contents: `${u2img1}`},
   ])
 
+  // Search tags
+  await check('GET', `/search_tags`, {tag: 'tag'},
+    [any, any, any, any, any, any, any, any])
+  await check('GET', `/search_tags`, {tag: ''}, undefined, 400)
+  await check('GET', `/search_tags`, {tag: '%_'}, [])
+
+  // Search by tag
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 10}, [any, any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 0, count: 1}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'd', type: 'new', start: 1, count: 1}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'new', start: 0, count: 10}, [any, any, any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'new', start: 2, count: 2}, [any]);
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'day', start: 0, count: 10}, [
+    {_ignoreRedundant: true, upvote_count: 1},
+    {_ignoreRedundant: true, upvote_count: 0},
+    {_ignoreRedundant: true, upvote_count: 0},
+  ]);
+  await check('POST', `/post/${pids[2]}/upvote`, {token: token1, is_upvote: 1}, {upvote_count: 1})
+  await check('POST', `/post/${pids[2]}/upvote`, {token: token2, is_upvote: 1}, {upvote_count: 2})
+  await check('GET', `/search_posts`, {token: token1, tag: 'tag2', type: 'day', start: 0, count: 10}, [
+    {_ignoreRedundant: true, upvote_count: 2},
+    {_ignoreRedundant: true, upvote_count: 1},
+    {_ignoreRedundant: true, upvote_count: 0},
+  ]);
+
+  await check('GET', `/search_collections`, {token: token1, tag: 'a', start: 0, count: 10}, [any]);
+  await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 0, count: 10}, [any]);
+  await check('GET', `/search_collections`, {token: token1, tag: 'tag2', start: 1, count: 10}, []);
+
+  // Message
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq2'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token2, to_user: 'kayuyuko', contents: 'qwqwqwqwq3'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq4'},
+    {id: any, timestamp: any})
+  await check('POST', '/message/send',
+    {token: token1, to_user: '栗小猫', contents: 'qwqwqwqwq5'},
+    {id: any, timestamp: any})
+  await check('GET', '/message/with/kayuyuko',
+    {token: token2, start: 0, count: 2}, [
+      {from_me: false, contents: 'qwqwqwqwq4', _ignoreRedundant: true},
+      {from_me: true, contents: 'qwqwqwqwq3', _ignoreRedundant: true},
+    ])
+  await check('GET', '/message/with/kayuyuko',
+    {token: token2, start: 1, count: 10}, [
+      {from_me: true, contents: 'qwqwqwqwq3', _ignoreRedundant: true},
+      {from_me: false, contents: 'qwqwqwqwq2', _ignoreRedundant: true},
+      {from_me: false, contents: 'qwqwqwqwq', _ignoreRedundant: true},
+    ])
+
+  await check('GET', '/message/latest', {token: token1}, [{
+    from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+    to_user: {nickname: '栗小猫', _ignoreRedundant: true},
+    unread_count: 0,
+    _ignoreRedundant: true,
+  }, {
+    from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+    to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
+    unread_count: 1,
+    _ignoreRedundant: true,
+  }])
+  await check('GET', '/message/latest', {token: token2}, [{
+    from_user: {nickname: 'kayuyuko', _ignoreRedundant: true},
+    to_user: {nickname: 'kurikoneko', _ignoreRedundant: true},
+    unread_count: 3,
+    _ignoreRedundant: true,
+  }])
+
+  // Message reading
+  await check('POST', '/message/read/kayuyuko', {token: token2}, {})
+  await check('GET', '/message/latest', {token: token1}, [any, {unread_count: 1, _ignoreRedundant: true}])
+  await check('GET', '/message/latest', {token: token2}, [{unread_count: 0, _ignoreRedundant: true}])
+
+  await check('POST', '/message/send',
+    {token: token1, to_user: 'kurikoneko', contents: 'qwqwqwqwq6'},
+    {id: any, timestamp: any})
+  await check('GET', '/message/latest', {token: token1}, [{unread_count: 1, _ignoreRedundant: true}, any])
+  await check('GET', '/message/latest', {token: token2}, [{unread_count: 1, _ignoreRedundant: true}])
+
+  // System messages
+  await check('GET', '/message/with/n',
+    {token: token2, start: 1, count: 10},
+    any);
+
   console.log(`\n${pass}/${total} passed`);
 })();
 
@@ -605,6 +736,7 @@ else (async () => {
   const C = 3;     // Number of collections per user (minimum)
   const Cd = 5;    // (variation)
   const M = 10;    // Average number of posts per collection
+  const A = 50;    // Number of tags
   const P = 50;    // Number of post upvotes per user (minimum)
   const Pd = 150;  // (variation)
   const S = 50;    // Number of stars per user (minimum)
@@ -615,6 +747,8 @@ else (async () => {
   const Vd = 2000; // (variation)
   const B = 5;     // Number of subscriptions per user (minimum)
   const Bd = 15;   // (variation)
+  const E = 10;    // Number of messages between a pair of users (minimum)
+  const Ed = 190;  // (variation)
 
   const token = Array(N);
   for (let i = 0; i < N; i++) {
@@ -677,13 +811,27 @@ else (async () => {
     return a;
   };
 
+  // Tags
+  const tagsAll = [];
+  for (let i = 0; i < A; i++) {
+    const s = bullshit.sentence(1).replace(/[，。；？·]/g, '');
+    const n = rand() % (s.length - 2);
+    tagsAll.push(s.substr(n, 2 + rand() % 3));
+  }
+
   // Create posts
   const postsAll = [];
   for (let u of shuffleRepeated(N, (u) => M * colls[u].length + rand() % 10)) {
+    const tags = [];
+    for (let a = 1 + rand() % 3, i = 0; i < a; i++) {
+      let u = rand() % (tagsAll.length - i) + i;
+      let t = tagsAll[u]; tagsAll[u] = tagsAll[i]; tagsAll[i] = t;
+      tags.push(tagsAll[i]);
+    }
     const args = {
       token: token[u],
       collection: colls[u][rand() % colls[u].length],
-      tags: 'tag3,tag4',
+      tags: tags.join(','),
     };
     if (rand() % 3 !== 0) {
       const contentImages = Array.from(Array(1 + rand() % 9),
@@ -772,6 +920,24 @@ else (async () => {
         {token: token[u], is_subscribe: 1}, any));
     }
   await Promise.all(promisesSubscriptions);
+
+  // Messages
+  for (let u = 0; u < N; u++)
+    for (let v = 0; v < N; v++) if (u !== v && rand() % 3 !== 0) {
+      for (let e = E + rand() % Ed; e > 0; e--) {
+        let fromToken, to_user;
+        if (rand() % 2 === 0) {
+          fromToken = token[u];
+          to_user = `uu${v}`;
+        } else {
+          fromToken = token[v];
+          to_user = `uu${u}`;
+        }
+        await check('POST', '/message/send',
+          {token: fromToken, to_user, contents: bullshit.sentence()},
+          any);
+      }
+    }
 
   console.log(token);
 

@@ -44,6 +44,7 @@
                 android:layout_marginBottom="30sp"
                 android:text="kayuyuko"
                 android:textSize="24sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/avatar_layout"
                 app:layout_constraintTop_toTopOf="parent"

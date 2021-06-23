@@ -133,9 +133,10 @@ func (p *Post) ReprBrief() map[string]interface{} {
 
 func (p *Post) ReprOutline() map[string]interface{} {
 	ret := map[string]interface{}{
-		"id":       p.Id,
-		"type":     p.Type,
-		"contents": p.truncatedContents(100),
+		"id":        p.Id,
+		"timestamp": p.Timestamp,
+		"type":      p.Type,
+		"contents":  p.truncatedContents(100),
 	}
 	if p.Type == 0 {
 		ret["caption"] = p.Caption
@@ -177,19 +178,23 @@ func (p *Post) Create() error {
 }
 
 // TODO: Optimize comment counting
-func postSelectClause(userId int32) string {
+func postSelectClauseWithBaseRel(userId int32, baseRel string) string {
 	u := strconv.FormatInt(int64(userId), 10)
 	return `SELECT
 		post.*, mine_user.nickname, mine_user.avatar, collection.title,
 		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id),
-		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id),
+		(SELECT COUNT (*) FROM post_upvote WHERE post_upvote.post_id = post.id) AS post_upvote_count,
 		(SELECT COUNT (*) FROM post_star WHERE post_star.post_id = post.id),
 		(SELECT COUNT (*) FROM comment WHERE comment.post_id = post.id),
 		(SELECT COUNT (*) <> 0 FROM post_upvote WHERE post_upvote.post_id = post.id AND post_upvote.user_id = ` + u + `),
 		(SELECT COUNT (*) <> 0 FROM post_star WHERE post_star.post_id = post.id AND post_star.user_id = ` + u + `)
-		FROM post INNER JOIN mine_user ON post.author_id = mine_user.id
+		FROM ` + baseRel + ` INNER JOIN mine_user ON post.author_id = mine_user.id
 		  INNER JOIN collection ON post.collection_id = collection.id
 	`
+}
+
+func postSelectClause(userId int32) string {
+	return postSelectClauseWithBaseRel(userId, "post")
 }
 
 func (p *Post) fields() []interface{} {
@@ -218,6 +223,25 @@ func (p *Post) Read(userId int32) error {
 	}
 
 	return nil
+}
+
+func readPostsOutline(userId int32) ([]map[string]interface{}, error) {
+	rows, err := db.Query(`SELECT id, timestamp, type, caption, contents FROM post
+		WHERE author_id = $1`, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	posts := []map[string]interface{}{}
+	for rows.Next() {
+		p := Post{}
+		err := rows.Scan(&p.Id, &p.Timestamp, &p.Type, &p.Caption, &p.Contents)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p.ReprOutline())
+	}
+	return posts, rows.Err()
 }
 
 func (p *Post) Upvote(u User, add bool) error {
@@ -252,7 +276,7 @@ func commentSelectClause(userId int32) string {
 		COALESCE(comment.reply_to, -1),
 		COALESCE(comment.reply_root, -1),
 		comment.contents,
-		(SELECT COUNT (*) FROM comment_upvote WHERE comment_upvote.comment_id = comment.id),
+		(SELECT COUNT (*) FROM comment_upvote WHERE comment_upvote.comment_id = comment.id) AS comment_upvote_count,
 		author.nickname, author.avatar,
 		COALESCE(reply_user.nickname, ''), COALESCE(reply_user.avatar, ''),
 		(SELECT COUNT (*) FROM comment AS c1 WHERE c1.reply_root = comment.id),
@@ -283,7 +307,22 @@ func (c *Comment) Read(userId int32) error {
 	return err
 }
 
-func ReadComments(postId int32, start int, count int, replyRoot int32, userId int32) ([]map[string]interface{}, error) {
+func ReadComments(postId int32, hot bool, start int, count int, replyRoot int32, userId int32) ([]map[string]interface{}, error) {
+	hotOrder := ""
+	if hot {
+		hotOrder = "comment_upvote_count DESC, "
+		// Calculate count
+		if err := db.QueryRow(
+			"SELECT COUNT (*) FROM comment WHERE comment.post_id = $1",
+			postId,
+		).Scan(&count); err != nil {
+			return nil, err
+		}
+		count /= 5
+		if count > 4 {
+			count = 4
+		}
+	}
 	replyRootCond := "comment.reply_root IS NULL"
 	queryArgs := []interface{}{postId, start, count}
 	if replyRoot != -1 {
@@ -292,7 +331,7 @@ func ReadComments(postId int32, start int, count int, replyRoot int32, userId in
 	}
 	rows, err := db.Query(commentSelectClause(userId)+
 		"WHERE comment.post_id = $1 AND "+replyRootCond+" "+
-		"ORDER BY comment.timestamp DESC, comment.id DESC "+
+		"ORDER BY "+hotOrder+"comment.timestamp DESC, comment.id DESC "+
 		"LIMIT $3 OFFSET $2",
 		queryArgs...,
 	)
@@ -306,6 +345,9 @@ func ReadComments(postId int32, start int, count int, replyRoot int32, userId in
 		err := rows.Scan(c.fields()...)
 		if err != nil {
 			return nil, err
+		}
+		if hot && c.UpvoteCount == 0 {
+			continue
 		}
 		comments = append(comments, c.Repr())
 	}

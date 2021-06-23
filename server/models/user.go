@@ -31,6 +31,10 @@ func init() {
 }
 
 func (u *User) Repr() map[string]interface{} {
+	posts, err := readPostsOutline(u.Id)
+	if err != nil {
+		panic(err)
+	}
 	collections, err := readCollections(u.Id)
 	if err != nil {
 		panic(err)
@@ -39,6 +43,7 @@ func (u *User) Repr() map[string]interface{} {
 		"nickname":    u.Nickname,
 		"avatar":      u.Avatar,
 		"signature":   u.Signature,
+		"posts":       posts,
 		"collections": collections,
 	}
 }
@@ -90,9 +95,9 @@ func (u *User) Create() error {
 	).Scan(&u.Id)
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23505" { // unique_violation
-			if err.Constraint == "nickname_unique" {
+			if err.Constraint == "user_nickname_uniq" {
 				return UserCreateError{UserCreateErrorNicknameExists}
-			} else if err.Constraint == "email_unique" {
+			} else if err.Constraint == "user_email_uniq" {
 				return UserCreateError{UserCreateErrorEmailExists}
 			}
 		}
@@ -120,12 +125,23 @@ func (u *User) ReadByEmail() error {
 }
 
 func (u *User) Update() error {
+	// TODO: Reduce duplication??
+	if !(len([]rune(u.Nickname)) >= 3 && len([]rune(u.Nickname)) <= 16) {
+		return UserCreateError{UserCreateErrorFormat}
+	}
 	_, err := db.Exec("UPDATE mine_user SET "+
 		"nickname = $1, email = $2, avatar = $3, signature = $4 "+
 		"WHERE id = $5",
 		u.Nickname, u.Email, u.Avatar, u.Signature,
 		u.Id,
 	)
+	if err, ok := err.(*pq.Error); ok {
+		if err.Code == "23505" { // unique_violation
+			if err.Constraint == "user_nickname_uniq" {
+				return UserCreateError{UserCreateErrorNicknameExists}
+			}
+		}
+	}
 	return err
 }
 

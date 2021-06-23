@@ -75,7 +75,17 @@ func getPostComments(w http.ResponseWriter, r *http.Request) {
 		replyRoot = replyRootParsed
 	}
 
-	comments, err := models.ReadComments(int32(id), start, count, int32(replyRoot), u.Id)
+	comments, err := models.ReadComments(int32(id), false, start, count, int32(replyRoot), u.Id)
+	if err != nil {
+		panic(err)
+	}
+	write(w, 200, comments)
+}
+
+func getPostCommentsHot(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth(r)
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	comments, err := models.ReadComments(int32(id), true, 0, 0, -1, u.Id)
 	if err != nil {
 		panic(err)
 	}
@@ -164,6 +174,7 @@ func init() {
 	registerHandler("/post/{id}", getPost, "GET")
 	registerHandler("/post/{id}/comment/new", postPostCommentNew, "POST")
 	registerHandler("/post/{id}/comments", getPostComments, "GET")
+	registerHandler("/post/{id}/comments/hot", getPostCommentsHot, "GET")
 	registerHandler("/post/{id}/upvote", postPostUpvote, "POST")
 	registerHandler("/post/{id}/star", postPostStar, "POST")
 	registerHandler("/post/{id}/set_collection", postPostSetCollection, "POST")

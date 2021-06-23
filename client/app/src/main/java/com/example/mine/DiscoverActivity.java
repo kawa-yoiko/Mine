@@ -1,14 +1,20 @@
 package com.example.mine;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,12 +23,19 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+
 import java.util.LinkedList;
 
 public class DiscoverActivity extends AppCompatActivity {
+    private String searchTag;
+
     private TabLayout tab;
     private RecyclerView recyclerView;
     LinkedList<Post> discovers = new LinkedList<>();
+    private DiscoverAdapter discoverAdapter;
+    private InfScrollListener infScrollListener = null;
+
     private Button dayBtn;
     private Button monthBtn;
     private Button semesterBtn;
@@ -37,6 +50,8 @@ public class DiscoverActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_discover);
 
+        this.searchTag = getIntent().getStringExtra("search");
+
         grey = this.getResources().getDrawable(R.drawable.bt_background_grey);
         darkGrey = this.getResources().getDrawable(R.drawable.bt_background_grey1);
 
@@ -50,11 +65,13 @@ public class DiscoverActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerview);
         //TODO： get corresponding discover data -- 最新
-        discovers.add(new Post("粥粥","测试","","kuriko", "2020.5.31", "测试", "测试最新", 0, 0, 0, 0));
+        this.discoverAdapter = new DiscoverAdapter(discovers);
 
         StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+
+        // Initialize view with newest posts
+        populateTimeline("new");
 
         tab = headView.findViewById(R.id.tab);
         View hotSelector = headView.findViewById(R.id.hot_selector);
@@ -65,10 +82,7 @@ public class DiscoverActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getText().equals("最新")) {
                     hotSelector.setVisibility(View.GONE);
-                    //TODO： get corresponding discover data -- 最新
-                    discovers.clear();
-                    discovers.add(new Post("粥粥","测试","","kuriko", "2020.5.31", "测试最新", "测试", 0, 0, 0, 0));
-                    recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+                    populateTimeline("new");
                 }
                 else if (tab.getText().equals("最热")) {
                     hotSelector.setVisibility(View.VISIBLE);
@@ -113,49 +127,80 @@ public class DiscoverActivity extends AppCompatActivity {
 
         //TODO: get info of this tag
         TextView tag = headView.findViewById(R.id.tag);
-        tag.setText("粥粥");
+        tag.setText(searchTag);
         TextView tag_num = headView.findViewById(R.id.tag_num);
         tag_num.setText("21k");
     }
 
+    private void populateTimeline(String type) {
+        discovers.clear();
+        discoverAdapter.notifyDataSetChanged();
+
+        SingleViewAdapter loadingAdapter = new SingleViewAdapter(
+                getLayoutInflater().inflate(R.layout.loading_indicator, (ViewGroup) recyclerView, false));
+        recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, discoverAdapter, loadingAdapter));
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        recyclerView.removeOnScrollListener(infScrollListener);
+        infScrollListener = new InfScrollListener(recyclerView.getLayoutManager(), 3) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void load(int start) {
+                InfScrollListener listener = this;
+                ServerReq.getJsonArray("/search_posts?type=" + type + "&tag=" + searchTag + "&start=" + start + "&count=10", (JSONArray arr) -> {
+                    try {
+                        int n = arr.length();
+                        for (int i = 0; i < n; i++) {
+                            discovers.add(new Post(arr.getJSONObject(i)));
+                        }
+                        boolean complete = (n < 10);
+                        Log.d("DiscoverActivity", "start = " + start + ", n = " + n + ", total = " + discovers.size());
+                        handler.post(() -> {
+                            if (discovers.size() == n)
+                                discoverAdapter.notifyDataSetChanged();
+                            else
+                                discoverAdapter.notifyItemRangeInserted(discovers.size() - n, n);
+                            if (complete) loadingAdapter.clear();
+                        });
+                        listener.finishLoad(complete);
+                    } catch (Exception e) {
+                        Log.e("DiscoverActivity", e.toString());
+                    }
+                });
+            }
+        };
+        recyclerView.addOnScrollListener(infScrollListener);
+    }
+
     private void setHotSelector(String type) {
         //TODO of kuriko: optimize： estimate if the new btn is same as the current;
-        discovers.clear();
         if(type.equals("day")) {
             dayBtn.setBackground(darkGrey);
             monthBtn.setBackground(grey);
             semesterBtn.setBackground(grey);
             totalBtn.setBackground(grey);
-            //TODO: get corresponding discover data -- daily hot
-            discovers.add(new Post("粥粥","测试日榜","","kuriko", "2020.5.31", "测试", "测试", 0, 0, 0, 0));
-            recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+            populateTimeline("day");
         }
         else if(type.equals("month")) {
             dayBtn.setBackground(grey);
             monthBtn.setBackground(darkGrey);
             semesterBtn.setBackground(grey);
             totalBtn.setBackground(grey);
-            //TODO: get corresponding discover data -- monthly hot
-            discovers.add(new Post("粥粥","测试月榜","","kuriko", "2020.5.31", "测试", "测试", 0, 0, 0, 0));
-            recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+            populateTimeline("month");
         }
         else if(type.equals("semester")) {
             dayBtn.setBackground(grey);
             monthBtn.setBackground(grey);
             semesterBtn.setBackground(darkGrey);
             totalBtn.setBackground(grey);
-            //TODO: get corresponding discover data -- semester's hot
-            discovers.add(new Post("粥粥","测试季榜","","kuriko", "2020.5.31", "测试", "测试", 0, 0, 0, 0));
-            recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+            populateTimeline("season");
         }
         else if(type.equals("total")) {
             dayBtn.setBackground(grey);
             monthBtn.setBackground(grey);
             semesterBtn.setBackground(grey);
             totalBtn.setBackground(darkGrey);
-            //TODO: get corresponding discover data -- totally hot
-            discovers.add(new Post("粥粥","测试总榜","","kuriko", "2020.5.31", "测试", "测试", 0, 0, 0, 0));
-            recyclerView.setAdapter(new ConcatAdapter(singleViewAdapter, new DiscoverAdapter(discovers)));
+            populateTimeline("all");
         }
     }
 }

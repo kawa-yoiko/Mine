@@ -2,6 +2,8 @@ package com.example.mine;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,7 @@ import java.util.function.BiConsumer;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class CollectionListView {
-    public static View inflate(Context context, BiConsumer<User.CollectionBrief, Boolean> callback) {
+    public static View inflate(Context context, String nickname, BiConsumer<User.CollectionBrief, Boolean> callback) {
         FrameLayout container = new FrameLayout(context);
         View.inflate(context, R.layout.loading_indicator, container);
 
@@ -31,13 +33,14 @@ public class CollectionListView {
         recyclerView.setAdapter(new Adapter(collections, callback));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        ServerReq.getJson("/whoami", (JSONObject obj) -> {
+        Handler handler = new Handler(Looper.getMainLooper());
+        ServerReq.getJson(nickname != null ? ("/whois/" + nickname) : "/whoami", (JSONObject obj) -> handler.post(() -> {
             User user = new User(obj);
             collections.addAll(user.collections);
             container.removeAllViews();
             container.addView(recyclerView);
             callback.accept(user.collections.get(0), true);
-        });
+        }));
 
         return container;
     }

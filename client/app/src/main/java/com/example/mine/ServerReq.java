@@ -6,6 +6,8 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -25,10 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import okhttp3.*;
+import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -42,6 +46,7 @@ public class ServerReq {
     static OkHttpClient client;
 
     static String token;
+    static String myNickname, myAvatar, myBio;
 
     static {
         client = new OkHttpClient();
@@ -53,6 +58,10 @@ public class ServerReq {
         } else {
             return url;
         }
+    }
+
+    public static String getUploadFullUrl(String id) {
+        return "http://8.140.133.34:7678/upload/" + id;
     }
 
     private static String streamToString(InputStream stream) {
@@ -111,6 +120,7 @@ public class ServerReq {
             if (response.code() >= 400 && response.code() <= 599)
                 Log.e("network", "Response code " + response);
             callback.accept(response.body().byteStream());
+            response.close();
         }
     }
 
@@ -126,9 +136,7 @@ public class ServerReq {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void get(String url, Consumer<String> callbackFn) {
-        getStream(url, (InputStream stream) -> {
-            callbackFn.accept(streamToString(stream));
-        });
+        getStream(url, (InputStream stream) -> callbackFn.accept(streamToString(stream)));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -184,6 +192,7 @@ public class ServerReq {
             } else {
                 try {
                     token = obj.getString("token");
+                    updateMyInfo(obj.getJSONObject("user"));
                     callbackFn.accept(true);
                 } catch (JSONException e) {
                     callbackFn.accept(false);
@@ -191,6 +200,16 @@ public class ServerReq {
             }
         });
     }
+
+    public static void updateMyInfo(JSONObject user) throws JSONException {
+        myNickname = user.getString("nickname");
+        myAvatar = user.getString("avatar");
+        myBio = user.getString("signature");
+    }
+
+    public static String getMyNickname() { return myNickname; }
+    public static String getMyAvatar() { return myAvatar; }
+    public static String getMyBio() { return myBio; }
 
     // https://github.com/square/okhttp/blob/master/samples/guide/src/main/java/okhttp3/recipes/Progress.java
     private static class ProgressRequestBody extends RequestBody {
@@ -244,24 +263,74 @@ public class ServerReq {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static void uploadFile(String url, File file, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+    private static void uploadFileWithBody(String url, RequestBody fileBody, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("fileqwqwqwq", "filequququq",
-                        RequestBody.create(file, MediaType.parse("application/octet-stream")))
+                .addFormDataPart("fileqwqwqwq", "filequququq", fileBody)
                 .build();
         Request request = new Request.Builder()
                 .url(getFullUrl(url))
                 .header("Authorization", token != null ? "Bearer " + token : "")
                 .post(new ProgressRequestBody(requestBody, (long contentLength, long bytesWritten) -> {
-                    Log.d("ServerReq", "content = " + contentLength + ", written = " + bytesWritten);
+                    // Log.d("ServerReq", "content = " + contentLength + ", written = " + bytesWritten);
                     progressFn.accept(contentLength, bytesWritten);
                 }))
                 .build();
-        Call call = client.newCall(request);
+        OkHttpClient extClient = client.newBuilder()
+                .retryOnConnectionFailure(true)
+                .callTimeout(0, TimeUnit.SECONDS)
+                .writeTimeout(3600, TimeUnit.SECONDS)
+                .readTimeout(3600, TimeUnit.SECONDS)
+                .build();
+        Call call = extClient.newCall(request);
         call.enqueue(new ReqCallback((InputStream stream) -> {
             callbackFn.accept(parseJson(streamToString(stream)));
         }));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFile(String url, File file, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+        uploadFileWithBody(url,
+                RequestBody.create(file, MediaType.parse("application/octet-stream")),
+                progressFn,
+                callbackFn);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void uploadFileStream(String url, InputStream inputStream, BiConsumer<Long, Long> progressFn, Consumer<JSONObject> callbackFn) {
+        final MediaType mediaType = MediaType.parse("application/octet-stream");
+        RequestBody fileBody = new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return mediaType;
+            }
+
+            @Override
+            public long contentLength() {
+                try {
+                    long a = inputStream.available();
+                    Log.d("uploadFileStream", "a = " + a);
+                    return inputStream.available();
+                } catch (IOException e) {
+                    return 0;
+                }
+            }
+
+            @Override
+            public void writeTo(BufferedSink sink) throws IOException {
+                Source source = null;
+                try {
+                    source = Okio.source(inputStream);
+                    sink.writeAll(source);
+                } catch (Exception e) {
+                    Log.d("uploadFileStream", "exception: " + e.toString());
+                } finally {
+                    Log.d("uploadFileStream", "closing quietly");
+                    Util.closeQuietly(source);
+                }
+            }
+        };
+        uploadFileWithBody(url, fileBody, progressFn, callbackFn);
     }
 
     public static class Utils {
@@ -277,15 +346,11 @@ public class ServerReq {
         }
 
         public static void loadImage(String url, ImageView imageView) {
-            Activity activity = getActivity(imageView);
-            if (activity == null) {
-                Log.e("network", "Hosting activity is null");
-                return;
-            }
+            Handler handler = new Handler(Looper.getMainLooper());
             imageView.setImageDrawable(null);
             ServerReq.getStream(url, (InputStream stream) -> {
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                activity.runOnUiThread(() -> imageView.setImageBitmap(bitmap));
+                handler.post(() -> imageView.setImageBitmap(bitmap));
             });
         }
     }
