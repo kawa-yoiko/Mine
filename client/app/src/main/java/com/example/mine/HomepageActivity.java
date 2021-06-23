@@ -1,6 +1,7 @@
 package com.example.mine;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -83,6 +84,9 @@ public class HomepageActivity extends AppCompatActivity{
         ((TextView) findViewById(R.id.collection_num)).setText(String.valueOf(user.collections.size()));
         ServerReq.Utils.loadImage("/upload/" + user.avatar,
                 ((ImageView) findViewById(R.id.avatar)));
+
+        ImageView btnMessage = findViewById(R.id.message_button);
+        btnMessage.setColorFilter(Color.parseColor("#F1D20A"));
     }
 
 
