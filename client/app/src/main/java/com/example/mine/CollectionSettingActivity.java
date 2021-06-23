@@ -107,7 +107,7 @@ public class CollectionSettingActivity extends AppCompatActivity {
                 String path = imageItem.path;
                 Bitmap bm = BitmapFactory.decodeFile(path);
                 cover_img.setImageBitmap(bm);
-                cover_img.setColorFilter(Color.WHITE);
+                cover_img.setColorFilter(null);
             }
         }
     }
