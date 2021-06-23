@@ -21,17 +21,19 @@
                     android:layout_marginRight="10dp"
                     android:src="@drawable/arrowleft">
                 </ImageView>
+
                 <TextView
+                    android:id="@+id/nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
-                    android:gravity="center"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
                     android:layout_toRightOf="@+id/btn_back"
+                    android:gravity="center"
                     android:paddingBottom="4dp"
-                    android:text="kuriko"></TextView>
+                    android:text="kuriko"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold"></TextView>
             </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 

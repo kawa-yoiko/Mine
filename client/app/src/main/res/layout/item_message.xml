@@ -52,29 +52,30 @@
                     android:layout_below="@id/username"
                     android:text="粥粥可爱"></TextView>
             </RelativeLayout>
+
             <RelativeLayout
-                android:layout_width="60dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true">
+
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5h前"
                     android:id="@+id/date"
-                   android:layout_alignParentRight="true"
-                    ></TextView>
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="6dp"
+                    android:layout_alignParentRight="true"
+                    android:text="5h前"></TextView>
+
+                <TextView
+                    android:id="@+id/message_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/date"
                     android:layout_alignParentRight="true"
-                    android:text="1"
                     android:layout_marginVertical="4dp"
-                    android:textColor="@color/white"
                     android:background="@drawable/background_circle_red"
-                    android:id="@+id/message_num"
-                    ></TextView>
+                    android:paddingHorizontal="6dp"
+                    android:text="1"
+                    android:textColor="@color/white"></TextView>
             </RelativeLayout>
         </RelativeLayout>
     <View
