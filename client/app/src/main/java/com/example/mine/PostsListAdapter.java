@@ -105,7 +105,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (holder instanceof ImageHolder) {
             ImageView content_image = item.findViewById(R.id.content);
-            if (post.getContentType() == 0) {
+            if (post.getContentType() == 1) {
                 ServerReq.Utils.loadImage("/upload/" + post.getContent().split(" ")[0], content_image);
             } else if (post.getContentType() == 2) {
                 content_image.setImageResource(R.drawable.music);
