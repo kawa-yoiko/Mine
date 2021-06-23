@@ -206,6 +206,31 @@
                     android:text="关于"
                     android:textColor="@color/black"></TextView>
             </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/logout_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#00FFFFFF"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="15dp">
+
+                <ImageView
+                    android:id="@+id/logout_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginRight="45dp"
+                    android:src="@drawable/arrowleft"></ImageView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/logout_icon"
+                    android:text="退出登录"
+                    android:textColor="@color/black"></TextView>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

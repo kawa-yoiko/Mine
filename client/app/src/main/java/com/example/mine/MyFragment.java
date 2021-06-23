@@ -1,8 +1,11 @@
 package com.example.mine;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,9 +43,11 @@ public class MyFragment  extends Fragment {
         ImageView settingIcon = view.findViewById(R.id.setting_icon);
         ImageView aboutIcon = view.findViewById(R.id.about_icon);
         ImageView starIcon = view.findViewById(R.id.star_icon);
+        ImageView logoutIcon = view.findViewById(R.id.logout_icon);
         settingIcon.setColorFilter(Color.parseColor("#AAAAAA"));
         aboutIcon.setColorFilter(Color.parseColor("#8196BE"));
         starIcon.setColorFilter(Color.parseColor("#F4DB35"));
+        logoutIcon.setColorFilter(Color.parseColor("#888888"));
         
         Button post_button = view.findViewById(R.id.post_button);
         post_button.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +113,17 @@ public class MyFragment  extends Fragment {
         ( view.findViewById(R.id.stars_button)).setOnClickListener((View v) -> {
             Intent intent = new Intent(getActivity(), StarActivity.class);
             getActivity().startActivity(intent);
+        });
+
+        (view.findViewById(R.id.logout_button)).setOnClickListener((View v) -> {
+            Activity activity = getActivity();
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
+            pref.edit().remove("token").apply();
+            Intent intentNew = new Intent();
+            intentNew.setClass(activity, LoginActivity.class);
+            intentNew.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            activity.startActivity(intentNew);
+            activity.finish();
         });
 
         ImageView gotoHomePageBtn = view.findViewById(R.id.goto_homepage);
