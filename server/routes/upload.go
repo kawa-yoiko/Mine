@@ -5,6 +5,7 @@ import (
 
 	"errors"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"os"
@@ -87,12 +88,24 @@ func postUploadAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func postUploadCollectionCover(w http.ResponseWriter, r *http.Request) {
+	u, files := handleUpload(w, r)
+	if len(files) != 1 {
+		panic(models.CheckedError{400})
+	}
+
+	c := referredCollection(u, mux.Vars(r)["id"])
+	c.Cover = files[0]
+	if err := c.Update(); err != nil {
+		panic(err)
+	}
+
+	write(w, 200, c.Repr())
 }
 
 func init() {
 	registerHandler("/upload", postUpload, "POST")
 	registerHandler("/upload/avatar", postUploadAvatar, "POST")
-	registerHandler("/upload/collection_cover", postUploadCollectionCover, "POST")
+	registerHandler("/upload/collection_cover/{id}", postUploadCollectionCover, "POST")
 
 	router.PathPrefix("/upload").Handler(
 		http.FileServer(http.Dir(uploadDir))).Methods("GET")

@@ -128,6 +128,21 @@ func (c *Collection) Read() error {
 	return nil
 }
 
+func (c *Collection) Update() error {
+	_, err := db.Exec(`UPDATE collection
+		SET cover = $2, title = $3, description = $4
+		WHERE id = $1`,
+		c.Id, c.Cover, c.Title, c.Description,
+	)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Update tags
+	// err = insertTags("collection_tag", "collection_id", c.Id, c.Tags)
+	return err
+}
+
 func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, error) {
 	defer rows.Close()
 	collections := []map[string]interface{}{}

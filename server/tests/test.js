@@ -509,6 +509,8 @@ if (process.env['GEN'] !== '1') (async () => {
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
   })
+  await check('PUT', `/upload/collection_cover/${lid3}`, {token: token1, file: 'avt1.png'}, undefined, 403)
+  await check('PUT', `/upload/collection_cover/${lid3}`, {token: token2, file: 'avt1.png'}, any)
 
   await check('POST', `/post/${pids[1]}/set_collection`, {
     token: token2,
