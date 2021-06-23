@@ -181,6 +181,11 @@ public class ServerReq {
         });
     }
 
+    public static String getToken() { return token; }
+    public static void login(String token) {
+        ServerReq.token = token;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void login(String nickname, String password, Consumer<Boolean> callbackFn) {
         postJson("/login", Arrays.asList(
