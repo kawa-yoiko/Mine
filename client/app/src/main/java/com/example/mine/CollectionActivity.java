@@ -32,6 +32,10 @@ public class CollectionActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.count)).setText(
                 String.format(Locale.CHINESE, "%d 篇作品", collection.posts.size())
         );
+        if (!collection.cover.isEmpty()) {
+            ServerReq.Utils.loadImage("/upload/" + collection.cover,
+                    (ImageView) findViewById(R.id.cover));
+        }
 
         // Reverse list
         int n = collection.posts.size();

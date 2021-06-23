@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -74,6 +75,10 @@ public class CollectionListView {
             ((TextView) v.findViewById(R.id.title)).setText(collection.title);
             ((TextView) v.findViewById(R.id.count)).setText(
                     String.format(Locale.CHINESE, "%d 篇作品", collection.postCount));
+            if (!collection.cover.isEmpty()) {
+                ServerReq.Utils.loadImage("/upload/" + collection.cover,
+                        (ImageView) v.findViewById(R.id.cover));
+            }
             v.setOnClickListener((View v1) -> this.callback.accept(collection, false));
         }
 

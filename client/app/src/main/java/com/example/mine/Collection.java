@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class Collection implements Serializable {
     public String authorName;
     public String authorAvatar;
+    public String cover;
     public String title;
     public String description;
     public ArrayList<PostBrief> posts;
@@ -37,6 +38,7 @@ public class Collection implements Serializable {
             JSONObject author = obj.getJSONObject("author");
             this.authorName = author.getString("nickname");
             this.authorAvatar = author.getString("avatar");
+            this.cover = obj.getString("cover");
             this.title = obj.getString("title");
             if (this.title.equals(""))
                 this.title = this.authorName + " 的未分类合集";
