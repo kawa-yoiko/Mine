@@ -277,7 +277,7 @@ if (process.env['GEN'] !== '1') (async () => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    collection: {id: lid1, title: any, post_count: 1},
+    collection: {id: lid1, cover: any, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 0,
     comment_count: 0,
@@ -445,7 +445,7 @@ if (process.env['GEN'] !== '1') (async () => {
     type: 0,
     caption: 'Caption',
     contents: 'Lorem ipsum',
-    collection: {id: lid1, title: any, post_count: 1},
+    collection: {id: lid1, cover: any, title: any, post_count: 1},
     tags: ['tag1', 'tag2'],
     upvote_count: 1,
     comment_count: 5,
@@ -469,6 +469,7 @@ if (process.env['GEN'] !== '1') (async () => {
   // Collections
   await check('GET', `/collection/${lid1}`, undefined, {
     author: {nickname: 'kayuyuko', avatar: avt1},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -479,6 +480,7 @@ if (process.env['GEN'] !== '1') (async () => {
   })
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -500,12 +502,15 @@ if (process.env['GEN'] !== '1') (async () => {
   }, {id: any})).id
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: 'Collection',
     description: 'A collection',
     posts: [],
     tags: ['tag2', 'tag3', 'tag4'],
     subscription_count: 0,
   })
+  await check('PUT', `/upload/collection_cover/${lid3}`, {token: token1, file: 'avt1.png'}, undefined, 403)
+  await check('PUT', `/upload/collection_cover/${lid3}`, {token: token2, file: 'avt1.png'}, any)
 
   await check('POST', `/post/${pids[1]}/set_collection`, {
     token: token2,
@@ -517,6 +522,7 @@ if (process.env['GEN'] !== '1') (async () => {
   }, {})
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -530,6 +536,7 @@ if (process.env['GEN'] !== '1') (async () => {
   })
   await check('GET', `/collection/${lid3}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: 'Collection',
     description: 'A collection',
     posts: [
@@ -561,6 +568,7 @@ if (process.env['GEN'] !== '1') (async () => {
   await check('POST', `/collection/${lid2}/subscribe`, {token: token1, is_subscribe: 0}, {subscription_count: 1})
   await check('GET', `/collection/${lid2}`, undefined, {
     author: {nickname: 'kurikoneko', avatar: avt2},
+    cover: any,
     title: any,
     description: any,
     posts: [
@@ -811,6 +819,15 @@ else (async () => {
     return a;
   };
 
+  // Subscriptions
+  const promisesSubscriptions = [];
+  for (let u = 0; u < N; u++)
+    for (let b = B + rand() % Bd; b > 0; b--) {
+      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
+        {token: token[u], is_subscribe: 1}, any));
+    }
+  await Promise.all(promisesSubscriptions);
+
   // Tags
   const tagsAll = [];
   for (let i = 0; i < A; i++) {
@@ -911,15 +928,6 @@ else (async () => {
       }, any));
     }
   await Promise.all(promisesStars);
-
-  // Subscriptions
-  const promisesSubscriptions = [];
-  for (let u = 0; u < N; u++)
-    for (let b = B + rand() % Bd; b > 0; b--) {
-      promisesSubscriptions.push(check('POST', `/collection/${collsAll[rand() % collsAll.length]}/subscribe`,
-        {token: token[u], is_subscribe: 1}, any));
-    }
-  await Promise.all(promisesSubscriptions);
 
   // Messages
   for (let u = 0; u < N; u++)

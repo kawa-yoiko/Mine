@@ -42,12 +42,14 @@ public class User implements Serializable {
 
     public static class CollectionBrief implements Serializable {
         public int id;
+        public String cover;
         public String title;
         public int postCount;
 
         public CollectionBrief(JSONObject obj) {
             try {
                 id = obj.getInt("id");
+                cover = obj.getString("cover");
                 title = obj.getString("title");
                 postCount = obj.getInt("post_count");
             } catch (JSONException e) {

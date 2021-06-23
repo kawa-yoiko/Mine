@@ -7,6 +7,7 @@ import (
 type Collection struct {
 	Id          int32
 	Author      User
+	Cover       string
 	Title       string
 	Description string
 	Tags        []string
@@ -20,6 +21,7 @@ func init() {
 	registerSchema("collection",
 		"id SERIAL PRIMARY KEY",
 		"author_id INTEGER NOT NULL",
+		"cover TEXT NOT NULL",
 		"title TEXT NOT NULL",
 		"description TEXT NOT NULL",
 		"ADD CONSTRAINT author_ref FOREIGN KEY (author_id) REFERENCES mine_user (id)",
@@ -45,6 +47,7 @@ func (c *Collection) Repr() map[string]interface{} {
 	}
 	return map[string]interface{}{
 		"author":             c.Author.ReprBrief(),
+		"cover":              c.Cover,
 		"title":              c.Title,
 		"description":        c.Description,
 		"posts":              posts,
@@ -56,6 +59,7 @@ func (c *Collection) Repr() map[string]interface{} {
 func (c *Collection) ReprBrief() map[string]interface{} {
 	return map[string]interface{}{
 		"id":         c.Id,
+		"cover":      c.Cover,
 		"title":      c.Title,
 		"post_count": c.PostCount,
 	}
@@ -63,9 +67,9 @@ func (c *Collection) ReprBrief() map[string]interface{} {
 
 func (c *Collection) Create() error {
 	err := db.QueryRow(`INSERT INTO
-		collection (author_id, title, description)
-		VALUES ($1, $2, $3) RETURNING id`,
-		c.Author.Id, c.Title, c.Description,
+		collection (author_id, cover, title, description)
+		VALUES ($1, $2, $3, $4) RETURNING id`,
+		c.Author.Id, c.Cover, c.Title, c.Description,
 	).Scan(&c.Id)
 	if err != nil {
 		return err
@@ -81,7 +85,7 @@ func (c *Collection) Read() error {
 		FROM collection INNER JOIN mine_user ON collection.author_id = mine_user.id
 		WHERE collection.id = $1`, c.Id,
 	).Scan(
-		&c.Id, &c.Author.Id, &c.Title, &c.Description,
+		&c.Id, &c.Author.Id, &c.Cover, &c.Title, &c.Description,
 		&c.Author.Nickname, &c.Author.Avatar,
 	)
 	if err != nil {
@@ -125,12 +129,27 @@ func (c *Collection) Read() error {
 	return nil
 }
 
+func (c *Collection) Update() error {
+	_, err := db.Exec(`UPDATE collection
+		SET cover = $2, title = $3, description = $4
+		WHERE id = $1`,
+		c.Id, c.Cover, c.Title, c.Description,
+	)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Update tags
+	// err = insertTags("collection_tag", "collection_id", c.Id, c.Tags)
+	return err
+}
+
 func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, error) {
 	defer rows.Close()
 	collections := []map[string]interface{}{}
 	for rows.Next() {
 		c := Collection{}
-		err := rows.Scan(&c.Id, &c.Title, &c.Description, &c.PostCount)
+		err := rows.Scan(&c.Id, &c.Cover, &c.Title, &c.Description, &c.PostCount)
 		if err != nil {
 			return nil, err
 		}
@@ -143,7 +162,7 @@ func collectionsReprBriefFromRows(rows *sql.Rows) ([]map[string]interface{}, err
 }
 
 func collectionSelectFields() string {
-	return ` id, title, description,
+	return ` id, cover, title, description,
 		(SELECT COUNT (*) FROM post WHERE post.collection_id = collection.id) `
 }
 
@@ -158,4 +177,24 @@ func readCollections(userId int32) ([]map[string]interface{}, error) {
 
 func (c *Collection) Subscribe(u User, add bool) error {
 	return processEntityUserRel("collection_subscription", "collection", false, c.Id, u, add, &c.SubCount)
+}
+
+func (c *Collection) ReadAllSubscribersIds() ([]int32, error) {
+	rows, err := db.Query(
+		`SELECT user_id FROM collection_subscription WHERE collection_id = $1`,
+		c.Id,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	ids := []int32{}
+	for rows.Next() {
+		var id int32
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
 }

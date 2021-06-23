@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -37,6 +38,9 @@ public class ChatActivity extends AppCompatActivity {
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_chat);
+
+        ((TextView) findViewById(R.id.nickname)).setText(otherNickname);
+
         recyclerView = findViewById(R.id.recyclerview);
         LinkedList<Chat> chats = new LinkedList<>();
 

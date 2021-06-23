@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +27,7 @@ import com.lzy.imagepicker.view.CropImageView;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,12 +75,23 @@ public class CollectionSettingActivity extends AppCompatActivity {
         ensureBtn.setOnClickListener((View v) -> {
             // send name, tag introduction and avator to server
             // if need, apply constraint that: only send changed items to server
+
             ServerReq.postJson("/collection/new", List.of(
                     new Pair<>("title", nameEdit.getText().toString()),
                     new Pair<>("description", introductionEdit.getText().toString()),
                     new Pair<>("tags", tagEdit.getText().toString())
             ), (JSONObject obj) -> {
-                finish();
+                int id = -1;
+                try {
+                    id = obj.getInt("id");
+                } catch (Exception e) {
+                    Log.e("CollectionSettingA", e.toString());
+                    return;
+                }
+                ServerReq.uploadFile(
+                        "/upload/collection_cover/" + id, new File(imageItem.path),
+                        (Long len, Long sent) -> {},
+                        (JSONObject objUnused) -> finish());
             });
         });
 
