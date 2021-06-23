@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -26,7 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private TextView titleView;
     private androidx.appcompat.widget.Toolbar toolbar;
-    private View searchButton;
+    private ImageView searchButton;
     //TODO maybe need modify
     private int isLogin = 0;
     private int LOGIN = 0;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         titleView = findViewById(R.id.title);
         toolbar = findViewById(R.id.toolbar);
         searchButton = findViewById(R.id.bt_search);
+        searchButton.setColorFilter(Color.parseColor("#777777"));
 
         Fragment discoverFragment = new DiscoverFragment();
         Fragment squareFragment = new SquareFragment();
@@ -103,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.my:
                             setCurrentFragment(myFragment);
                             toolbar.setVisibility(View.VISIBLE);
+                            searchButton.setVisibility(View.GONE);
                             titleView.setText("我的");
                             return true;
                     }

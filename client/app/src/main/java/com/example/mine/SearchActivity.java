@@ -26,9 +26,9 @@ public class SearchActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_search);
         LinkedList<String> searches = new LinkedList<>();
-        searches.add("狗粮");
-        searches.add("摄影");
-        searches.add("五条悟");
+//        searches.add("狗粮");
+//        searches.add("摄影");
+//        searches.add("五条悟");
         SearchAdapter adapter = new SearchAdapter(searches);
         recyclerView = findViewById(R.id.tag_recycleview);
         recyclerView.setAdapter(adapter);
