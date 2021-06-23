@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -140,8 +141,14 @@ public class MyFragment  extends Fragment {
     }
 
     private void updateUserInfoDisplay() {
-        ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(),
-                getView().findViewById(R.id.avatar));
+        ImageView avatar = getView().findViewById(R.id.avatar);
+        if (ServerReq.getMyAvatar().isEmpty()) {
+            avatar.setColorFilter(ResourcesCompat.getColor(getResources(), R.color.themeyellow, null));
+            avatar.setImageResource(R.drawable.image);
+        } else {
+            avatar.setColorFilter(null);
+            ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(), avatar);
+        }
         ((TextView) getView().findViewById(R.id.nickname)).setText(ServerReq.getMyNickname());
         ((TextView) getView().findViewById(R.id.signature)).setText(ServerReq.getMyBio());
     }
