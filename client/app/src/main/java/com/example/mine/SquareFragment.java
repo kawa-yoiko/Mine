@@ -103,7 +103,7 @@ public class SquareFragment extends Fragment {
 
     private void rebuildItems() {
         dateAndImages.clear();
-        dateAndImages.add(new DateItem("2021 年 5 月"));
+        dateAndImages.add(new DateItem("2021 年 6 月"));
         for (Collection.PostBrief post : posts) {
             if (post.type == 0) {
                 dateAndImages.add(new TextItem(post.id, post.caption, post.contents));

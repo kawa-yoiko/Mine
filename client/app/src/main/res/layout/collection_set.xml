@@ -30,7 +30,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 class="com.example.mine.WidthEqualsHeightImageView"
-                android:src="@drawable/luoxiaohei"
+                android:src="@drawable/image"
                 android:id="@+id/cover"
                 android:scaleType="centerCrop"></view>
             <Button
@@ -64,9 +64,9 @@
                 android:layout_centerVertical="true"
                 android:text="名称"></TextView>
             <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="粥粥可爱"
+                android:text=""
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
                 android:background="#00FFFFFF"
@@ -85,9 +85,10 @@
                 android:textSize="16dp"
                 android:text="标签"></TextView>
             <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="狗粮, 摄影"
+                android:text=""
+                android:hint="多个标签之间用逗号分隔"
                 android:gravity="top"
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"
@@ -113,9 +114,9 @@
                 android:textSize="16dp"
                 android:text="简介"></TextView>
             <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="栗子什么时候才能拥有粥粥等身抱枕呢呢呢"
+                android:text=""
                 android:gravity="top"
                 android:layout_marginLeft="70dp"
                 android:textSize="16dp"

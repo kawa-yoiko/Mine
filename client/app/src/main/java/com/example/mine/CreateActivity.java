@@ -56,9 +56,12 @@ public class CreateActivity extends AppCompatActivity {
     ArrayList<ImageItem> imageItems = new ArrayList<>(0);
     WidthEqualsHeightImageView addImage;
     ImageButton addMediaButton;
+    View popViewCollection;
+    FrameLayout collectionContainer;
     Uri singleMediaUri;
-    private static int IMAGE_PICKER = 0;
-    private static int VIDEO_PICKER = 2;
+    private static final int IMAGE_PICKER = 0;
+    private static final int VIDEO_PICKER = 1;
+    private static final int COLLECTION_CREATE = 2;
 
     private String tags = "";
     private User.CollectionBrief collection = null;
@@ -138,16 +141,9 @@ public class CreateActivity extends AppCompatActivity {
         });
         ((TextView) cv.findViewById(R.id.tag)).setText("");
 
-        View popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
-        FrameLayout collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
-        collectionContainer.removeAllViews();
-        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), null, (User.CollectionBrief sel, Boolean init) -> {
-            if (init && collection != null) return;
-            Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
-            collection = sel;
-            CreateActivity.this.runOnUiThread(() -> ((TextView) cv.findViewById(R.id.collection)).setText(sel.title));
-            if (!init) popupWindowCollection.dismiss();
-        }));
+        popViewCollection = getLayoutInflater().inflate(R.layout.popup_collection, null);
+        collectionContainer = popViewCollection.findViewById(R.id.fl_collection);
+        populateCollectionContainer();
 
         View setCollectionButton = findViewById(R.id.add_collection);
         setCollectionButton.setOnClickListener(new View.OnClickListener() {
@@ -156,8 +152,8 @@ public class CreateActivity extends AppCompatActivity {
                 Button createButton = popViewCollection.findViewById(R.id.create);
                 createButton.setOnClickListener((View v1) -> {
                     Intent intentToCreate = new Intent();
-                    intentToCreate.setClass(v1.getContext(), CollectionSettingActivity.class);
-                    v1.getContext().startActivity(intentToCreate);
+                    intentToCreate.setClass(CreateActivity.this, CollectionSettingActivity.class);
+                    CreateActivity.this.startActivityForResult(intentToCreate, COLLECTION_CREATE);
                 });
                 popupWindowCollection = new PopupWindow(popViewCollection, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 popupWindowCollection.setOutsideTouchable(true);
@@ -274,7 +270,20 @@ public class CreateActivity extends AppCompatActivity {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void populateCollectionContainer() {
+        collectionContainer.removeAllViews();
+        collectionContainer.addView(CollectionListView.inflate(popViewCollection.getContext(), null, (User.CollectionBrief sel, Boolean init) -> {
+            if (init && collection != null) return;
+            Log.d("CreateActivity", "selected collection " + sel.title + " (" + sel.id + ")");
+            collection = sel;
+            CreateActivity.this.runOnUiThread(() ->
+                    ((TextView) getWindow().getDecorView().findViewById(R.id.collection)).setText(sel.title));
+            if (!init) popupWindowCollection.dismiss();
+        }));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -292,6 +301,8 @@ public class CreateActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.video_view,
                         new VideoPlayerFragment(singleMediaUri)).commit();
             }
+        } else if (requestCode == COLLECTION_CREATE) {
+            populateCollectionContainer();
         }
     }
 

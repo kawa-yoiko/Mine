@@ -41,9 +41,6 @@ public class SettingActivity extends AppCompatActivity {
     private EditText passwordEdit;
     private EditText passwordConfirmEdit;
     private EditText introductionEdit;
-    private String nickname;
-    private String password;
-    private String introduction;
     private boolean isAvatarChanged = false;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -73,26 +70,10 @@ public class SettingActivity extends AppCompatActivity {
         passwordConfirmEdit = findViewById(R.id.password_confirm);
         nicknameEdit = findViewById(R.id.nickname);
         introductionEdit = findViewById(R.id.introduction);
-        password = passwordEdit.getText().toString();
-        nickname = nicknameEdit.getText().toString();
-        introduction = introductionEdit.getText().toString();
 
         ServerReq.Utils.loadImage("/upload/" + ServerReq.getMyAvatar(), avatar_img);
         nicknameEdit.setText(ServerReq.getMyNickname());
         introductionEdit.setText(ServerReq.getMyBio());
-
-        passwordEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    // passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                }
-                else {
-                    // passwordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    password = passwordEdit.getText().toString();
-                }
-            }
-        });
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener((View v) -> {

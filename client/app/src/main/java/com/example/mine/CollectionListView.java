@@ -2,6 +2,8 @@ package com.example.mine;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +33,14 @@ public class CollectionListView {
         recyclerView.setAdapter(new Adapter(collections, callback));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        ServerReq.getJson(nickname != null ? ("/whois/" + nickname) : "/whoami", (JSONObject obj) -> {
+        Handler handler = new Handler(Looper.getMainLooper());
+        ServerReq.getJson(nickname != null ? ("/whois/" + nickname) : "/whoami", (JSONObject obj) -> handler.post(() -> {
             User user = new User(obj);
             collections.addAll(user.collections);
             container.removeAllViews();
             container.addView(recyclerView);
             callback.accept(user.collections.get(0), true);
-        });
+        }));
 
         return container;
     }
