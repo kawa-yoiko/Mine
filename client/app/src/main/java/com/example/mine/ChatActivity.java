@@ -47,6 +47,14 @@ public class ChatActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
+        View btn_back = findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChatActivity.this.finish();
+            }
+        });
+
         Handler handler = new Handler(Looper.getMainLooper());
         ServerReq.getJsonArray("/message/with/" + otherNickname + "?start=0&count=50", (JSONArray arr) -> handler.post(() -> {
             try {

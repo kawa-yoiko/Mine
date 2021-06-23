@@ -36,21 +36,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-//        Intent intent = getIntent();
-//
-//        if (intent.getStringExtra("isLogin") != null) {
-//            String str = intent.getStringExtra("isLogin");
-//            if(str.equals("true")) {
-//                // already login
-//                isLogin = 1;
-//            }
-//        }
-//        if(isLogin == 0) {
-//            //goto LoginActivity
-//            Intent intentNew = new Intent();
-//            intentNew.setClass(MainActivity.this, LoginActivity.class);
-//            MainActivity.this.startActivity(intentNew);
-//        }
+        Intent intent = getIntent();
+
+        if (intent.getStringExtra("isLogin") != null) {
+            String str = intent.getStringExtra("isLogin");
+            if(str.equals("true")) {
+                // already login
+                isLogin = 1;
+            }
+        }
+        if(isLogin == 0) {
+            //goto LoginActivity
+            Intent intentNew = new Intent();
+            intentNew.setClass(MainActivity.this, LoginActivity.class);
+            MainActivity.this.startActivity(intentNew);
+        }
 
 
 

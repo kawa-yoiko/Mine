@@ -14,12 +14,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="10dp"
             android:id="@+id/avatar_layout"
             >
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/luoxiaohei"
                 android:scaleType="centerCrop"
                 android:id="@+id/avatar"
@@ -28,16 +28,16 @@
                 tools:ignore="MissingConstraints"></ImageView>
             <View
                 android:id="@+id/test"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@drawable/imageview_corner"
                 app:layout_constraintCircle="@id/test1"
                 tools:ignore="MissingConstraints">
             </View>
             <View
                 android:id="@+id/test1"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@drawable/image_view_stroke"
                 app:layout_constraintCircle="@id/avatar"
                 tools:ignore="MissingConstraints">  </View>

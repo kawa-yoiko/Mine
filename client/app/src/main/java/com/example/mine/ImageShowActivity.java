@@ -48,17 +48,17 @@ public class ImageShowActivity extends AppCompatActivity {
         ViewGroup dotsBox = findViewById(R.id.dots_box);
         for(int i = 0; i < imageNum; i++) {
             ImageView dot = new ImageView(this.getBaseContext());
-            dot.setLayoutParams(new ViewGroup.LayoutParams(15, 15));
+            dot.setLayoutParams(new ViewGroup.LayoutParams(20, 20));
             dots[i] = dot;
             if(i == currentPage) {
-                dot.setBackgroundResource(R.drawable.background_whiteblue);
+                dot.setBackgroundResource(R.drawable.background_white);
             }
             else {
                 dot.setBackgroundResource(R.drawable.background_grey2);
             }
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(15, 15);
-            layoutParams.rightMargin = 8;
-            layoutParams.leftMargin = 8;
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(20, 20);
+            layoutParams.rightMargin = 12;
+            layoutParams.leftMargin = 12;
             dotsBox.addView(dot, layoutParams);
         }
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -74,7 +74,7 @@ public class ImageShowActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 dots[currentPage].setBackgroundResource(R.drawable.background_grey2);
                 currentPage = position;
-                dots[currentPage].setBackgroundResource(R.drawable.background_whiteblue);
+                dots[currentPage].setBackgroundResource(R.drawable.background_white);
 
             }
 

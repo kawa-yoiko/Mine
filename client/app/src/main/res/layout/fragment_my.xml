@@ -17,8 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
-
-            <androidx.cardview.widget.CardView
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_marginRight="5dp"
                 android:id="@+id/avatar_layout"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
@@ -26,15 +26,48 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
-
-                <view
-                    android:id="@+id/avatar"
-                    class="com.example.mine.WidthEqualsHeightImageView"
+            >
+                <ImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
+                    android:src="@drawable/luoxiaohei"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/luoxiaohei2" />
-            </androidx.cardview.widget.CardView>
+                    android:id="@+id/avatar"
+                    android:adjustViewBounds="true"
+                    app:layout_constraintCircle="@id/test"
+                    tools:ignore="MissingConstraints"></ImageView>
+                <View
+                    android:id="@+id/test"
+                    android:layout_width="80.5dp"
+                    android:layout_height="80.5dp"
+                    android:background="@drawable/imageview_corner1"
+                    app:layout_constraintCircle="@id/test1"
+                    tools:ignore="MissingConstraints">
+                </View>
+                <View
+                    android:id="@+id/test1"
+                    android:layout_width="80.5dp"
+                    android:layout_height="80.5dp"
+                    android:background="@drawable/imageview_stroke"
+                    app:layout_constraintCircle="@id/avatar"
+                    tools:ignore="MissingConstraints">  </View>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:id="@+id/avatar_layout"-->
+<!--                android:layout_width="80dp"-->
+<!--                android:layout_height="80dp"-->
+<!--                android:layout_marginLeft="20dp"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent">-->
+<!--                <view-->
+<!--                    android:id="@+id/avatar"-->
+<!--                    class="com.example.mine.WidthEqualsHeightImageView"-->
+<!--                    android:layout_width="80dp"-->
+<!--                    android:layout_height="80dp"-->
+<!--                    android:scaleType="centerCrop"-->
+<!--                    android:src="@drawable/luoxiaohei2" />-->
+<!--            </androidx.cardview.widget.CardView>-->
 
             <TextView
                 android:id="@+id/nickname"

@@ -196,6 +196,9 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="20"
             android:layout_marginHorizontal="6dp"
+            android:hint="hint"
+            android:paddingHorizontal="10dp"
+            android:textSize="15dp"
             android:background="@drawable/bt_background_grey"></EditText>
 
         <ImageView
