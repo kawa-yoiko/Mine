@@ -61,6 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="#猫猫 #狗粮 #摄影 #1234567891234"
+                    android:textColor="@color/grey_5"
                     android:textSize="16dp"></TextView>
             </HorizontalScrollView>
         </LinearLayout>
