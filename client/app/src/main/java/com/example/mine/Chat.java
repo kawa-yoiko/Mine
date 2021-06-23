@@ -6,11 +6,13 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class    Chat {
+    public int id;
     private String content;
     private String date;
     private int isUserOwn; // 0-- false 1-- true(is user own)
 
-    public Chat(String content, String date, int isUserOwn) {
+    public Chat(int id, String content, String date, int isUserOwn) {
+        this.id = id;
         this.content = content;
         this.date = date;
         this.isUserOwn = isUserOwn;
@@ -18,6 +20,7 @@ public class    Chat {
 
     public Chat(JSONObject obj) {
         try {
+            this.id = obj.getInt("id");
             this.content = obj.getString("contents");
             this.date = DateUtils.getRelativeTimeSpanString(obj.getLong("timestamp") * 1000).toString();
             this.isUserOwn = (obj.getBoolean("from_me") ? 1 : 0);
