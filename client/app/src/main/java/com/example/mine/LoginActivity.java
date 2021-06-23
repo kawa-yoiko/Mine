@@ -104,7 +104,9 @@ public class LoginActivity extends AppCompatActivity {
                             toast.show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("isLogin", "true");
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                             LoginActivity.this.startActivity(intent);
+                            LoginActivity.this.finish();
                         }
                     }));
             }

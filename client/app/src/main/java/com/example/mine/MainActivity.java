@@ -52,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
             //goto LoginActivity
             Intent intentNew = new Intent();
             intentNew.setClass(MainActivity.this, LoginActivity.class);
+            intentNew.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             MainActivity.this.startActivity(intentNew);
+            MainActivity.this.finish();
         }
 
 
