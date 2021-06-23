@@ -1,5 +1,6 @@
 package com.example.mine;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,10 +27,11 @@ public class ToggleReqButton {
 
     private final int iconNormal;
     private final int iconActive;
-    private final int iconPending;
+    private final int tint;
+    private final int grey = Color.parseColor("#888888");
 
     public ToggleReqButton(View button, ImageView icon, TextView text,
-                           int iconNormal, int iconActive, int iconPending,
+                           int iconNormal, int iconActive, int tint,
                            String url, String key) {
         handler = new Handler(Looper.getMainLooper());
         this.state = 0;
@@ -39,7 +41,7 @@ public class ToggleReqButton {
 
         this.iconNormal = iconNormal;
         this.iconActive = iconActive;
-        this.iconPending = iconPending;
+        this.tint = tint;
 
         button.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -70,8 +72,11 @@ public class ToggleReqButton {
         handler.post(() -> {
             button.setEnabled(state != -1);
             icon.setImageResource(
-                    state == -1 ? iconPending :
+                    state == -1 ? iconNormal :
                     state == 0 ? iconNormal : iconActive);
+            icon.setColorFilter(
+                    state == -1 ? tint :
+                    state == 0 ? grey : tint);
             if (number != -1) text.setText(String.valueOf(number));
         });
     }

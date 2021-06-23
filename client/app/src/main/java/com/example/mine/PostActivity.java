@@ -3,8 +3,6 @@ package com.example.mine;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -12,34 +10,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -90,16 +81,15 @@ public class PostActivity extends AppCompatActivity {
         ImageView flowerIcon = findViewById(R.id.flower_icon);
         ImageView commentButton = findViewById(R.id.comment_button);
         ImageView starIcon = findViewById(R.id.star_icon);
-        flowerIcon.setColorFilter(Color.parseColor("#FBBABA"));
         commentButton.setColorFilter(Color.parseColor("#A2E0FF"));
-        starIcon.setColorFilter(Color.parseColor("#F4DB35"));
 
         // Flower button
         ToggleReqButton toggleFlower = new ToggleReqButton(
                 findViewById(R.id.flower_button),
                 findViewById(R.id.flower_icon),
                 findViewById(R.id.flower_num),
-                R.drawable.flower_monochrome, R.drawable.flower, R.drawable.flower_monochrome,
+                R.drawable.flower_monochrome, R.drawable.flower,
+                Color.parseColor("#FBBABA"),
                 "/post/" + post.id + "/upvote",
                 "upvote");
         toggleFlower.setState(post.myUpvote ? 1 : 0, post.getFlower_num());
@@ -109,7 +99,8 @@ public class PostActivity extends AppCompatActivity {
                 findViewById(R.id.star_button),
                 findViewById(R.id.star_icon),
                 findViewById(R.id.star_num),
-                R.drawable.star_monochrome, R.drawable.star, R.drawable.star_monochrome,
+                R.drawable.star_monochrome, R.drawable.star,
+                Color.parseColor("#F4DB35"),
                 "/post/" + post.id + "/star",
                 "star");
         toggleStar.setState(post.myStar ? 1 : 0, post.getStar_num());
