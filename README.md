@@ -2,7 +2,9 @@
 
 原创作品网站平台
 
-设计文档 → https://codimd.starrah.cn/aoXg7pwRThasaQZ1p4Vd1Q
+[**演示视频**](https://github.com/kawa-yoiko/Mine/releases/download/demo-video/demo.mp4)
+
+设计文档 → https://codimd.starrah.cn/aoXg7pwRThasaQZ1p4Vd1Q  
 前后端接口 → https://codimd.starrah.cn/xu0f2xGAR6-snXnLnmKfSw
 
 ## 客户端程序编译
