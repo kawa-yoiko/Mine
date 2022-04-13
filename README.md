@@ -1,6 +1,6 @@
 # Mine
 
-原创作品网站平台
+原创作品网络平台，包括服务端与 Android 客户端（44100612《移动应用软件开发》课程项目）
 
 [**演示视频**](https://github.com/kawa-yoiko/Mine/releases/download/demo-video/demo.mp4)
 
